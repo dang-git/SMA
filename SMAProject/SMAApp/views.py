@@ -19,7 +19,11 @@ def get_keyword(request):
 			print('extracting')
 			df = extract.searchKeyWord(form.cleaned_data['keyword'])
 			data = engagements.return_engagements(df)
-			return render(request, 'diagnostics.html', {'users': data['users'], 'tweets': data['tweets'], 'engagements': data['engagements'], 'reach': data['reach']})    
+			return render(request, 'diagnostics.html',
+                 {'users': "{:,}".format(data['users']),
+                  'tweets': "{:,}".format(data['tweets']),
+                  'engagements': "{:,}".format(data['engagements']),
+                  'reach': "{:,}".format(data['reach'])})    
 	else:
 		form = SearchForm()
 	return render(request, 'search.html', {'form': form})
