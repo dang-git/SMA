@@ -17,8 +17,9 @@ def searchKeyWord(input):
     auth = OAuthHandler(consumer_key, consumer_secret)
     auth.set_access_token(access_token, access_secret)
     api = tweepy.API(auth, proxy=proxy)
+    keys = input.split(',')
     print(input)
-    key = '("' + '") OR ("'.join(input) + '")'
+    key = '("' + '") OR ("'.join(keys) + '")'
     lapse = 10
     start = time.time()
     run = True
