@@ -17,16 +17,27 @@ def get_keyword(request):
 		form = SearchForm(request.POST)
 		if form.is_valid():
 			print('extracting')
+			request.session['engagements_data'] = ""
 			df = extract.searchKeyWord(form.cleaned_data['keyword'])
 			data = engagements.return_engagements(df)
+			formattedData = formatData(data)
+			print(formattedData)
+			request.session['engagements_data'] = formattedData
 			return render(request, 'diagnostics.html',
-                 {'users': "{:,}".format(data['users']),
-                  'tweets': "{:,}".format(data['tweets']),
-                  'engagements': "{:,}".format(data['engagements']),
-                  'reach': "{:,}".format(data['reach'])})    
+                formattedData)    
 	else:
 		form = SearchForm()
 	return render(request, 'search.html', {'form': form})
 
-class diagnostics(TemplateView):
-    template_name = "diagnostics.html"
+def open_diagnostics(request):
+	formattedData = request.session['engagements_data']
+	print(formattedData)
+	return render(request, 'diagnostics.html',
+               formattedData)  
+    #template_name = "diagnostics.html"
+
+def formatData(data):
+ 	return	{'users': "{:,}".format(data['users']),
+                  'tweets': "{:,}".format(data['tweets']),
+                  'engagements': "{:,}".format(data['engagements']),
+                  'reach': "{:,}".format(data['reach'])}
