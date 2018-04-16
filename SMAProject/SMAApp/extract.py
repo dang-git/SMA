@@ -20,7 +20,7 @@ def searchKeyWord(input):
     keys = input.split(',')
     print(input)
     key = '("' + '") OR ("'.join(keys) + '")'
-    lapse = 10
+    lapse = 1
     start = time.time()
     run = True
     df = pd.DataFrame()
@@ -86,3 +86,4 @@ def searchKeyWord(input):
         df = pd.DataFrame(rows_list)
         df["dateextracted"] = date_extracted
         df["keywords"] = ",".join(input)
+        return df
