@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import pandas as pd
-import time
+from datetime import datetime
 
 def return_engagements(df):
     # tweet count, user count, engagements
@@ -19,7 +19,7 @@ def return_timeline(df):
     tl['datehour'] = [i.replace(microsecond=0,second=0) for i in tl.dateofposting]
     tl = tl.groupby(['datehour'], as_index=False).count().reset_index()
     del tl['index']
-    tl["int"] = [time.mktime(t.timetuple()) for t in tl.datehour]
+    tl["int"] = [1000*(t.replace(tzinfo=None)-datetime(1970,1,1)).total_seconds() for t in tl.datehour]
     chartdata = {'x': tl["int"],
         'name': 'Volume', 'y1': tl['dateofposting'], 'kwargs1': { 'color': '#a4c639' }
     }
