@@ -21,11 +21,12 @@
 					{% csrf_token %}
 					{{form}}
 					<button type="submit" id="searchButton">Search</button>
-					<br/>
-					  <input type="radio" name="gender" value="fb" checked> FB<br>
-					  <input type="radio" name="gender" value="twitter"> Twitter<br>
-					  <input type="radio" name="gender" value="glassdoor"> Glassdoor  
 				</form>
+			</div>
+			<div id="radio">
+				<input type="radio" value="fb" checked> FB<br>
+				<input type="radio" value="twitter"> Twitter<br>
+				<input type="radio" value="glassdoor"> Glassdoor
 			</div>
 		</div>
 		<div class="navbar">

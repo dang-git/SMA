@@ -7,6 +7,7 @@ from django.http import HttpResponseRedirect
 from .forms import SearchForm
 from SMAApp import extract, engagements
 from django.template.response import TemplateResponse
+import pandas as pd
 # Create your views here.
 
 def home(request):
@@ -18,20 +19,24 @@ def get_keyword(request):
 		if form.is_valid():
 			print('extracting')
 			request.session['engagements_data'] = ""
-			df = extract.searchKeyWord(form.cleaned_data['keyword'])
+			#df = extract.searchKeyWord(form.cleaned_data['keyword'])
+			df = pd.read_pickle("file.pkl")
 			data = engagements.return_engagements(df)
 			formattedData = formatData(data)
-			print(formattedData)
-			request.session['engagements_data'] = formattedData
+			all_data = {}
+			all_data["engagements"] = formattedData
+			request.session['engagements_data'] = {"engagements": all_data['engagements']}
+			print(request.session['engagements_data'])
+			timeline = engagements.return_timeline(df)
+			all_data["timeline"] = demo_linechart(request, timeline)
 			return render(request, 'diagnostics.html',
-                formattedData)    
+                all_data['timeline'])
 	else:
 		form = SearchForm()
 	return render(request, 'search.html', {'form': form})
 
 def open_diagnostics(request):
 	formattedData = request.session['engagements_data']
-	print(formattedData)
 	return render(request, 'diagnostics.html',
                formattedData)  
     #template_name = "diagnostics.html"
@@ -41,3 +46,22 @@ def formatData(data):
                   'tweets': "{:,}".format(data['tweets']),
                   'engagements': "{:,}".format(data['engagements']),
                   'reach': "{:,}".format(data['reach'])}
+     
+def demo_linechart(request, chartdata):
+    """
+    lineChart page
+    """
+    charttype = "lineChart"
+    chartcontainer = 'linechart_container'  # container name
+    data = {
+        'charttype': charttype,
+        'chartdata': chartdata,
+        'chartcontainer': chartcontainer,
+        'extra': {
+            'x_is_date': True,
+            'x_axis_format': '%d %b %Y %H',
+            'tag_script_js': True,
+            'jquery_on_ready': False,
+        }
+    }
+    return data

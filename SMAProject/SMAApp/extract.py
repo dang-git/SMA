@@ -85,5 +85,5 @@ def searchKeyWord(input):
             run = False
         df = pd.DataFrame(rows_list)
         df["dateextracted"] = date_extracted
-        df["keywords"] = ",".join(input)
+        df["keywords"] = input
         return df

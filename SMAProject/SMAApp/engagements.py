@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+import pandas as pd
 
 def return_engagements(df):
     # tweet count, user count, engagements
@@ -11,3 +11,15 @@ def return_engagements(df):
     rh = dfu['flcount'].sum() + dfu.username.nunique()
     desc_js['reach'] = int(rh)
     return desc_js
+
+def return_timeline(df):
+    # timeline
+    tl = pd.DataFrame(df.dateofposting)
+    tl['datehour'] = [i.replace(microsecond=0,second=0) for i in tl.dateofposting]
+    tl = tl.groupby(['datehour'], as_index=False).count().reset_index()
+    del tl['index']
+    tl["int"] = [t.timetuple() for t in tl.datehour]
+    chartdata = {'x': tl["int"],
+        'name': 'Volume', 'y1': tl['dateofposting'], 'kwargs1': { 'color': '#a4c639' }
+    }
+    return chartdata
