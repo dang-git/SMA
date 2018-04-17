@@ -136,7 +136,8 @@ STATIC_URL = '/static/'
 # Specifie path to components root (you need to use absolute path)
 BOWER_COMPONENTS_ROOT = os.path.join(APPLICATION_DIR, 'components')
 
-BOWER_PATH = '/usr/local/bin/bower'
+#BOWER_PATH = '/usr/local/bin/bower'
+BOWER_PATH = "bower.cmd"
 
 BOWER_INSTALLED_APPS = (
     'd3#3.3.13',
