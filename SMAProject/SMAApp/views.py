@@ -30,7 +30,7 @@ def get_keyword(request):
 			timeline = engagements.return_timeline(df)
 			all_data["timeline"] = demo_linechart(request, timeline)
 			return render(request, 'diagnostics.html',
-                all_data['timeline'])
+                all_data)
 	else:
 		form = SearchForm()
 	return render(request, 'search.html', {'form': form})
