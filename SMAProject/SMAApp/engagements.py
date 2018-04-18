@@ -21,7 +21,7 @@ def return_timeline(df):
     del tl['index']
     tl["int"] = [1000*(t.replace(tzinfo=None)-datetime(1970,1,1)).total_seconds() for t in tl.datehour]
     chartdata = {'x': tl["int"],
-        'name': 'Volume', 'y1': tl['dateofposting'], 'kwargs1': { 'color': '#a4c639' }
+        'name': 'Volume', 'y1': tl['dateofposting'], 'kwargs1': { 'color': '#ef6c00' }
     }
     return chartdata
 
@@ -42,6 +42,7 @@ def return_geocode(df):
     data = {}
     for i in df.coordinates:
         if i != None:
-            print(i)
             data[len(data)] = {"lat": i[0], "long": i[1]}
     return data
+
+#def 

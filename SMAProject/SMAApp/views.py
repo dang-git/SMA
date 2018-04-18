@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.shortcuts import render, render_to_response
+from django.shortcuts import render
 from django.views.generic import TemplateView
 from django.http import HttpResponseRedirect
 from .forms import SearchForm
 from SMAApp import extract, engagements
-from django.template.response import TemplateResponse
 import pandas as pd
 # Create your views here.
 
@@ -45,7 +44,7 @@ def formatData(data):
                   'tweets': "{:,}".format(data['tweets']),
                   'engagements': "{:,}".format(data['engagements']),
                   'reach': "{:,}".format(data['reach'])}
-     
+
 def demo_linechart(request, chartdata):
     """
     lineChart page
