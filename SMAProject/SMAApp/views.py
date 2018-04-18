@@ -39,6 +39,18 @@ def open_diagnostics(request):
                formattedData)  
     #template_name = "diagnostics.html"
 
+def open_influencers(request):
+    return render(request, 'influencers.html')  
+
+def open_influentialposts(request):
+	return render(request, 'influentialposts.html')  
+
+def open_sentiments(request):
+	return render(request, 'sentiments.html')
+
+def open_topics(request):
+	return render(request, 'topics.html')
+
 def formatData(data):
  	return	{'users': "{:,}".format(data['users']),
                   'tweets': "{:,}".format(data['tweets']),
