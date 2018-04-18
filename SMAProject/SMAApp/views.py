@@ -58,7 +58,7 @@ def demo_linechart(request, chartdata):
         'chartcontainer': chartcontainer,
         'extra': {
             'x_is_date': True,
-            'x_axis_format': '%d %b %Y %H',
+            'x_axis_format': '%b-%d %H:%m',
             'tag_script_js': True,
             'jquery_on_ready': False,
         }
