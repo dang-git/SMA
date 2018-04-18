@@ -5,47 +5,60 @@ body {
 	margin: 0;
 }
 
+@font-face {
+    font-family: 'Raleway';
+    src: url('Raleway-Regular.ttf');
+}
+
+@font-face {
+    font-family: 'Raleway-Bold';
+    src: url('Raleway-Bold.ttf');
+}
+
 #fly {
-	margin-top: 30px;
-	margin-left: 20px;
+	margin-top: 2vw;
+	margin-left: 1.5vw;
+	height: 4vw;
 }
 
 
 #twt {
 	color: #ffe0b2;
-	font: 44px 'Raleway';
+	font-size: 3.5vw;
+	font-family: 'Raleway-Bold';
 	font-weight: bolder;
 }
 
 #hs{
 	color: #ff9800;
-	font: 44px 'Raleway';
+	font-size: 3.5vw;
+	font-family: 'Raleway-Bold';
 	font-weight: bolder;
 }
 
 #sub {
 	color: #ffffff;
-	font: 20px 'Raleway';
-	margin: 15px;
+	font: 1.3vw 'Raleway';
+	margin: 1.2vw;
 }
 
 /* Form wrapper styling */
 .form-wrapper {
-    width: 630px;
+    width: 46.15vw;
     border: 1;
 	text-align: center;
-    margin: 200px auto 50px auto;
+    margin: 13vw auto 2vw auto;
     /*background: #999999;*/
 }
 
 /* Form text input */
 .form-wrapper input {
-    width: 480px;
-    height: 23px;
-	margin-top: 8px;
-    padding: 10px 5px;
+    width: 35.15vw;
+    height: 1.5vw;
+	margin-top: .6vw;
+    padding: .8vw .36vw;
     float: left;   
-    font: 18px 'Raleway';
+    font: 1vw 'Raleway';
     border: 0;
     background: #eee;     
 }
@@ -53,41 +66,41 @@ body {
 .form-wrapper input:focus {
     outline: 0;
     background: #fff;
-    box-shadow: 0 0 2px rgba(0,0,0,.8) inset;
+    box-shadow: 0 0 .5vw rgba(0,0,0,.8) inset;
 }
 
 .form-wrapper input::-webkit-input-placeholder {
    color: #999;
-   font-size: 12px;
+   font-size: 1vw;
    font-weight: normal;
    font-style: italic;
 }
 
 .form-wrapper input:-moz-placeholder {
-    color: #999;
-	font-size: 12px;
-    font-weight: normal;
-    font-style: italic;
+   color: #999;
+   font-size: 1vw;
+   font-weight: normal;
+   font-style: italic;
 }
 
 .form-wrapper input:-ms-input-placeholder {
-    color: #999;
-	font-size: 12px;
-    font-weight: normal;
-    font-style: italic;
+   color: #999;
+   font-size: 1vw;
+   font-weight: normal;
+   font-style: italic;
 }   
 
 /* Form submit button */
 .form-wrapper button {
-	margin-top: 8px;
+	margin-top: .6vw;
     overflow: visible;
     position: relative;
 	border: 0;
     float: right;
     cursor: pointer;
-    height: 43px;
-    width: 140px;
-    font: 16px 'Raleway';
+    height: 3.13vw;
+    width: 10.25vw;
+    font: 1.3vw 'Raleway';
 	font-weight: normal;
     color: #ffffff;
     background: #ef6c00;   
@@ -132,9 +145,9 @@ body {
     float: left;
     display: block;
     color: #ffffff;
-    padding: 25px 16px;
+    padding: 1.5vw 1vw;
     text-decoration: none;
-    font: 13px 'Raleway';
+    font: 1vw 'Raleway';
 	text-align: right;
 	height: 100%;
 }
@@ -142,9 +155,9 @@ body {
 .navbar a.pw {
 	background-color: #ffffff;
 	color: #01579b;
-	font: 13px 'Raleway';
+	font: 1vw 'Raleway';
 	font-weight: bold;
-	width: 120px;
+	width: 10vw;
 }
 
 .navbar a.pw:hover {
@@ -155,4 +168,3 @@ body {
 	background-color: #ff9800;
 	color: #ffffff;
 }
-
