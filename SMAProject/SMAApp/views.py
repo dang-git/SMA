@@ -25,7 +25,7 @@ def get_keyword(request):
 			formattedData = formatData(data)
 			all_data = {}
 			all_data["engagements"] = formattedData
-			request.session['engagements_data'] = {"engagements": all_data['engagements']}
+			request.session['engagements_data'] = all_data
 			timeline = engagements.return_timeline(df)
 			all_data["timeline"] = demo_linechart(request, timeline)
 			return render(request, 'diagnostics.html',
@@ -58,7 +58,7 @@ def demo_linechart(request, chartdata):
         'chartcontainer': chartcontainer,
         'extra': {
             'x_is_date': True,
-            'x_axis_format': '%b-%d %H:%m',
+            'x_axis_format': '%d %b %Y %H',
             'tag_script_js': True,
             'jquery_on_ready': False,
         }

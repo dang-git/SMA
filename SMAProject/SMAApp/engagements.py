@@ -24,3 +24,24 @@ def return_timeline(df):
         'name': 'Volume', 'y1': tl['dateofposting'], 'kwargs1': { 'color': '#a4c639' }
     }
     return chartdata
+
+def return_composition(df):
+    data = dict(df.type.value_counts())
+    return data
+
+def return_source(df):
+    src = dict(df.source.value_counts())
+    src_ = {}
+    src_["Web Client"]  = src["Twitter Web Client"]
+    src_["Android"]  = src["Twitter for Android"]
+    src_["iPhone"]  = src["Twitter for iPhone"]
+    src_["Others"]  = sum(src.values()) - src_["Web Client"] - src_["Android"] - src_["iPhone"]
+    return src_
+
+def return_geocode(df):
+    data = {}
+    for i in df.coordinates:
+        if i != None:
+            print(i)
+            data[len(data)] = {"lat": i[0], "long": i[1]}
+    return data
