@@ -17,13 +17,12 @@ body {
 	background-image: url("bg2.png");
 	position: fixed;
 	top: 0px;
-	width: 100%
+	width: 100%;
 }
 
 #fly {
 	margin-top: 2vw;
 	margin-left: 1.5vw;
-	height: 4vw;
 }
 
 .sidenav {
@@ -35,7 +34,7 @@ body {
     left: 0;
     background-color: #454545;
     overflow-x: hidden; /* Disable horizontal scroll */
-    padding-top: 1vw;
+    padding-top: 0vw;
 }
 
 .sidenav a {
@@ -73,8 +72,8 @@ body {
 }
 
 #postsLabel, #usersLabel, #audienceLabel, #engagementsLabel {
-	font-size: 12px;
-	margin-top: 2px;
+	font-size: 1vw;
+	margin-top: 1vw;
 	color: #666666;
 	font-family: "Helvetica";
 }
