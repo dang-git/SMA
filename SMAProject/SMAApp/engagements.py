@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 import pandas as pd
 from datetime import datetime
 
@@ -96,4 +97,27 @@ def return_infl_posts(df):
            "3rd": {"name": df['name'][2], "username": "@%s" % df['username'][2], "profileimage": df['profileimage'][2], "favorites": df['fvcount'][2], "retweets": df['rtcount'][2], "tweet": df["tweet"][2]},
            "4th": {"name": df['name'][3], "username": "@%s" % df['username'][3], "profileimage": df['profileimage'][3], "favorites": df['fvcount'][3], "retweets": df['rtcount'][3], "tweet": df["tweet"][3]},
            "5th": {"name": df['name'][4], "username": "@%s" % df['username'][4], "profileimage": df['profileimage'][4], "favorites": df['fvcount'][4], "retweets": df['rtcount'][4], "tweet": df["tweet"][4]}}
+    return data
+
+
+
+"""::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+FOR TOPICS TAB DATA
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::"""
+
+# wordcloud
+# topic clustering
+
+
+
+
+"""::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+FOR POLARITY TAB DATA
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::"""
+
+from SMAApp import polarize
+
+def return_polarity(df):
+    df['polarity'] = [polarize.polarity(i) for i in df.tweet]
+    data = dict(df.polarity.value_counts())
     return data
