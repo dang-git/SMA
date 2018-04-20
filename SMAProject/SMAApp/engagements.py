@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
+
 import pandas as pd
 from datetime import datetime
 
 
 """::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-DIAGNOSTICS TAB DATA
+FOR DIAGNOSTICS TAB DATA
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::"""
 
 def return_engagements(df):
@@ -57,18 +58,66 @@ def return_geocode(df):
 FOR INFLUENCERS TAB DATA
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::"""
 
-def return_influencers(df):
-    cols = ["username", "tweet", "rtcount", "fvcount", "type"]
+# set value for filter_ to engagements and flcount only
+def return_influencers(df, filter_):
+    cols = ["name", "username", "rtcount", "fvcount", "type", "profileimage", "flcount"]
     df = df[cols].reset_index()
     del df['index']
     df = df[df['type'] != 'retweet']
-    print(df.head())
-    df = df.groupby(['username', 'tweet'], sort=False)['rtcount', 'fvcount'].max().reset_index()
-    df = df.sort_values('rtcount', ascending=False).head(10).reset_index()
+    postcount = df.groupby(['username']).count().reset_index()[['username', 'profileimage']]
+    postcount.columns = ['username', 'postcount']
+    df = df.groupby(['name', 'username', 'flcount', 'profileimage'], sort=False)['rtcount', 'fvcount'].sum().reset_index()
+    df = pd.merge(df, postcount, how='left', on=['username'])
+    df['engagements'] = df['rtcount'] + df['fvcount']
+    df = df.sort_values(filter_, ascending=False).head(10).reset_index()
+    data = {"1st": {"name": df['name'][0], "username": "@%s" % df['username'][0], "profileimage": df['profileimage'][0], "post": df['postcount'][0], "favorites": df['fvcount'][0], "retweets": df['rtcount'][0], "followers": df['flcount'][0]},
+               "2nd": {"name": df['name'][1], "username": "@%s" % df['username'][1], "profileimage": df['profileimage'][1], "post": df['postcount'][1], "favorites": df['fvcount'][1], "retweets": df['rtcount'][1], "followers": df['flcount'][1]},
+               "3rd": {"name": df['name'][2], "username": "@%s" % df['username'][2], "profileimage": df['profileimage'][2], "post": df['postcount'][2], "favorites": df['fvcount'][2], "retweets": df['rtcount'][2], "followers": df['flcount'][2]},
+               "4th": {"name": df['name'][3], "username": "@%s" % df['username'][3], "profileimage": df['profileimage'][3], "post": df['postcount'][3], "favorites": df['fvcount'][3], "retweets": df['rtcount'][3], "followers": df['flcount'][3]},
+               "5th": {"name": df['name'][4], "username": "@%s" % df['username'][4], "profileimage": df['profileimage'][4], "post": df['postcount'][4], "favorites": df['fvcount'][4], "retweets": df['rtcount'][4], "followers": df['flcount'][4]}}
+    return data
+
+
+
+"""::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+FOR INFLUENTIAL POSTS TAB DATA
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::"""
+
+def return_infl_posts(df):
+    cols = ["name", "username", "profileimage", "flcount", "tweet", "rtcount", "fvcount", "type"]
+    df = df[cols].reset_index()
     del df['index']
-    data = {"1st": {"username": "@%s" % df['username'][0], "favorites": df['fvcount'][0], "retweets": df['rtcount'][0], "tweet": df["tweet"][0]},
-               "2nd": {"username": "@%s" % df['username'][1], "favorites": df['fvcount'][1], "retweets": df['rtcount'][1], "tweet": df["tweet"][1]},
-               "3rd": {"username": "@%s" % df['username'][2], "favorites": df['fvcount'][2], "retweets": df['rtcount'][2], "tweet": df["tweet"][2]},
-               "4th": {"username": "@%s" % df['username'][3], "favorites": df['fvcount'][3], "retweets": df['rtcount'][3], "tweet": df["tweet"][3]},
-               "5th": {"username": "@%s" % df['username'][4], "favorites": df['fvcount'][4], "retweets": df['rtcount'][4], "tweet": df["tweet"][4]}}
+    df = df[df['type'] != 'retweet']
+    df = df.groupby(['name', 'username', 'profileimage', 'tweet'], sort=False)['rtcount', 'fvcount', 'flcount'].max().reset_index()
+    df['engagements'] = df['rtcount'] + df['fvcount']
+    df = df.sort_values('engagements', ascending=False).head(10).reset_index()
+    del df['index']
+    data = {"1st": {"name": df['name'][0], "username": "@%s" % df['username'][0], "profileimage": df['profileimage'][0], "favorites": df['fvcount'][0], "retweets": df['rtcount'][0], "tweet": df["tweet"][0]},
+           "2nd": {"name": df['name'][1], "username": "@%s" % df['username'][1], "profileimage": df['profileimage'][1], "favorites": df['fvcount'][1], "retweets": df['rtcount'][1], "tweet": df["tweet"][1]},
+           "3rd": {"name": df['name'][2], "username": "@%s" % df['username'][2], "profileimage": df['profileimage'][2], "favorites": df['fvcount'][2], "retweets": df['rtcount'][2], "tweet": df["tweet"][2]},
+           "4th": {"name": df['name'][3], "username": "@%s" % df['username'][3], "profileimage": df['profileimage'][3], "favorites": df['fvcount'][3], "retweets": df['rtcount'][3], "tweet": df["tweet"][3]},
+           "5th": {"name": df['name'][4], "username": "@%s" % df['username'][4], "profileimage": df['profileimage'][4], "favorites": df['fvcount'][4], "retweets": df['rtcount'][4], "tweet": df["tweet"][4]}}
+    return data
+
+
+
+"""::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+FOR TOPICS TAB DATA
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::"""
+
+# wordcloud
+# topic clustering
+
+
+
+
+"""::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+FOR POLARITY TAB DATA
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::"""
+
+from SMAApp import polarize
+
+def return_polarity(df):
+    df['polarity'] = [polarize.polarity(i) for i in df.tweet]
+    data = dict(df.polarity.value_counts())
     return data
