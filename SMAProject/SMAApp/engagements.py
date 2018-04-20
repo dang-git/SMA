@@ -48,7 +48,7 @@ def return_geocode(df):
     data = {}
     for i in df.coordinates:
         if i != None:
-            data[len(data)] = {"lat": i[0], "long": i[1]}
+            data[len(data)] = {"lat": i[1], "long": i[0]}
     return data
 
 
