@@ -2,12 +2,10 @@ $(document).ready(function () {
 $.ajax({
     url: '/ajax/get_geocodes/',
     success: function (data) {
-    alert("inside");
     //var obj = JSON.parse(data);
     initMap(data);
     }
 });
-
 });
 
 function initMap(coordinates) {
