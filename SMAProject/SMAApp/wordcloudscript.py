@@ -93,5 +93,5 @@ def return_wordcloud(data):
         wc = WordCloud(background_color = '#ffffff', max_words = 300, mask = hcmask, stopwords = stops)
         wc.generate(message)
         wc.recolor(color_func = image_colors)
-        #save wordcloud
-        #wc.to_file("wordcloud.png")
+        # saves wordcloud as png files
+        wc.to_file("wordcloud.png")
