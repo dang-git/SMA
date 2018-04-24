@@ -46,7 +46,11 @@ def open_diagnostics(request):
     #template_name = "diagnostics.html"
 
 def open_influencers(request):
-    return render(request, 'influencers.html')  
+	data = {}
+	data = engagements.return_engagements(request.session["df"])
+	data['engData'] = engagements.return_influencers(request.session["df"],'engagements')
+	data['folData'] = engagements.return_influencers(request.session["df"],'flcount')
+	return render(request, 'influencers.html', {'engData':data['engData'],'folData':data['folData'] })  
 
 def open_influentialposts(request):
 	return render(request, 'influentialposts.html')  
