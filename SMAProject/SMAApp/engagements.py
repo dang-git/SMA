@@ -112,7 +112,7 @@ FOR TOPICS TAB DATA
 
 # topic clustering
 # will use hierarchical document clustering
-# check topics.py
+# check lda.py
 
 
 
