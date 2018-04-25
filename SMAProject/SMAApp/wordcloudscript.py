@@ -82,16 +82,16 @@ def return_wordcloud(data):
             words[i] = "nakaw"
         if words[i] in ['fufund', 'fund', 'funds']: 
             words[i] = "fund"
-        message = ''
-        for i in range(0, len(words)):
-            message = message + ' ' + words[i]
-        #wordcloud background picture
-        img = Image.open('bg.png')
-        img = img.resize((900,550), Image.ANTIALIAS)
-        hcmask = np.array(img)
-        image_colors = ImageColorGenerator(hcmask)
-        wc = WordCloud(background_color = '#ffffff', max_words = 300, mask = hcmask, stopwords = stops)
-        wc.generate(message)
-        wc.recolor(color_func = image_colors)
-        # saves wordcloud as png files
-        wc.to_file("wordcloud.png")
+    message = ''
+    for i in range(0, len(words)):
+        message = message + ' ' + words[i]
+    #wordcloud background picture
+    img = Image.open('bg2.jpg')
+    img = img.resize((900,550), Image.ANTIALIAS)
+    hcmask = np.array(img)
+    image_colors = ImageColorGenerator(hcmask)
+    wc = WordCloud(background_color = '#ffffff', max_words = 300, mask = hcmask, stopwords = stops)
+    wc.generate(message)
+    wc.recolor(color_func = image_colors)
+    # saves wordcloud as png files
+    wc.to_file("wordcloud.png")
