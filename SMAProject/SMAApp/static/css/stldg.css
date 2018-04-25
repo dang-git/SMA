@@ -84,3 +84,16 @@ body {
 	color: #01579b;
 	margin-left: 2vw;
 }
+
+#map {
+	width: 100%;
+	height: 400px;
+}
+
+div.engagements {
+	float: right;
+}
+
+div.followers {
+	float: left;
+}

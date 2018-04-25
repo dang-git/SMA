@@ -3,10 +3,11 @@ from __future__ import unicode_literals
 
 from django.shortcuts import render
 from django.views.generic import TemplateView
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse
 from .forms import SearchForm
 from SMAApp import extract, engagements
 import pandas as pd
+import json
 # Create your views here.
 
 def home(request):
@@ -27,11 +28,16 @@ def get_keyword(request):
 			request.session['engagements_data'] = all_data
 			timeline = engagements.return_timeline(df)
 			all_data["timeline"] = demo_linechart(request, timeline)
+			request.session["df"] = df
 			return render(request, 'diagnostics.html',
                 all_data)
 	else:
 		form = SearchForm()
 	return render(request, 'search.html', {'form': form})
+
+def return_geocode(request):
+	geoCodes = engagements.return_geocode(request.session["df"])
+	return JsonResponse(geoCodes)  
 
 def open_diagnostics(request):
 	formattedData = request.session['engagements_data']
@@ -40,7 +46,11 @@ def open_diagnostics(request):
     #template_name = "diagnostics.html"
 
 def open_influencers(request):
-    return render(request, 'influencers.html')  
+	data = {}
+	data = engagements.return_engagements(request.session["df"])
+	data['engData'] = engagements.return_influencers(request.session["df"],'engagements')
+	data['folData'] = engagements.return_influencers(request.session["df"],'flcount')
+	return render(request, 'influencers.html', {'engData':data['engData'],'folData':data['folData'] })  
 
 def open_influentialposts(request):
 	return render(request, 'influentialposts.html')  

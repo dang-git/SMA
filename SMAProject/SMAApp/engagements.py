@@ -49,7 +49,7 @@ def return_geocode(df):
     data = {}
     for i in df.coordinates:
         if i != None:
-            data[len(data)] = {"lat": i[0], "long": i[1]}
+            data[len(data)] = {"lat": i[1], "long": i[0]}
     return data
 
 
@@ -70,11 +70,14 @@ def return_influencers(df, filter_):
     df = pd.merge(df, postcount, how='left', on=['username'])
     df['engagements'] = df['rtcount'] + df['fvcount']
     df = df.sort_values(filter_, ascending=False).head(10).reset_index()
-    data = {"1st": {"name": df['name'][0], "username": "@%s" % df['username'][0], "profileimage": df['profileimage'][0], "post": df['postcount'][0], "favorites": df['fvcount'][0], "retweets": df['rtcount'][0], "followers": df['flcount'][0]},
-               "2nd": {"name": df['name'][1], "username": "@%s" % df['username'][1], "profileimage": df['profileimage'][1], "post": df['postcount'][1], "favorites": df['fvcount'][1], "retweets": df['rtcount'][1], "followers": df['flcount'][1]},
-               "3rd": {"name": df['name'][2], "username": "@%s" % df['username'][2], "profileimage": df['profileimage'][2], "post": df['postcount'][2], "favorites": df['fvcount'][2], "retweets": df['rtcount'][2], "followers": df['flcount'][2]},
-               "4th": {"name": df['name'][3], "username": "@%s" % df['username'][3], "profileimage": df['profileimage'][3], "post": df['postcount'][3], "favorites": df['fvcount'][3], "retweets": df['rtcount'][3], "followers": df['flcount'][3]},
-               "5th": {"name": df['name'][4], "username": "@%s" % df['username'][4], "profileimage": df['profileimage'][4], "post": df['postcount'][4], "favorites": df['fvcount'][4], "retweets": df['rtcount'][4], "followers": df['flcount'][4]}}
+    data = {}
+    for i in range(5):
+        data[i] = {"name": df['name'][i], "username": "@%s" % df['username'][i], "profileimage": df['profileimage'][i].replace('_normal',''), "post": df['postcount'][i], "favorites": df['fvcount'][i], "retweets": df['rtcount'][i], "followers": df['flcount'][i]}
+    # data = {"1st": {"name": df['name'][0], "username": "@%s" % df['username'][0], "profileimage": df['profileimage'][0], "post": df['postcount'][0], "favorites": df['fvcount'][0], "retweets": df['rtcount'][0], "followers": df['flcount'][0]},
+    #            "2nd": {"name": df['name'][1], "username": "@%s" % df['username'][1], "profileimage": df['profileimage'][1], "post": df['postcount'][1], "favorites": df['fvcount'][1], "retweets": df['rtcount'][1], "followers": df['flcount'][1]},
+    #            "3rd": {"name": df['name'][2], "username": "@%s" % df['username'][2], "profileimage": df['profileimage'][2], "post": df['postcount'][2], "favorites": df['fvcount'][2], "retweets": df['rtcount'][2], "followers": df['flcount'][2]},
+    #            "4th": {"name": df['name'][3], "username": "@%s" % df['username'][3], "profileimage": df['profileimage'][3], "post": df['postcount'][3], "favorites": df['fvcount'][3], "retweets": df['rtcount'][3], "followers": df['flcount'][3]},
+    #            "5th": {"name": df['name'][4], "username": "@%s" % df['username'][4], "profileimage": df['profileimage'][4], "post": df['postcount'][4], "favorites": df['fvcount'][4], "retweets": df['rtcount'][4], "followers": df['flcount'][4]}}
     return data
 
 

@@ -1,21 +1,20 @@
+{% load staticfiles %}
 <!DOCTYPE html>
 <html>
+		<title>TWITTER SEARCH</title>
 <head>
-    <title>TWITTER SEARCH</title>
+	<link href="{% static 'css/stldg.css' %}" rel='stylesheet' type='text/css'>
 </head>
 <body>
 	<div class="sidenav">
-		<a href="/diagnostics/" class="tab">DIAGNOSTICS</a>
-		<a href="/influencers/" class="tab">INFLUENCERS</a>
-        <a href="/influentialposts/" class="tab">INFLUENTIAL POSTS</a>
-        <a href="/topics/" class="tab">TOPICS</a>
-		<a id="d1" href="/sentiments/" class="tab active">SENTIMENTS</a>
+			<a href="{% url 'diagnostics' %}" class="tab">DIAGNOSTICS</a>
+			<a href="{% url 'influencers' %}" class="tab">INFLUENCERS</a>
+			<a href="{% url 'influentialposts' %}" class="tab">INFLUENTIAL POSTS</a>
+			<a href="{% url 'topics' %}" class="tab">TOPICS</a>
+			<a href="{% url 'sentiments' %}" class="tab active">SENTIMENTS</a>
 	</div>
 	<div class="main">
 
 	</div>
-	<script src="onmain.js" type='text/javascript'></script>
-	<link href='stlinfl.css' rel='stylesheet' type='text/css'>
-	<style type="text/css"></style>
 </body>
 </html>
