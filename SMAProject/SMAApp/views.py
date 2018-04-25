@@ -56,7 +56,10 @@ def open_influentialposts(request):
 	return render(request, 'influentialposts.html')  
 
 def open_sentiments(request):
-	return render(request, 'sentiments.html')
+    chartdata = engagements.return_polarity(request.session["df"])
+    data = {}
+    data['polar'] = demo_donutchart(chartdata)
+    return render(request, 'sentiments.html', data)
 
 def open_topics(request):
 	return render(request, 'topics.html')
@@ -82,6 +85,30 @@ def demo_linechart(request, chartdata):
             'x_axis_format': '%b-%d %H:%m',
             'tag_script_js': True,
             'jquery_on_ready': False,
+        }
+    }
+    return data
+
+def demo_donutchart(chartdata):
+    """
+    pieChart page
+    """
+    charttype = "pieChart"
+    chartcontainer = 'piechart_container'  # container name
+    data = {
+        'charttype': charttype,
+        'chartdata': chartdata,
+        'chartcontainer': chartcontainer,
+        'extra': {
+            'x_is_date': False,
+            'x_axis_format': '',
+            'tag_script_js': True,
+            'jquery_on_ready': False,
+			'donut':True,
+            'donutRatio':0.5,
+            'chart_attr':{
+                'labelType':'\"percent\"',
+            }
         }
     }
     return data
