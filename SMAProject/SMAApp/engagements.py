@@ -105,9 +105,11 @@ def return_infl_posts(df):
 FOR TOPICS TAB DATA
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::"""
 
-# wordcloud
-# topic clustering
+# for wordcloud, check wordcloudscript.py
 
+# topic clustering
+# will use hierarchical document clustering
+# check topics.py
 
 
 
