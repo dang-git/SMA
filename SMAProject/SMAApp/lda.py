@@ -10,7 +10,7 @@ from gensim import corpora, models
 import re
 from nltk.stem.snowball import SnowballStemmer
 stemmer = SnowballStemmer("english")
-import numpy as np
+import pyLDAvis
 
 stopwords = nltk.corpus.stopwords.words('english')
 stopwords.extend(["rt", "n't", "'s", "ve", "amp"])
@@ -60,4 +60,6 @@ def lda_model(corpus, dictionary):
         for j in i[1]:
             topic.append(j[0])
         all_topics[len(all_topics)+1] = ", ".join(topic)
+    p = pyLDAvis.gensim.prepare(lda, corpus, dictionary)
+    pyLDAvis.save_html(p, 'lda.html')
     return all_topics
