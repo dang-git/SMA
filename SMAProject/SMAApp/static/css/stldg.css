@@ -100,3 +100,11 @@ div.followers {
 svg.nvd3-svg{
 	margin: 0px;
 }
+
+div.polarity{
+	float: right;
+}
+
+table.polarity-table, table.polarity-table td {
+	border: 1px solid #1C6EA4;
+}

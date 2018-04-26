@@ -50,7 +50,7 @@ def count_word(message):
         else:
             dict_[i] = 1
     for i in dict_:
-        list_.append({'text': i, 'frequency': dict_[i]})
+        list_.append({'text': i, 'size': dict_[i]})
     return list_
 
 

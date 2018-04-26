@@ -17,7 +17,21 @@
 	<div class="main">
 			{% include_chart_jscss %}
 			{% load_chart polar.charttype polar.chartdata polar.chartcontainer polar.extra %}
-			{% include_container polar.chartcontainer 1000 1000 %}
+			{% include_container polar.chartcontainer 500 1150 %}
+	</div>
+	<div class="polarity">
+		{% for key, values in polarityTable.items %}
+		<table class="polarity-table">
+			<tr>
+				<td>
+					{{key}}
+				</td>
+				<td>
+					{{values}}
+				</td>
+			</tr>
+		</table>
+		{% endfor %}
 	</div>
 </body>
 </html>

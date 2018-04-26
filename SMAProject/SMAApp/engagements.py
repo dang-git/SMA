@@ -122,7 +122,7 @@ FOR POLARITY TAB DATA
 
 from SMAApp import polarize
 
-def return_polarity(df):
+def return_polarity_chartdata(df):
     df['polarity'] = [polarize.polarity(i) for i in df.tweet]
     data = dict(df.polarity.value_counts())
     xdata = [*data]
@@ -130,5 +130,11 @@ def return_polarity(df):
     ydata = [int(i) for i in ydata]
     chartdata = {'x': xdata, 'y1': ydata, 'name':'Volume', 'kwargs1': { 'color': '#ef6c00' }
     }
-    print(chartdata)
     return chartdata
+
+def return_polarity(df):
+    df['polarity'] = [polarize.polarity(i) for i in df.tweet]
+    data = dict(df.polarity.value_counts())
+    print("hehe")
+    print(data)
+    return data

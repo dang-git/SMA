@@ -14,4 +14,5 @@ urlpatterns = [
 
     # Ajax Response
     url(r'^ajax/get_geocodes/$', views.return_geocode, name='get_geocodes'),
+    url(r'^ajax/get_wordcloud/$', views.return_wordcloud, name='get_wordcloud'),
 ]
