@@ -54,12 +54,12 @@
 		<div id="donut_chart_container">
     		<div>
         		<p id="src_title">SOURCE</p>
-        		{% load_chart source.charttype source.chartdata source.chartcontainer %}
+        		{% load_chart source.charttype source.chartdata source.chartcontainer source.extra %}
         		{% include_container source.chartcontainer 400 500 %}
     		</div>
     		<div>
         		<p id="comp_title">COMPOSITION</p>
-        		{% load_chart composition.charttype composition.chartdata composition.chartcontainer %}
+        		{% load_chart composition.charttype composition.chartdata composition.chartcontainer source.extra %}
         		{% include_container composition.chartcontainer 400 500 %}
     		</div>
 		

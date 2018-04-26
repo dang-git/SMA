@@ -186,9 +186,8 @@ def compositionPiechartConverter(data):
             'tag_script_js': True,
             'jquery_on_ready': False,
             'donut':True,
-            'donutRatio':0.35,
+            'donutRatio':0.5,
             'chart_attr':{
-                'labelThreshold':0.5,
                 'labelType':'\"percent\"',
             }
         }
