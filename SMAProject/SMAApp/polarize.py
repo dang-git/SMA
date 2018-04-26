@@ -19,13 +19,14 @@ import pandas as pd
 
 bf = pd.read_csv("base_forms.csv", header=None)
 base_forms = {}
+
 for i in list(range(0,len(bf))):
     base_forms[bf[0][i].lower()] = bf[1][i].lower()
 
 v = pd.read_csv("verbs.csv", header=None)
 for i in list(range(0,len(v))):
     base_forms[v[0][i].lower()] = v[1][i].lower()
-        
+
 emojis = {
 u'\U0001f600': ' emjaaa ',
 u'\U0001f601': ' emjaab ',

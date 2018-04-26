@@ -97,3 +97,6 @@ div.engagements {
 div.followers {
 	float: left;
 }
+svg.nvd3-svg{
+	margin: 0px;
+}
