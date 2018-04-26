@@ -4,6 +4,11 @@
 		<title>TWITTER SEARCH</title>
 <head>
 	<link href="{% static 'css/stldg.css' %}" rel='stylesheet' type='text/css'>
+	<script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+	<script src="{% static 'js/d3/d3.js' %}"></script>
+	<script src="{% static 'js/d3/d3.layout.cloud.js' %}"></script>
+	<script src="{% static 'js/d3/d3.wordcloud.js' %}"></script>
+	<script src="{% static 'js/wordcloud.js' %}"></script>
 </head>
 <body>
 	<div class="sidenav">
@@ -15,13 +20,6 @@
 	</div>
 	<div class="main">
 		<div id='wordcloud'></div>
-		<script>
-		  d3.wordcloud()
-			.size([800, 400])
-			.selector('#wordcloud')
-			.words([{text: 'word', size: 5}, {text: 'cloud', size: 15}])
-			.start();
-		</script>
 	</div>
 </body>
 </html>
