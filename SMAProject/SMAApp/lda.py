@@ -10,7 +10,9 @@ from gensim import corpora, models
 import re
 from nltk.stem.snowball import SnowballStemmer
 stemmer = SnowballStemmer("english")
+lemma = nltk.wordnet.WordNetLemmatizer()
 import pyLDAvis
+import pyLDAvis.gensim
 
 stopwords = nltk.corpus.stopwords.words('english')
 stopwords.extend(["rt", "n't", "'s", "ve", "amp"])
@@ -38,7 +40,8 @@ def tokenize_and_stem(text):
     for token in tokens:
         if re.search('[a-zA-Z]', token):
             filtered_tokens.append(token)
-    stems = [stemmer.stem(t) for t in filtered_tokens]
+    # there is a need to improve stemmer
+    stems = [lemma.lemmatize(t) for t in filtered_tokens]
     return stems
 
 def further_process(sentences):
@@ -50,7 +53,8 @@ def further_process(sentences):
     corpus = [dictionary.doc2bow(text) for text in texts]
     return corpus, dictionary
 
-def lda_model(corpus, dictionary):
+def lda_model(data):
+    corpus, dictionary = further_process(data.tweet)
     lda = models.LdaModel(corpus, num_topics=4, id2word=dictionary, update_every=5,
                           chunksize=10000, passes=100)
     topics_matrix = lda.show_topics(formatted=False, num_words=20)
@@ -61,5 +65,6 @@ def lda_model(corpus, dictionary):
             topic.append(j[0])
         all_topics[len(all_topics)+1] = ", ".join(topic)
     p = pyLDAvis.gensim.prepare(lda, corpus, dictionary)
+    # save as viz html file
     pyLDAvis.save_html(p, 'lda.html')
-    return all_topics
+    #return all_topics

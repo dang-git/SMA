@@ -6,11 +6,53 @@ Created on Tue Jun 20 14:06:20 2017
 """
 
 import re
-import pandas as pd
-from wordcloud import WordCloud
-from wordcloud import ImageColorGenerator
-from PIL import Image
-import numpy as np
+#import pandas as pd
+#from wordcloud import WordCloud
+#from wordcloud import ImageColorGenerator
+#from PIL import Image
+#import numpy as np
+import nltk
+lemma = nltk.wordnet.WordNetLemmatizer()
+stopwords = nltk.corpus.stopwords.words('english')
+stopwords.extend(["rt", "n't", "'s", "ve", "amp"])
+
+
+def tokenize_only(text):
+    text = re.sub('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', '', str(text))
+    text = text.encode('utf-8').decode('ascii', 'ignore')
+    tokens = [word.lower() for sent in nltk.sent_tokenize(text) for word in nltk.word_tokenize(sent)]
+    filtered_tokens = []
+    for token in tokens:
+        if re.search('[a-zA-Z]', token):
+            filtered_tokens.append(token)
+    filtered_tokens = " ".join(filtered_tokens)
+    return filtered_tokens
+
+
+def tokenize_and_stem(text):
+    tokens = [word for sent in nltk.sent_tokenize(text) for word in nltk.word_tokenize(sent)]
+    filtered_tokens = []
+    for token in tokens:
+        if re.search('[a-zA-Z]', token):
+            filtered_tokens.append(token)
+    # there is a need to improve stemmer
+    stems = [lemma.lemmatize(t) for t in filtered_tokens]
+    return stems
+
+
+def count_word(message):
+    dict_ = {}
+    list_ = []
+    tokens = tokenize_and_stem(tokenize_only(message))
+    for i in tokens:
+        if i in dict_:
+            dict_[i] += 1
+        else:
+            dict_[i] = 1
+    for i in dict_:
+        list_.append({'text': i, 'frequency': dict_[i]})
+    return list_
+
 
 def return_wordcloud(data):
     message = ''
@@ -28,7 +70,7 @@ def return_wordcloud(data):
         speech = re.sub(r'<[^<>]+>', ' ', speech)
         speech = re.sub('[^a-zA-Z-]', ' ', speech)
         message = message + ' ' + speech
-    stops = list(pd.read_csv("stops.csv", header=None)[0])
+    stops = stopwords
     names = ['camacho', 'jason', 'ron', 'alcantara-banaybanay', 'rob', 'cynthia', 'sonja', 'roy', 'gahon', 'mejia', 'rosales', 'tuba', 'maquilan', 'galvez', 'abdurahman', 'jerome', 'jessie', 'rutor', 'pedro', 'keith', 'sabalburo', 'marissa', 'santosghel', 'april', 'anjannette', 'riza', 'salido', 'rg', 'tj', 'balderama', 'estanislao', 'oliveros', 'tvpatrol', 'scarlett', 'icasiano-ruiz', 'dela', 'secondez,ly', 'labong', 'ayyie', 'augusto', 'hannah', 'aurora', 'gerodias', 'evardome', 'jacq', 'vera', 'bugna', 'lhenyet', 'sol', 'besinal', 'ivanong', 'hya', 'joed', 'ofrin', 'erlinda', 'esperanza', 'dumaguing', 'philippines', 'solatorio', 'michael', 'dia', 'ryan', 'ri', 'p', 'harry', 'elah', 'venus', 'caryl', 'orzo', 'louie', 'zabarte', 'inot', 'zhav', 'tel', 'osinsao', 'musñgi', 'teo', 'jerelyn', 'abarquez', 'falcis', 'jc', 'galay', 'mangaliman', 'marilyn', 'arnold', 'rodmar', 'elise', 'redrose', 'belleza', 'capalad', 'rosauro', 'celestino', 'jochelle', 'cely', 'vitorillo', 'kris', 'canales', 'barrientos', 'lising', 'laurence', 'haze', 'binabay', 't', 'joycie', 'net', 'roann', 'jayson', 'phoebe', 'christian', 'dahl', 'laborre', 'therese', 'henry', 'jasmine', 'avigail', 'leo', 'ching', 'simon', 'janessa', 'jhunski', 'josol', 'odero', 'pacis', 'relly', 'terrence', 'bemon', 'calter', 'marionne', 'heracleo', 'louise', 'nodalo', 'alyssa', 'raffytulfo', 'aki', 'ramos', 'lizette', 'cindy', 'dasco', 'cathy', 'janice', 'rlndblnsg', 'dre', 'agustin', 'jann', 'robillos', 'sirc', 'mendozadel', 'apple', 'apyang', 'julie', 'boqx', 'bro', 'rhonn', 'austria', 'alinsod', 'aimee', 'kristina', 'elizaga', 'baltazar', 'gagalang', 'ishibashi', 'trinidad', 'angelo', 'cha', 'tels', 'jayme', 'andaya', 'barrios', 'mendoza', 'nava', 'charie', 'aya', 'ambid', 'elleyn', 'rodriguez', 'salash', 'presquito', 'bonilla', 'chu', 'galguerra', 'morc', 'jonathan', 'seguerra', 'baba', 'escalona', 'miayo', 'sarmiento', 'baliuag', 'aiza', 'israel', 'yvaine', 'casey', 'barcellano', 'dios', 'tesalona', 'zamora', 'chastine', 'secuya', 'conje', 'esquivel', 'te', 'ma', 'caguiat', 'rayson', 'gabriel', 'mo', 'krizza', 'albon', 'jude', 'mj', 'nina', 'arches', 'archer', 'del', 'era', 'flo', 'julliane', 'bojo', 'ernest', 'olivar', 'dee', 'zafe', 'heart', 'gerly', 'rappler', 'shara', 'milagrosa', 'amalia', 'dato-on', 'honey', 'naome', 'allauigan', 'daiserie', 'malig-on', 'nobleza', 'tan', 'agena', 'angielyn', 'sis', 'mendoza-del', 'reyespia', 'silos', 'russelloto', 'roderos', 'lorisse', 'cabrillos', 'ava', 'camille', 'brian', 'sia', 'mayores', 'gallart', 'mari', 'reyes', 'enz', 'fortaliza', 'divo', 'masujer', 'mar', 'dadia', 'elizabeth', 'gmanews', 'ayala', 'may', 'alojado', 'hong', 'alegre', 'ronald', 'levi', 'margret', 'actiontv', 'rosanna', 'mai', 'alindada', 'avengers', 'malena', 'a', 'abe', 'beltran', 'azzupary', 'pamparo-castrillo', 'rosalinda', 'arciento', 'q', 'umagang', 'claire', 'riezel', 'martina', 'pangilinan-po', 'gerard', 'buge', 'paz', 'castillejos',
          'sd', 'shiela', 'voluntarioso', 'navarroanj', 'johnell', 'josephine', 'quiño', 'orana', 'yvonne', 'emmanuel', 'caudilla', 'modesto', 'mabel', 'dagaraga', 'mallari', 'glen', 'jian', 'josie', 'runas', 'zepeda', 'amaloveina', 'yucai', 'lu', 'dolly', 'romarico', 'santelices', 'taylo', 'esem', 'rara', 'jady', 'balungcas', 'barbosa', 'dacumos', 'vhie', 'notario', 'diko', 'jvr', 'dan', 'jadloc', 'tanzie', 'flordeliza', 'caampued', 'cendy', 'baillo', 'alojchristine', 'dalusong', 'adri', 'odee', 'son', 'rhym', 'bryan', 'vidal', 'ruby', 'usman', 'jenina', 'james', 'tere', 'fhei', 'l', 'alexis', 'nerecena', 'cammille', 'wong', 'jefferson', 'mead', 'lheyann', 'bong', 'alice', 'deguzman', 'em', 'guinto', 'jenn', 'rachelle', 'cecille', 'rojas', 'alojadoacatherine', 'katrina', 'sardeniola', 'guilangue', 'macabanti-geronimo', 'marcos', 'girl', 'nanit', 'aldrin', 'marius', 'angulo', 'rey', 'ibarra', 'ernie', 'garcia', 'gonzales', 'robert', 'pajiji', 'kenn', 'keno', 'lagumbay', 'mandz', 'zanchez', 'charlyne', 'daniel', 'ren', 'dominguiano', 'gutierrez', ',buan', 'generoso', 'dahleng', 'lorgene', 'ella', 'rj', 'benjamin', 'torres', 'harold', 'clarence', 'alban', 'lawrence', 'ganzon', 'caronan', 'perucho', 'fred', 'mikhail', 'jhenni', 'jill', 'yuri', 'carl', 'ramoy', 'asi', 'romualdo', 'ariane', 'princess', 'esteves', 'asmaira', 'marla', 'yara', 'dorlyn', 'ate', 'watisdis', 'g', 'cañeda', 'cadiz', 'barbara', 'helen', 'gelyn', 'marlo', 'david', 'katniss', 'nalzaro', 'mae', 'isa', 'quinto', 'tyntine', 'legaspi', 'nebrida', 'cangas', 'paclibar', 'albarido', 'pangilinan', 'dione', 'justine', 'ong', 'famor', 'jesus', 'bernadette', 'pamparo-castrillolouise', 'mel', 'jazz', 'pablo', 'rona', 'jerizza', 'scent', 'mervyn', 'lazala', 'reinier', 'combate', 'ian', 'castaneda', 'castillo', 'imelda', 'perado', 'isadel', 'pilarca', 'magcawas', 'ramssel', 'aldwin', 'patiño', 'mayvelle', 'gilbert', 'john', 'jen', 'genesis', 'rosario', 'cabral', 'vargasmaglalang', 'padrinao-villanueva', 'acogido', 'taylo-', 'villanueva', 'silang', 'carmi', 'valencia', 'grace', 'valdz', 'rollie', 'king', 'vienne', 'man-on', 'jayjay', 'treb', 'maricel', 'manlapaz', 'capili', 'cristobal', 'abs-cbn', 'genson', 'salazar', 'lourdes', 'sophia', 'and', 'ver-dee', 'jinky', 'aquino', 'ana', 'lhene', 'ann', 'ram', 'francial', 'dungog-romagos', 'canlapan', 'mararac', 'quilinguing', 'herlene', 'kevin', 'ray', 'poblete', 'sotelo', 'ybanez', 'lamsen', 'maximo', 'mia', 'lim', 'ecalnir', '-', 'oh', 'roehl', 'aisha', 'chiong', 'fajilan', 'rowen', 'arazas', 'jhen', 'fayot', 'emalyn', 'mamhie', 'santiago', 'mariz', 'abella', 'manette', 'alcantara', 'unang', 'hazel', 'maris', 'jeph', 'jazziel', 'kelly', 'caponpon', 'sapo', 'charm', 'villafuerte', 'bh3', 'marie', 'fria', 'maria', 'don', 'besas', 'ofiana', 'flor', 'ylime', 'm', 'paru', 'saguinsin', 'lujera', 'bulan', 'charmaeine', 'brey', 'renier', 'gabaleo', 'ramososhasha', 'daluz', 'arjaybaluyot', 'zacarias', 'ralph', 
          'charles', 'niel', 'jarder', 'troy', 'merin', 'perlas', 'sarenbeniga', 'cabeliza', 'sangalang', 'florentino', 'kale', 'figueroa', 'cyril', 'leigh', 'cherryl', 'jay', 'jabee', 'locsin', 'ayen', 'mitzi', 'tanya', 'aldo', 'botabara', 'alocha', 'jam', 'gideon', 'aby', 'vierneza', 'caroline', 'sieg', 'ruiz', 'rica', 'boris', 'angieline', 'adviento', 'couz', 'jomar', 'criste', 'de', 'dc', 'b', 'cora', 'dy', 'uy', 'kayganda', 'gen', 'rondez', 'alexander', 'buan', 'dianne', 'casabuena', 'joanne', 'emm', 'corvin', 'lala', 'remata', 'charleane', 'felipe', 'jaime', 'roger', 'aris', 'jeosh', 'allito', 'dagtaagta', 'leynes', 'bam', 'jovie', 'khristine', 'rfl', 'carrillo', 'eiram', 'nixx', 'agulto', 'cao', 'buscagan', 'isabel', 'roque', 'ablen', 'leslie', 'rmg', 'ricyet', 'bautista', 'troilus', 'nimfa', 'angie', 'corro', 'caster', 'cheska', 'dexter', 'jennyrose', 'mitch', 'gayjow', 'apol', 'arlyn', 'mamayay', 'verbo', 'rito', 'aranza', 'isha', 'morales', 'marvin', 'zabala', 'palogan', 'jasmin', 'baltar', 'tania', 'dhianne', 'rimas', 'jov', 'domo', 'joy', 'herrera', 'valerie', 'antoniano', 'jr', 'hirit', 'javierariane', 'nikka', 'manalili', 'yba', 'selene', 'news', 'ravela', 'lopez', 'loudine', 'manabat', 'c', 'javier', 'almonguera', 'jm', 'jocelyn', 'edgar', 'vincharl', 'shankanecai', 'soriano', 'tolentino', 'milo', 'jonas', 's', 'com', 'eto', 'con', 'ayeeh', 'oswa', 'mangilit', 'co', 'jeff', 'toni', 'cinth', 'durante', 'cla', 'guzman', 'karen', 'rae', 'esbra', 'kev', 'baccay', 'magbanua', 'sherwin', 'san', 'carpio', 'rrvee', 'kinjan', 'karlo', 'lanymay', 'odey', 'karla', 'elmer', 'teus', 'kasten', 'mark', 'olave', 'raffy', 'mikee', 'yan', 'noel', 'razzie', 'pj', 'quintong', 'zobel', 'mary', 'caloi', 'hernandez', 'roselyn', 'mike', 'cecile', 'dhey', 'chua', 'gemma', 'mahusay', 'dhes', 'andrew', 'gan', 'fritz', 'andrei', 'dote', 'taboadabas', 'mhee', 'quilapio', 'aileen', 'kerstin', 'judee', 'remy', 'deden', 'cepriano', 'calderonukaren', 'castro', 'n', 'dacanay', 'capinpin', 'aldie', 'margie', 'maravilla-casacop', 'vicky', 'jerald', 'drewan', 'archie', 'veronica', 'parugrug', 'bustarde', 'portugal', 'susana', 'cabangon', 'veras', 'shamy', 'yam', 'ii', 'rio', 'oquindo', 'majano', 'perez', 'jingco', 'zandro', 'boom', 'zaldy', 'ayuban', 'ignacio', 'santos', 'guzman-francisco', 'cascabel', 'pau', 'aldana', 'belle', 'edwin', 'macalalad', 'bella', 'leoniño', 'rules', 'ocampo', 'jepher', 'naces', 'claridad', 'miya', 'pam', 'paoner', 'brigente', 'calacday', 'raymond', 'leonie', 'condes', 'talaban', 'kit', 'palabrica', 'cudiamat', 'kim', 'dayan', 'villegas', 'vargas', 'gaspay', 'villa', 'arra', 'albesa', 'blanco', 'meazel', 'antonio', 'portillo', 'jessica', 'toy', 'espiritu', 'llanto', 'jayvee', 'legera', 'denjie', 'burgos', 'alvin', 'bonecille', 'jexter', 'rhoen', 'hervas', 'celzo', 'bes', 'jaul', 'oxford', 'jonard', 'ethel', 'patsy', 'laurel', 'paul', 'montañez', 'riachelle', 'rochelle', 'trins', 'bry', 'rose', 'gma', 
@@ -85,13 +127,14 @@ def return_wordcloud(data):
     message = ''
     for i in range(0, len(words)):
         message = message + ' ' + words[i]
+    return count_word(message)
     #wordcloud background picture
-    img = Image.open('bg2.jpg')
-    img = img.resize((900,550), Image.ANTIALIAS)
-    hcmask = np.array(img)
-    image_colors = ImageColorGenerator(hcmask)
-    wc = WordCloud(background_color = '#ffffff', max_words = 300, mask = hcmask, stopwords = stops)
-    wc.generate(message)
-    wc.recolor(color_func = image_colors)
+    #img = Image.open('bg2.jpg')
+    #img = img.resize((900,550), Image.ANTIALIAS)
+    #hcmask = np.array(img)
+    #image_colors = ImageColorGenerator(hcmask)
+    #wc = WordCloud(background_color = '#ffffff', max_words = 300, mask = hcmask, stopwords = stops)
+    #wc.generate(message)
+    #wc.recolor(color_func = image_colors)
     # saves wordcloud as png files
-    wc.to_file("wordcloud.png")
+    #wc.to_file("wordcloud.png")
