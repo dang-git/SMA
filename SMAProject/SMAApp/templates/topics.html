@@ -1,7 +1,10 @@
 {% load staticfiles %}
 <!DOCTYPE html>
+<title>TWITTER SEARCH</title>
 <html>
-		<title>TWITTER SEARCH</title>
+	<script src="{% static 'js/d3/d3.js' %}" type='text/javascript'></script>
+	<script src="{% static 'js/d3/d3.layout.cloud.js' %}" type='text/javascript'></script>
+	<script src="{% static 'js/d3/d3.wordcloud.js' %}" type='text/javascript'></script>
 <head>
 	<link href="{% static 'css/stldg.css' %}" rel='stylesheet' type='text/css'>
 </head>
@@ -14,7 +17,14 @@
 			<a href="{% url 'sentiments' %}" class="tab">SENTIMENTS</a>
 	</div>
 	<div class="main">
-
+		<div id='wordcloud'></div>
+		<script>
+		  d3.wordcloud()
+			.size([800, 400])
+			.selector('#wordcloud')
+			.words([{text: 'word', size: 5}, {text: 'cloud', size: 15}])
+			.start();
+		</script>
 	</div>
 </body>
 </html>

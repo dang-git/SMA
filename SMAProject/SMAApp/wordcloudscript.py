@@ -137,4 +137,8 @@ def return_wordcloud(data):
     #wc.generate(message)
     #wc.recolor(color_func = image_colors)
     # saves wordcloud as png files
+<<<<<<< HEAD
     #wc.to_file("wordcloud.png")
+=======
+    #wc.to_file("wordcloud.png")
+>>>>>>> 72aee922fd5fdf287e264200c1757e711a2a16b6

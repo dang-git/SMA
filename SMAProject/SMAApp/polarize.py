@@ -16,12 +16,12 @@ import os
 import string
 
 base_forms = {}
-with open("base_forms.csv") as infile:
+with open("C:/Users/christian.dy/Documents/GitHub/SMA/SMAProject/SMAApp/base_forms.csv") as infile:
     readCSV = csv.reader(infile, delimiter=',')
     for row in readCSV:
         base_forms[row[0].lower()] = row[1].lower()
 
-with open("verbs.csv") as infile:
+with open("C:/Users/christian.dy/Documents/GitHub/SMA/SMAProject/SMAApp/verbs.csv") as infile:
     readCSV = csv.reader(infile, delimiter=',')
     for row in readCSV:
         base_forms[row[0]] = row[1]

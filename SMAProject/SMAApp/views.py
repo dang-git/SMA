@@ -5,7 +5,7 @@ from django.shortcuts import render
 from django.views.generic import TemplateView
 from django.http import HttpResponseRedirect, JsonResponse
 from .forms import SearchForm
-from SMAApp import extract, engagements
+from SMAApp import extract, engagements, wordcloudscript, lda
 import pandas as pd
 import json
 # Create your views here.
@@ -62,7 +62,9 @@ def open_sentiments(request):
     return render(request, 'sentiments.html', data)
 
 def open_topics(request):
-	return render(request, 'topics.html')
+    #lda.lda_model(request.session["df"])
+    wordcloudscript.return_wordcloud(request.session["df"])
+    return render(request, 'topics.html')
 
 def formatData(data):
  	return	{'users': "{:,}".format(data['users']),
