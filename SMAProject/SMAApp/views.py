@@ -59,7 +59,11 @@ def open_influencers(request):
 	return render(request, 'influencers.html', {'engData':data['engData'],'folData':data['folData'] })  
 
 def open_influentialposts(request):
-	return render(request, 'influentialposts.html')  
+    data = {}
+    df = pd.read_pickle("file.pkl")
+    data = engagements.return_infl_posts(df)
+    data["influentialPost"] = data
+    return render(request, 'influentialposts.html', data)  
 
 def open_sentiments(request):
     chartdata = engagements.return_polarity(request.session["df"])

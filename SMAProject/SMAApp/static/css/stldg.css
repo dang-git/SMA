@@ -78,7 +78,7 @@ body {
 	font-family: "Helvetica";
 }
 
-#eng_title, #tl_title, #src_title, #comp_title {
+#eng_title, #tl_title, #src_title, #comp_title, .influencer-name {
 	font-size: 1.5vw;
 	font-family: "Raleway-Bold";
 	color: #01579b;
@@ -107,10 +107,30 @@ svg.nvd3-svg{
 
 #src_title, #comp_title{
     width: 50%;
+    }
+    
 div.polarity{
 	float: right;
 }
 
 table.polarity-table, table.polarity-table td {
 	border: 1px solid #1C6EA4;
+}
+
+.influencer-desc{
+    width: 20%;
+}
+
+.influencer-data{
+    margin: 0;
+}
+
+#influencer-data-container{
+    margin-left: 25px;
+}
+
+#inf_title{
+    margin-left: 25px;
+    font-size: 20px;
+    color: grey;
 }
