@@ -40,8 +40,8 @@ def return_geocode(request):
 	return JsonResponse(geoCodes)  
 
 def open_diagnostics(request):
-	formattedData = request.session['engagements_data']
-	return render(request, 'diagnostics.html',
+    formattedData = request.session['engagements_data']
+    return render(request, 'diagnostics.html',
                formattedData)  
     #template_name = "diagnostics.html"
 
