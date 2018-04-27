@@ -68,6 +68,19 @@
 			{% load_chart timeline.charttype timeline.chartdata timeline.chartcontainer timeline.extra %}
 			{% include_container timeline.chartcontainer 400 1150 %}
 		</div>
+		<div id="donut_chart_container">
+    		<div>
+        		<p id="src_title">SOURCE</p>
+        		{% load_chart source.charttype source.chartdata source.chartcontainer source.extra %}
+        		{% include_container source.chartcontainer 400 500 %}
+    		</div>
+    		<div>
+        		<p id="comp_title">COMPOSITION</p>
+        		{% load_chart composition.charttype composition.chartdata composition.chartcontainer source.extra %}
+        		{% include_container composition.chartcontainer 400 500 %}
+    		</div>
+		
+		</div>
 		<p id="tl_title">LOCATIONS</p>
 		<div id="map">
     		

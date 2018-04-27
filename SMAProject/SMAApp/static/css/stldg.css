@@ -104,7 +104,7 @@ body {
 	font-family: "Helvetica";
 }
 
-#eng_title, #tl_title {
+#eng_title, #tl_title, #src_title, #comp_title {
 	font-size: 1.5vw;
 	font-family: "Raleway-Bold";
 	color: #01579b;
@@ -208,4 +208,18 @@ td.engagement-details{
 
 .follower-img, .engagement-img{
     width: 30px;
+}
+#donut_chart_container{
+    display: flex;
+}
+
+#src_title, #comp_title{
+    width: 50%;
+}
+div.polarity{
+	float: right;
+}
+
+table.polarity-table, table.polarity-table td {
+	border: 1px solid #1C6EA4;
 }
