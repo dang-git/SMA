@@ -56,7 +56,7 @@ def searchKeyWord(input):
                         row['type'] = "original"
                     row['fvcount'] = tweet.favorite_count
                     row['rtcount'] = tweet.retweet_count
-                    row['userid'] = tweet.user.id
+                    row['userid'] = str(tweet.user.id)
                     row['username'] = tweet.user.screen_name
                     row['name'] = tweet.user.name
                     row['profileimage'] = tweet.user.profile_image_url_https
@@ -72,6 +72,7 @@ def searchKeyWord(input):
                         row['coordinates'] = None
                     row['tweetlocation'] = tweet.place
                     rows_list.append(row)
+                    # insert_to_tweet
                 else:
                     run = False
         except tweepy.TweepError as e:
