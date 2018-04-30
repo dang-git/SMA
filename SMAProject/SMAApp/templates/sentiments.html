@@ -22,13 +22,8 @@
 			 <!-- </form> -->
 			</div>
 		</div>
-	<div class="sidenav">
-			<a href="{% url 'diagnostics' %}" class="tab">DIAGNOSTICS</a>
-			<a href="{% url 'influencers' %}" class="tab">INFLUENCERS</a>
-			<a href="{% url 'influentialposts' %}" class="tab">INFLUENTIAL POSTS</a>
-			<a href="{% url 'topics' %}" class="tab">TOPICS</a>
-			<a href="{% url 'sentiments' %}" class="tab active">SENTIMENTS</a>
-	</div>
+	<!-- sidebar -->
+		{% include  'sidebar.html'%}
 	<div class="main">
 			{% include_chart_jscss %}
 			{% load_chart polar.charttype polar.chartdata polar.chartcontainer polar.extra %}

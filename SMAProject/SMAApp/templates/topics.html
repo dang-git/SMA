@@ -21,13 +21,8 @@
 			 <!-- </form> -->
 			</div>
 		</div>
-	<div class="sidenav">
-			<a href="{% url 'diagnostics' %}" class="tab">DIAGNOSTICS</a>
-			<a href="{% url 'influencers' %}" class="tab">INFLUENCERS</a>
-			<a href="{% url 'influentialposts' %}" class="tab">INFLUENTIAL POSTS</a>
-			<a href="{% url 'topics' %}" class="tab active">TOPICS</a>
-			<a href="{% url 'sentiments' %}" class="tab">SENTIMENTS</a>
-	</div>
+	<!-- sidebar -->
+		{% include  'sidebar.html'%}
 	<div class="main">
 		<img src="{% static 'images/wordcloud.png' %}"/>
 		<!-- <div id='wordcloud'></div>

@@ -8,13 +8,26 @@
 </head>
 
 <body>
-	<div class="sidenav">
-			<a href="{% url 'diagnostics' %}" class="tab">DIAGNOSTICS</a>
-			<a href="{% url 'influencers' %}" class="tab active">INFLUENCERS</a>
-			<a href="{% url 'influentialposts' %}" class="tab">INFLUENTIAL POSTS</a>
-			<a href="{% url 'topics' %}" class="tab">TOPICS</a>
-			<a href="{% url 'sentiments' %}" class="tab">SENTIMENTS</a>
+
+   <!--header -->
+	<div class="panel-heading">
+    	<div class="header-panel-item">
+    		<a href="#search.html" class="" target="_blank">
+    			<img id="fly" src="{% static 'images/logo-light2.png' %}" height="50">
+    		</a>
+		</div>
+		<div class="header-panel-item right-item" id="homeServicesItem">
+    		<a href="#" class="item-link">Home</a>
+    		<a href="#" class="item-link">Services</a>
+    		<input type="text" placeholder="Search #hashtag" id="searchHashtag">
+		</div>
 	</div>
+	
+	<!--body -->
+<div id="content">	
+
+    <!-- sidebar -->
+		{% include  'sidebar.html'%}
 	<div class="main">
 		<!-- Followers -->
 		<div class="followers">
@@ -22,15 +35,15 @@
 				{% for key, values in folData.items %}
 				<table class="follower-table">
 					<td class="follower-img">
-						<img src="{{values.profileimage}}" height="100px" width="100px" />
+						<img src="{{values.profileimage}}" class="profile-image" height="100px" width="100px" />
 					</td>
 					<td class="follower-desc">
-						<p>{{values.name}}</p>
-						<p>USERNAME: {{values.username}}</p>
-						<p>FOLLOWERS: {{values.followers}}</p>
-						<p>POSTS: {{values.post}}</p>
-						<p>LIKES: {{values.favorites}}</p>
-						<p>RETWEET: {{values.retweets}}</p>
+						<p class="follower-text-details"><b><em>{{values.name}}</b></em></p>
+						<p class="follower-text-details">USERNAME: {{values.username}}</p>
+						<p class="follower-text-details">FOLLOWERS: {{values.followers}}</p>
+						<p class="follower-text-details">POSTS: {{values.post}}</p>
+						<p class="follower-text-details">LIKES: {{values.favorites}}</p>
+						<p class="follower-text-details">RETWEET: {{values.retweets}}</p>
 					</td>
 				</table>
 				{% endfor %}
@@ -43,18 +56,29 @@
 				<td class="engagement-img">
 					<img src="{{values.profileimage}}" height="100px" width="100px" />
 				</td>
-				<td>
-					<p>{{values.name}}</p>
-					<p>USERNAME: {{values.username}}</p>
-					<p>FOLLOWERS: {{values.followers}}</p>
-					<p>POSTS: {{values.post}}</p>
-					<p>LIKES: {{values.favorites}}</p>
-					<p>RETWEET: {{values.retweets}}</p>
+				<td class="engagement-details">
+					<p class="follower-text-details"><b><em>{{values.name}}</b></em></p>
+					<p class="follower-text-details">USERNAME: {{values.username}}</p>
+					<p class="follower-text-details">FOLLOWERS: {{values.followers}}</p>
+					<p class="follower-text-details">POSTS: {{values.post}}</p>
+					<p class="follower-text-details">LIKES: {{values.favorites}}</p>
+					<p class="follower-text-details">RETWEET: {{values.retweets}}</p>
 				</td>
 			</table>
 			{% endfor %}
 		</div>
 	</div>
+</div>	
+
+		<div id="footerSection">
+    		<div id="pointwestContainer">
+        		<a href="#" class="pointwest-link right">Pointwest</a>
+        	</div>
+        	<div id="contactHelpContainer">
+            	<a href="#" class="contact-help-link">Contact</a>
+            	<a href="#" class="contact-help-link">Help</a>
+         </div>
+    	</div>
 </body>
 
 </html>
