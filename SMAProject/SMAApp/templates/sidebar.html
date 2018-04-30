@@ -1,0 +1,17 @@
+{% load staticfiles %}
+
+<link href="{% static 'css/stldg.css' %}" rel='stylesheet' type='text/css'>
+<script src="{% static 'js/jquery-3.3.1.min.js' %}" type='text/javascript'></script>
+<script src="{% static 'js/dgn1.js' %}" type='text/javascript'></script>
+
+<div id="sn" class="sidenav">
+		<a href="{% url 'diagnostics' %}" class="tab diagnostics">DIAGNOSTICS</a>
+		<a href="{% url 'influencers' %}" class="tab influencers">INFLUENCERS</a>
+		<a href="{% url 'influentialposts' %}" class="tab influentialposts">INFLUENTIAL POSTS</a>
+		<a href="{% url 'topics' %}" class="tab topics">TOPICS</a>
+		<a href="{% url 'sentiments' %}" class="tab sentiments">SENTIMENTS</a>
+    	<div id="poweredBy">
+        	<p class="powered-by-text">Powered by: <br> Pointwest Innovation Corp.</p>
+        	<img id="pointwestLogo" src="{% static 'images/Pointwest_Agility Defined.png' %}" height="40" align="middle">
+    	</div>
+</div>
