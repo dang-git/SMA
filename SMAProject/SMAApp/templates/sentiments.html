@@ -7,6 +7,21 @@
 	<link href="{% static 'css/stldg.css' %}" rel='stylesheet' type='text/css'>
 </head>
 <body>
+	<!--header -->
+	<div class="panel-heading">
+			<div class="header-panel-item">
+				<a href="#search.html" class="" target="_blank">
+					<img id="fly" src="{% static 'images/logo-light2.png' %}" height="50">
+				</a>
+			</div>
+			<div class="header-panel-item right-item" id="homeServicesItem">
+				<a href="#" class="item-link">Home</a>
+				<a href="#" class="item-link">Services</a>
+				<!-- <form method="post"> -->
+					<input type="text" placeholder="Search #hashtag" id="searchHashtag">
+			 <!-- </form> -->
+			</div>
+		</div>
 	<div class="sidenav">
 			<a href="{% url 'diagnostics' %}" class="tab">DIAGNOSTICS</a>
 			<a href="{% url 'influencers' %}" class="tab">INFLUENCERS</a>
@@ -17,7 +32,20 @@
 	<div class="main">
 			{% include_chart_jscss %}
 			{% load_chart polar.charttype polar.chartdata polar.chartcontainer polar.extra %}
-			{% include_container polar.chartcontainer 1000 1000 %}
+			{% include_container polar.chartcontainer 500 1150 %}
 	</div>
+	<div class="polarity">
+		{% for key, values in polarityTable.items %}
+		<table class="polarity-table">
+			<tr>
+				<td>
+					{{key}}
+				</td>
+				<td>
+					{{values}}
+				</td>
+			</tr>
+		</table>
+		{% endfor %}
 </body>
 </html>

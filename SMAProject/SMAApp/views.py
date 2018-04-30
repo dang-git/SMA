@@ -5,7 +5,7 @@ from django.shortcuts import render
 from django.views.generic import TemplateView
 from django.http import HttpResponseRedirect, JsonResponse
 from .forms import SearchForm
-from SMAApp import extract, engagements
+from SMAApp import extract, engagements, wordcloudscript
 import pandas as pd
 import json
 # Create your views here.
@@ -45,6 +45,10 @@ def return_geocode(request):
 	geoCodes = engagements.return_geocode(request.session["df"])
 	return JsonResponse(geoCodes)  
 
+# def return_wordcloud(request):
+#     words = wordcloudscript.return_wordcloud(request.session["df"])
+#     return JsonResponse(words, safe=False)
+
 def open_diagnostics(request):
 	formattedData = request.session['engagements_data']
 	return render(request, 'diagnostics.html',
@@ -60,18 +64,19 @@ def open_influencers(request):
 
 def open_influentialposts(request):
     data = {}
-    df = pd.read_pickle("file.pkl")
-    data = engagements.return_infl_posts(df)
-    data["influentialPost"] = data
+    data = engagements.return_infl_posts(request.session["df"])
+    data['influentialPost'] = data
     return render(request, 'influentialposts.html', data)  
 
 def open_sentiments(request):
-    chartdata = engagements.return_polarity(request.session["df"])
+    chartdata = engagements.return_polarity_chartdata(request.session["df"])
     data = {}
+    data['polarityTable'] = engagements.return_polarity(request.session["df"])
     data['polar'] = demo_donutchart(chartdata)
     return render(request, 'sentiments.html', data)
 
 def open_topics(request):
+	wordcloudscript.return_wordcloud(request.session["df"])
 	return render(request, 'topics.html')
 
 def formatData(data):
