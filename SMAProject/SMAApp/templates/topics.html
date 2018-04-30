@@ -6,6 +6,21 @@
 	<link href="{% static 'css/stldg.css' %}" rel='stylesheet' type='text/css'>
 </head>
 <body>
+	<!--header -->
+	<div class="panel-heading">
+			<div class="header-panel-item">
+				<a href="#search.html" class="" target="_blank">
+					<img id="fly" src="{% static 'images/logo-light2.png' %}" height="50">
+				</a>
+			</div>
+			<div class="header-panel-item right-item" id="homeServicesItem">
+				<a href="#" class="item-link">Home</a>
+				<a href="#" class="item-link">Services</a>
+				<!-- <form method="post"> -->
+					<input type="text" placeholder="Search #hashtag" id="searchHashtag">
+			 <!-- </form> -->
+			</div>
+		</div>
 	<div class="sidenav">
 			<a href="{% url 'diagnostics' %}" class="tab">DIAGNOSTICS</a>
 			<a href="{% url 'influencers' %}" class="tab">INFLUENCERS</a>
@@ -14,14 +29,18 @@
 			<a href="{% url 'sentiments' %}" class="tab">SENTIMENTS</a>
 	</div>
 	<div class="main">
-		<div id='wordcloud'></div>
+		<img src="{% static 'images/wordcloud.png' %}"/>
+		<!-- <div id='wordcloud'></div>
 		<script>
 		  d3.wordcloud()
 			.size([800, 400])
 			.selector('#wordcloud')
 			.words([{text: 'word', size: 5}, {text: 'cloud', size: 15}])
 			.start();
-		</script>
+		</script> -->
+	</div>
+	<div class="lda">
+			{% include 'lda.html' %}
 	</div>
 </body>
 </html>

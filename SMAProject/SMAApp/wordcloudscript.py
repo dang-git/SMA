@@ -6,11 +6,11 @@ Created on Tue Jun 20 14:06:20 2017
 """
 
 import re
-#import pandas as pd
-#from wordcloud import WordCloud
-#from wordcloud import ImageColorGenerator
-#from PIL import Image
-#import numpy as np
+import pandas as pd
+from wordcloud import WordCloud
+from wordcloud import ImageColorGenerator
+from PIL import Image
+import numpy as np
 import nltk
 lemma = nltk.wordnet.WordNetLemmatizer()
 stopwords = nltk.corpus.stopwords.words('english')
@@ -50,7 +50,7 @@ def count_word(message):
         else:
             dict_[i] = 1
     for i in dict_:
-        list_.append({'text': i, 'frequency': dict_[i]})
+        list_.append({'text': i, 'size': dict_[i]})
     return list_
 
 
@@ -127,14 +127,14 @@ def return_wordcloud(data):
     message = ''
     for i in range(0, len(words)):
         message = message + ' ' + words[i]
-    return count_word(message)
+    # return count_word(message)
     #wordcloud background picture
-    #img = Image.open('bg2.jpg')
-    #img = img.resize((900,550), Image.ANTIALIAS)
-    #hcmask = np.array(img)
-    #image_colors = ImageColorGenerator(hcmask)
-    #wc = WordCloud(background_color = '#ffffff', max_words = 300, mask = hcmask, stopwords = stops)
-    #wc.generate(message)
-    #wc.recolor(color_func = image_colors)
-    # saves wordcloud as png files
-    #wc.to_file("wordcloud.png")
+    img = Image.open('C:/Users/christian.dy/Documents/GitHub/SMA/SMAProject/SMAApp/bg2.jpg')
+    img = img.resize((900,550), Image.ANTIALIAS)
+    hcmask = np.array(img)
+    image_colors = ImageColorGenerator(hcmask)
+    wc = WordCloud(background_color = '#ffffff', max_words = 300, mask = hcmask, stopwords = stops)
+    wc.generate(message)
+    wc.recolor(color_func = image_colors)
+    #saves wordcloud as png files
+    wc.to_file("C:/Users/christian.dy/Documents/GitHub/SMA/SMAProject/SMAApp/static/images/wordcloud.png")

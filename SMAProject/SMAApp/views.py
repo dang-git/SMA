@@ -5,7 +5,7 @@ from django.shortcuts import render
 from django.views.generic import TemplateView
 from django.http import HttpResponseRedirect, JsonResponse
 from .forms import SearchForm
-from SMAApp import extract, engagements
+from SMAApp import extract, engagements, wordcloudscript
 import pandas as pd
 import json
 # Create your views here.
@@ -28,6 +28,12 @@ def get_keyword(request):
 			request.session['engagements_data'] = all_data
 			timeline = engagements.return_timeline(df)
 			all_data["timeline"] = demo_linechart(request, timeline)
+			sourceData = engagements.return_source(df)
+			sourceFormattedData = sourcePiechartConverter(sourceFormatData(sourceData))
+			all_data["source"] = sourceFormattedData
+			composition = engagements.return_composition(df)
+			compositionFormattedData = compositionPiechartConverter(compositionFormatData(composition))
+			all_data["composition"] = compositionFormattedData
 			request.session["df"] = df
 			return render(request, 'diagnostics.html',
                 all_data)
@@ -38,6 +44,10 @@ def get_keyword(request):
 def return_geocode(request):
 	geoCodes = engagements.return_geocode(request.session["df"])
 	return JsonResponse(geoCodes)  
+
+# def return_wordcloud(request):
+#     words = wordcloudscript.return_wordcloud(request.session["df"])
+#     return JsonResponse(words, safe=False)
 
 def open_diagnostics(request):
 	formattedData = request.session['engagements_data']
@@ -53,15 +63,20 @@ def open_influencers(request):
 	return render(request, 'influencers.html', {'engData':data['engData'],'folData':data['folData'] })  
 
 def open_influentialposts(request):
-	return render(request, 'influentialposts.html')  
+    data = {}
+    data = engagements.return_infl_posts(request.session["df"])
+    data['influentialPost'] = data
+    return render(request, 'influentialposts.html', data)  
 
 def open_sentiments(request):
-    chartdata = engagements.return_polarity(request.session["df"])
+    chartdata = engagements.return_polarity_chartdata(request.session["df"])
     data = {}
+    data['polarityTable'] = engagements.return_polarity(request.session["df"])
     data['polar'] = demo_donutchart(chartdata)
     return render(request, 'sentiments.html', data)
 
 def open_topics(request):
+	wordcloudscript.return_wordcloud(request.session["df"])
 	return render(request, 'topics.html')
 
 def formatData(data):
@@ -69,6 +84,13 @@ def formatData(data):
                   'tweets': "{:,}".format(data['tweets']),
                   'engagements': "{:,}".format(data['engagements']),
                   'reach': "{:,}".format(data['reach'])}
+
+def sourceFormatData(data):
+    return {'webClient': "{:,}".format(data['Web Client']),
+            'android': "{:,}".format(data['Android']),
+            'iPhone': "{:,}".format(data['iPhone']),
+            'others': "{:,}".format(data['Others']),
+            } 
 
 def demo_linechart(request, chartdata):
     """
@@ -104,7 +126,75 @@ def demo_donutchart(chartdata):
             'x_axis_format': '',
             'tag_script_js': True,
             'jquery_on_ready': False,
-			'donut':True,
+    			'donut':True,
+            'donutRatio':0.5,
+            'chart_attr':{
+                'labelType':'\"percent\"',
+            }
+        }
+    }
+    return data
+
+def sourcePiechartConverter(data):
+    """
+    pieChart page
+    """
+    
+    xdata = ["Web Client", "Android", "iPhone", "Others"]
+    ydata = [data["webClient"], data["android"], data["iPhone"], data["others"]]
+
+    extra_serie = {"tooltip": {"y_start": "", "y_end": ""}}
+    chartdata = {'x': xdata, 'y1': ydata, 'extra1': extra_serie}
+    charttype = "pieChart"
+    chartcontainer = 'source_piechart_container'
+
+    data = {
+        'chartcontainer': chartcontainer,
+        'charttype': charttype,
+        'chartdata': chartdata,
+        'extra': {
+            'x_is_date': False,
+            'x_axis_format': '',
+            'tag_script_js': True,
+            'jquery_on_ready': False,
+            'donut':True,
+            'donutRatio':0.5,
+            'chart_attr':{
+                'labelType':'\"percent\"',
+            }
+        }
+    }
+    return data
+
+def compositionFormatData(data):
+    return {'retweet': "{:,}".format(data['retweet']),
+            'original': "{:,}".format(data['original']),
+            'reply': "{:,}".format(data['reply']),
+            } 
+    
+def compositionPiechartConverter(data):
+    """
+    pieChart page
+    """
+    
+    xdata = ["Retweet", "Original", "Reply"]
+    ydata = [data["retweet"], data["original"], data["reply"]]
+
+    extra_serie = {"tooltip": {"y_start": "", "y_end": ""}}
+    chartdata = {'x': xdata, 'y1': ydata, 'extra1': extra_serie}
+    charttype = "pieChart"
+    chartcontainer = 'composition_piechart_container'
+
+    data = {
+        'chartcontainer': chartcontainer,
+        'charttype': charttype,
+        'chartdata': chartdata,
+        'extra': {
+            'x_is_date': False,
+            'x_axis_format': '',
+            'tag_script_js': True,
+            'jquery_on_ready': False,
+            'donut':True,
             'donutRatio':0.5,
             'chart_attr':{
                 'labelType':'\"percent\"',

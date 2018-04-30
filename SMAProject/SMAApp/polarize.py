@@ -14,19 +14,18 @@ import re
 import math
 import os
 import string
-import pandas as pd
 
-
-bf = pd.read_csv("base_forms.csv", header=None)
 base_forms = {}
+with open("C:/Users/christian.dy/Documents/GitHub/SMA/SMAProject/SMAApp/base_forms.csv") as infile:
+    readCSV = csv.reader(infile, delimiter=',')
+    for row in readCSV:
+        base_forms[row[0].lower()] = row[1].lower()
 
-for i in list(range(0,len(bf))):
-    base_forms[bf[0][i].lower()] = bf[1][i].lower()
-
-v = pd.read_csv("verbs.csv", header=None)
-for i in list(range(0,len(v))):
-    base_forms[v[0][i].lower()] = v[1][i].lower()
-
+with open("C:/Users/christian.dy/Documents/GitHub/SMA/SMAProject/SMAApp/verbs.csv") as infile:
+    readCSV = csv.reader(infile, delimiter=',')
+    for row in readCSV:
+        base_forms[row[0]] = row[1]
+        
 emojis = {
 u'\U0001f600': ' emjaaa ',
 u'\U0001f601': ' emjaab ',
