@@ -210,6 +210,7 @@ td.engagement-details{
     width: 30px;
 }
 #donut_chart_container{
+    padding-left:260px;
     display: flex;
 }
 

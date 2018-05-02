@@ -38,6 +38,17 @@
 	</div>
 	
 	<div id="content">
+    	<div id = "sn" class="sidenav">
+    		<a href="{% url 'diagnostics' %}" class="tab active">DIAGNOSTICS</a>
+    		<a href="{% url 'influencers' %}" class="tab">INFLUENCERS</a>
+    		<a href="{% url 'influentialposts' %}" class="tab">INFLUENTIAL POSTS</a>
+    		<a href="{% url 'topics' %}" class="tab">TOPICS</a>
+    		<a href="{% url 'sentiments' %}" class="tab">SENTIMENTS</a>
+    		<div id="poweredBy">
+        		<p class="powered-by-text">Powered by: <br> Pointwest Innovation Corp.</p>
+        		<img id="pointwestLogo" src="{% static 'images/Pointwest_Agility Defined.png' %}" height="40" align="middle">
+    		</div>
+    	</div>
     	<!-- sidebar -->
 		{% include  'sidebar.html'%}
 		
