@@ -17,7 +17,11 @@
 				<a href="#" class="item-link">Home</a>
 				<a href="#" class="item-link">Services</a>
 				<!-- <form method="post"> -->
-					<input type="text" placeholder="Search #hashtag" id="searchHashtag">
+				<form id="searchForm" class="form-wrapper cf" action="/diagnostics/" method="post">
+    				<input type="text" placeholder="Search #hashtag" id="searchHashtag">
+    				{% csrf_token %}
+    				<button type="submit" id="searchButton">Search</button>
+    			</form>
 			 <!-- </form> -->
 			</div>
 		</div>
