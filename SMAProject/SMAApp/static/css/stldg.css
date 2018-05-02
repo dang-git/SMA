@@ -22,7 +22,7 @@ body {
 }
 
 .header-panel-item{
-    width: auto;
+    width: 35%;
     display: inline-block;
 }
 
@@ -36,8 +36,9 @@ body {
 }
 
 .right-item{
-    margin-left: 700px;
+    margin-left: 300px;
     margin-bottom: 9px;
+    display: inline-flex;
 }
 
 #searchHashtag{
