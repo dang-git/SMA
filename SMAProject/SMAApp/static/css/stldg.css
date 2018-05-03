@@ -22,7 +22,7 @@ body {
 }
 
 .header-panel-item{
-    width: auto;
+    width: 35%;
     display: inline-block;
 }
 
@@ -36,8 +36,9 @@ body {
 }
 
 .right-item{
-    margin-left: 700px;
+    margin-left: 300px;
     margin-bottom: 9px;
+    display: inline-flex;
 }
 
 #searchHashtag{
@@ -227,6 +228,7 @@ td.engagement-details{
     width: 30px;
 }
 #donut_chart_container{
+    /* padding-left:260px; */
     display: flex;
 }
 

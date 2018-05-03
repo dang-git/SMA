@@ -17,16 +17,7 @@
 <body>
 	<!--header -->
 	<div class="panel-heading">
-		<div class="header-panel-item">
-			<a href="#search.html" class="" target="_blank">
-				<img id="fly" src="{% static 'images/logo-light2.png' %}" height="50">
-			</a>
-		</div>
-		<div class="header-panel-item right-item" id="homeServicesItem">
-			<a href="#" class="item-link">Home</a>
-			<a href="#" class="item-link">Services</a>
-			<input type="text" placeholder="Search #hashtag" id="searchHashtag">
-		</div>
+		{% include 'header.html'%}
 	</div>
 
 	<div id="content">
@@ -37,19 +28,20 @@
 			<div class="topic-title">QUICK STATISTICS</div>
 			<div id="QuickStatContainer">
 				<div id="posts">
-					<p id="postsCount">{{ engagements.tweets }}</p>
+					<p id="postsCount">{{ all_data.engagements.tweets }}</p>
+					<p id="postsCount">{{ formattedData.engagements.tweets }}</p>
 					<p id="postsLabel">POSTS</p>
 				</div>
 				<div id="users">
-					<p id="usersCount">{{ engagements.users }}</p>
+					<p id="usersCount">{{ all_data.engagements.users }}</p>
 					<p id="usersLabel">USERS</p>
 				</div>
 				<div id="audience">
-					<p id="audienceCount">{{ engagements.reach }}</p>
+					<p id="audienceCount">{{ all_data.engagements.reach }}</p>
 					<p id="audienceLabel">POTENTIAL AUDIENCE</p>
 				</div>
 				<div id="engagements">
-					<p id="engagementsCount">{{ engagements.engagements }}</p>
+					<p id="engagementsCount">{{ all_data.engagements.engagements }}</p>
 					<p id="engagementsLabel">ENGAGEMENTS</p>
 				</div>
 				<div class="search-insight-container">
@@ -62,9 +54,8 @@
 			<div class="topic-title">TIMELINE</div>
 			<div id="timelineContainer">
 				{% include_chart_jscss %} 
-				{% load_chart timeline.charttype timeline.chartdata timeline.chartcontainer timeline.extra %} 
-				{% include_container timeline.chartcontainer 400 1150 %}
-
+				{% load_chart all_data.timeline.charttype all_data.timeline.chartdata all_data.timeline.chartcontainer all_data.timeline.extra %} 
+				{% include_container all_data.timeline.chartcontainer 400 1150 %}
 				<div class="search-insight-container">
 					<input type="text" placeholder="Type insights here" class="search-insights-input">
 				</div>
@@ -74,23 +65,21 @@
 		<div id="donut_chart_container">
 			<div class="donut-chart-left">
 				<div class="topic-title">SOURCES</div>
-				{% load_chart source.charttype source.chartdata source.chartcontainer source.extra %} 
-				{% include_container source.chartcontainer 400 500 %}
+				{% load_chart all_data.source.charttype all_data.source.chartdata all_data.source.chartcontainer all_data.source.extra %}
+				{% include_container all_data.source.chartcontainer 400 500 %}
 				<div class="search-insight-container">
 					<input type="text" placeholder="Type insights here" class="search-insights-input">
 				</div>
 			</div>
 			<div class="donut-chart-right">
 				<div class="topic-title">COMPOSITION</div>
-				{% load_chart composition.charttype composition.chartdata composition.chartcontainer source.extra %} 
-				{% include_container composition.chartcontainer 400 500 %}
+				{% load_chart all_data.composition.charttype all_data.composition.chartdata all_data.composition.chartcontainer all_data.source.extra%} 
+				{% include_container all_data.composition.chartcontainer 400 500 %}
 				<div class="search-insight-container">
 					<input type="text" placeholder="Type insights here" class="search-insights-input">
 				</div>
 			</div>
 		</div>
-
-
 		<div class="topic-main-container location-topic-container">
 			<div class="topic-title">LOCATIONS</div>
 			<div id="map">
@@ -102,7 +91,6 @@
 		</div>
 	</div>
 
-
 	<div id="footerSection">
 		<div id="pointwestContainer">
 			<a href="#" class="pointwest-link right">Pointwest</a>
@@ -112,8 +100,6 @@
 			<a href="#" class="contact-help-link">Help</a>
 		</div>
 	</div>
-
-
 </body>
 
 </html>
