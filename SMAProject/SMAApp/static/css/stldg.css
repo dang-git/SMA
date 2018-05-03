@@ -56,7 +56,7 @@ body {
     width: 18vw; /* Set the width of the sidebar */
     position: fixed; /* Fixed Sidebar (stay in place on scroll) */
     z-index: 0; /* Stay on top */
-    top: 6.3vw; /* Stay at the top */
+    top: 6.6vw; /* Stay at the top */
     left: 0;
     background-color: #454545;
     overflow-y: hidden; /* Disable horizontal scroll */
@@ -104,7 +104,7 @@ body {
 	font-family: "Helvetica";
 }
 
-#eng_title, #tl_title, #src_title, #comp_title, .influencer-name {
+#eng_title, #tl_title, #src_title, #comp_title, .influencer-name  {
 	font-size: 1.5vw;
 	font-family: "Raleway-Bold";
 	color: #01579b;
@@ -114,18 +114,32 @@ body {
 #map {
 	width: 100%;
 	height: 400px;
-	margin-left: 18vw;
+	/* margin-left: 18vw; */
+}
+
+.profile-image{
+    border-radius: 50%;
+    border: 1px dashed #ef6c00;
 }
 
 div.engagements {
 	float: right;
-	margin-left: 60px;
+    margin-left: 60px;
+    border: 2px solid #1f77b4;
 }
 
 div.followers {
 	float: left;
-	margin-left: 60px;
+    margin-left: 60px;
+    border: 2px solid #1f77b4;
 }
+
+.username-text{
+    font-size: 1.5vw;
+	font-family: "Helvetica";
+	color: #ef6c00;
+}
+
 svg.nvd3-svg{
 	margin: 0px;
 }
@@ -186,20 +200,23 @@ svg.nvd3-svg{
 }
 
 #timelineContainer{
-    padding-left: 260px;
+    /* padding-left: 260px; */
+    border: 2px solid #1f77b4;
+    width: 99.6%;
 }
 
 .follower-table, .engagement-table{
     width: 100%;
+    border-spacing: 10px; 
 }
 
-td.follower-desc{
+/* td.follower-desc{
     border: 1px solid #000;
 }
 
 td.engagement-details{
     border: 1px solid #000;
-}
+} */
 
 .follower-text-details{
     margin: 0;
@@ -216,17 +233,9 @@ td.engagement-details{
 #src_title, #comp_title{
     width: 50%;
     }
-    
-div.polarity{
-	float: right;
-}
-
-table.polarity-table, table.polarity-table td {
-	border: 1px solid #1C6EA4;
-}
 
 .influencer-desc{
-    width: 20%;
+    width: 25%;
 }
 
 .influencer-data{
@@ -234,11 +243,142 @@ table.polarity-table, table.polarity-table td {
 }
 
 #influencer-data-container{
-    margin-left: 25px;
+    /* margin: 25px; */
+    border: 2px solid #1f77b4;
 }
 
 #inf_title{
     margin-left: 25px;
     font-size: 20px;
     color: grey;
+}
+
+/* sentiments */
+ table.polarity-table{
+    width: 400px;
+    height: 120px;
+} 
+
+table.polarity-table, table.polarity-table td {
+    border: 2px solid #000;
+    border-collapse: collapse;
+    text-align: center;
+    text-transform: uppercase;
+    font-family: "Helvetica";
+    padding: 10px;
+}
+
+.polarity-table-heading{
+    color: #ef6c00;
+}
+
+.topic-main-container{
+    /* border: 1px solid #1f77b4; */
+    /* border: 2px solid lightseagreen; */
+    margin-left: 300px;
+    margin-top: 130px;
+    margin-bottom: 40px;
+}
+
+.topic-title{
+    background-color: #1f77b4;
+    border: 1px solid #1f77b4;
+    color: #ef6c00;
+    padding: 10px;
+    font-family: "Helvetica";
+    font-weight: bold;
+}
+
+#polarityMapContainer{
+    border: 2px solid #1f77b4;
+    width: 100%;
+}
+
+#piechart_container{
+    /* border: 1px solid #000; */
+    display: inline-block;
+    vertical-align: middle;
+    width: auto;
+}
+
+div.polarity{
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 50px;
+}
+
+.search-insights-input{
+    background-color : rgb(238,238,238);
+    border-radius: 5px;
+    padding: 10px;
+    width: 90%;
+}
+
+::-webkit-input-placeholder {
+    font-style: italic;
+ }
+
+ .search-insight-container{
+     width: auto;
+     padding: 10px;
+     margin-top: -10px;
+ }
+
+ /* influential posts */
+.influencer-tweet{
+    border: 1px dashed #ef6c00;
+}
+
+p.influencer-data.influencer-name{
+    color: #ef6c00;
+}
+
+/* topics */
+#wordcloudImageContainer{
+    border: 2px solid #1f77b4;
+    width: 99.6%;
+}
+
+#uploadImageContainer{
+    width: auto;
+    padding: 10px;
+    margin-top: -10px;
+}
+
+#uploadImageFileBtn{
+    border: 1px solid #000;
+}
+
+.cloud-topic-container{
+    width: 60%;
+} 
+
+.lda{
+    margin-left: 300px;
+    margin-bottom: 40px;
+}
+
+/* diagnostics */
+#QuickStatContainer{
+    border: 2px solid #1f77b4;
+    width: 99.6%;
+    display: inline-block;
+}
+
+.timeline-topic-container{
+    margin-top: 0;
+}
+
+.donut-chart-left{
+    margin-left: 300px;
+    border: 2px solid #1f77b4;
+}
+
+.donut-chart-right{
+    margin-left: 100px;
+    border: 2px solid #1f77b4;
+}
+
+.location-topic-container{
+    margin-top: 50px;
 }

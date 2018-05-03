@@ -1,51 +1,73 @@
-{% load staticfiles %}
-{% load nvd3_tags %}
+{% load staticfiles %} {% load nvd3_tags %}
 <!DOCTYPE html>
 <html>
-		<title>TWITTER SEARCH</title>
+<title>TWITTER SEARCH</title>
+
 <head>
 	<link href="{% static 'css/stldg.css' %}" rel='stylesheet' type='text/css'>
 </head>
+
 <body>
 	<!--header -->
 	<div class="panel-heading">
-			<div class="header-panel-item">
-				<a href="#search.html" class="" target="_blank">
-					<img id="fly" src="{% static 'images/logo-light2.png' %}" height="50">
-				</a>
-			</div>
-			<div class="header-panel-item right-item" id="homeServicesItem">
-				<a href="#" class="item-link">Home</a>
-				<a href="#" class="item-link">Services</a>
-				<!-- <form method="post"> -->
-					<input type="text" placeholder="Search #hashtag" id="searchHashtag">
-			 <!-- </form> -->
+		<div class="header-panel-item">
+			<a href="#search.html" class="" target="_blank">
+				<img id="fly" src="{% static 'images/logo-light2.png' %}" height="50">
+			</a>
+		</div>
+		<div class="header-panel-item right-item" id="homeServicesItem">
+			<a href="#" class="item-link">Home</a>
+			<a href="#" class="item-link">Services</a>
+			<!-- <form method="post"> -->
+			<input type="text" placeholder="Search #hashtag" id="searchHashtag">
+			<!-- </form> -->
+		</div>
+	</div>
+
+	<!-- sidebar -->
+	<div id="content">
+		{% include 'sidebar.html'%}
+		<div class="topic-main-container">
+			<div class="topic-title">POLARITY</div>
+			<div id="polarityMapContainer">
+				{% include_chart_jscss %} 
+				{% load_chart polar.charttype polar.chartdata polar.chartcontainer polar.extra %} 
+				{% include_container polar.chartcontainer 500 500 %}
+				<div class="polarity">
+					<table class="polarity-table">
+						<tr>
+							<td class="polarity-table-heading">polarity</td>
+							<td class="polarity-table-heading">score</td>
+						</tr>
+						{% for key, values in polarityTable.items %}
+						<tr>
+							<td>
+								{{key}}
+							</td>
+							<td>
+								{{values}}
+							</td>
+						</tr>
+						{% endfor %}
+					</table>
+				</div>
+				<div class="search-insight-container">
+					<input type="text" placeholder="Type insights here" class="search-insights-input">
+				</div>
 			</div>
 		</div>
-	<div class="sidenav">
-			<a href="{% url 'diagnostics' %}" class="tab">DIAGNOSTICS</a>
-			<a href="{% url 'influencers' %}" class="tab">INFLUENCERS</a>
-			<a href="{% url 'influentialposts' %}" class="tab">INFLUENTIAL POSTS</a>
-			<a href="{% url 'topics' %}" class="tab">TOPICS</a>
-			<a href="{% url 'sentiments' %}" class="tab active">SENTIMENTS</a>
 	</div>
-	<div class="main">
-			{% include_chart_jscss %}
-			{% load_chart polar.charttype polar.chartdata polar.chartcontainer polar.extra %}
-			{% include_container polar.chartcontainer 500 1150 %}
+	<!-- footer -->
+	<div id="footerSection">
+		<div id="pointwestContainer">
+			<a href="#" class="pointwest-link right">Pointwest</a>
+		</div>
+		<div id="contactHelpContainer">
+			<a href="#" class="contact-help-link">Contact</a>
+			<a href="#" class="contact-help-link">Help</a>
+		</div>
 	</div>
-	<div class="polarity">
-		{% for key, values in polarityTable.items %}
-		<table class="polarity-table">
-			<tr>
-				<td>
-					{{key}}
-				</td>
-				<td>
-					{{values}}
-				</td>
-			</tr>
-		</table>
-		{% endfor %}
+
 </body>
+
 </html>

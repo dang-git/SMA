@@ -1,115 +1,123 @@
 {% load staticfiles %}
 <!DOCTYPE html>
 <html>
-		<title>TWITTER SEARCH</title>
+<title>TWITTER SEARCH</title>
+
 <head>
 	<link href="{% static 'css/stldg.css' %}" rel='stylesheet' type='text/css'>
-	<script src="{% static 'js/dgn1.js' %}" type='text/javascript'></script>
 </head>
+
 <body>
 	<!--header -->
 	<div class="panel-heading">
-			<div class="header-panel-item">
-				<a href="#search.html" class="" target="_blank">
-					<img id="fly" src="{% static 'images/logo-light2.png' %}" height="50">
-				</a>
-			</div>
-			<div class="header-panel-item right-item" id="homeServicesItem">
-				<a href="#" class="item-link">Home</a>
-				<a href="#" class="item-link">Services</a>
-				<!-- <form method="post"> -->
-					<input type="text" placeholder="Search #hashtag" id="searchHashtag">
-			 <!-- </form> -->
+		<div class="header-panel-item">
+			<a href="#search.html" class="" target="_blank">
+				<img id="fly" src="{% static 'images/logo-light2.png' %}" height="50">
+			</a>
+		</div>
+		<div class="header-panel-item right-item" id="homeServicesItem">
+			<a href="#" class="item-link">Home</a>
+			<a href="#" class="item-link">Services</a>
+			<!-- <form method="post"> -->
+			<input type="text" placeholder="Search #hashtag" id="searchHashtag">
+			<!-- </form> -->
+		</div>
+	</div>
+	<!-- sidebar -->
+	<div id="content">
+		{% include 'sidebar.html'%}
+		<div class="topic-main-container">
+			<div class="topic-title">BY ENGAGEMENTS</div>
+			<div id="influencer-data-container">
+
+				<table class="follower-table">
+					<tr>
+						<td class="influencer-img">
+							<img src="{{ influentialPost.1st.profileimage }}" height="100px" width="100px" />
+						</td>
+						<td class="influencer-desc">
+							<p class="influencer-data influencer-name">{{ influentialPost.1st.name }}</p>
+							<p class="influencer-data">USERNAME: <em>{{ influentialPost.1st.username }}</em></p>
+							<p class="influencer-data">RETWEET: {{ influentialPost.1st.retweets }}</p>
+							<p class="influencer-data">LIKES: {{ influentialPost.1st.favorites }}</p>
+						</td>
+						<td class="influencer-tweet">
+							<p>{{ influentialPost.1st.tweet }}</p>
+						</td>
+					</tr>
+
+					<tr>
+						<td class="influencer-img">
+							<img src="{{ influentialPost.2nd.profileimage }}" height="100px" width="100px" />
+						</td>
+						<td class="influencer-desc">
+							<p class="influencer-data influencer-name">{{ influentialPost.2nd.name }}</p>
+							<p class="influencer-data">USERNAME: <em>{{ influentialPost.2nd.username }}</em></p>
+							<p class="influencer-data">RETWEET: {{ influentialPost.2nd.retweets }}</p>
+							<p class="influencer-data">LIKES: {{ influentialPost.2nd.favorites }}</p>
+						</td>
+						<td class="influencer-tweet">
+							<p>{{ influentialPost.2nd.tweet }}</p>
+						</td>
+					</tr>
+
+					<tr>
+						<td class="influencer-img">
+							<img src="{{ influentialPost.3rd.profileimage }}" height="100px" width="100px" />
+						</td>
+						<td class="influencer-desc">
+							<p class="influencer-data influencer-name">{{ influentialPost.3rd.name }}</p>
+							<p class="influencer-data">USERNAME: <em>{{ influentialPost.3rd.username }}</em></p>
+							<p class="influencer-data">RETWEET: {{ influentialPost.3rd.retweets }}</p>
+							<p class="influencer-data">LIKES: {{ influentialPost.3rd.favorites }}</p>
+						</td>
+						<td class="influencer-tweet">
+							<p>{{ influentialPost.3rd.tweet }}</p>
+						</td>
+					</tr>
+
+					<tr>
+						<td class="influencer-img">
+							<img src="{{ influentialPost.4th.profileimage }}" height="100px" width="100px" />
+						</td>
+						<td class="influencer-desc">
+							<p class="influencer-data influencer-name">{{ influentialPost.4th.name }}</p>
+							<p class="influencer-data">USERNAME: <em>{{ influentialPost.4th.username }}</em></p>
+							<p class="influencer-data">RETWEET: {{ influentialPost.4th.retweets }}</p>
+							<p class="influencer-data">LIKES: {{ influentialPost.4th.favorites }}</p>
+						</td>
+						<td class="influencer-tweet">
+							<p>{{ influentialPost.4th.tweet }}</p>
+						</td>
+					</tr>
+
+					<tr>
+						<td class="influencer-img">
+							<img src="{{ influentialPost.5th.profileimage }}" height="100px" width="100px" />
+						</td>
+						<td class="influencer-desc">
+							<p class="influencer-data influencer-name">{{ influentialPost.5th.name }}</p>
+							<p class="influencer-data">USERNAME: <em>{{ influentialPost.5th.username }}</em></p>
+							<p class="influencer-data">RETWEET: {{ influentialPost.5th.retweets }}</p>
+							<p class="influencer-data">LIKES: {{ influentialPost.5th.favorites }}</p>
+						</td>
+						<td class="influencer-tweet">
+							<p>{{ influentialPost.5th.tweet }}</p>
+						</td>
+					</tr>
+				</table>
 			</div>
 		</div>
-	<div class="sidenav">
-			<a href="{% url 'diagnostics' %}" class="tab">DIAGNOSTICS</a>
-			<a href="{% url 'influencers' %}" class="tab">INFLUENCERS</a>
-			<a href="{% url 'influentialposts' %}" class="tab active">INFLUENTIAL POSTS</a>
-			<a href="{% url 'topics' %}" class="tab">TOPICS</a>
-			<a href="{% url 'sentiments' %}" class="tab">SENTIMENTS</a>
 	</div>
-	<div class="main">
-    	<p id="inf_title">BY ENGAGEMENTS</p>
-    	<div id="influencer-data-container">
-    	
-    	<table class="follower-table">
-            <tr>
-					<td class="influencer-img">
-						<img src="{{ influentialPost.1st.profileimage }}" height="100px" width="100px" />
-					</td>
-					<td class="influencer-desc">
-						<p class="influencer-data influencer-name">{{ influentialPost.1st.name }}</p>
-                	<p class="influencer-data">USERNAME: {{ influentialPost.1st.username }}</p>
-                	<p class="influencer-data">RETWEET: {{ influentialPost.1st.retweets }}</p>
-                	<p class="influencer-data">LIKES: {{ influentialPost.1st.favorites }}</p>
-					</td>
-					<td class="influencer-tweet">
-    					<p>{{ influentialPost.1st.tweet }}</p>
-					</td>
-				</tr>
-				
-				<tr>
-					<td class="influencer-img">
-						<img src="{{ influentialPost.2nd.profileimage }}" height="100px" width="100px" />
-					</td>
-					<td class="influencer-desc">
-						<p class="influencer-data influencer-name">{{ influentialPost.2nd.name }}</p>
-                	<p class="influencer-data">USERNAME: {{ influentialPost.2nd.username }}</p>
-                	<p class="influencer-data">RETWEET: {{ influentialPost.2nd.retweets }}</p>
-                	<p class="influencer-data">LIKES: {{ influentialPost.2nd.favorites }}</p>
-					</td>
-					<td class="influencer-tweet">
-    					<p>{{ influentialPost.2nd.tweet }}</p>
-					</td>
-				</tr>
-				
-				<tr>
-					<td class="influencer-img">
-						<img src="{{ influentialPost.3rd.profileimage }}" height="100px" width="100px" />
-					</td>
-					<td class="influencer-desc">
-						<p class="influencer-data influencer-name">{{ influentialPost.3rd.name }}</p>
-                	<p class="influencer-data">USERNAME: {{ influentialPost.3rd.username }}</p>
-                	<p class="influencer-data">RETWEET: {{ influentialPost.3rd.retweets }}</p>
-                	<p class="influencer-data">LIKES: {{ influentialPost.3rd.favorites }}</p>
-					</td>
-					<td class="influencer-tweet">
-    					<p>{{ influentialPost.3rd.tweet }}</p>
-					</td>
-				</tr>
-				
-				<tr>
-					<td class="influencer-img">
-						<img src="{{ influentialPost.4th.profileimage }}" height="100px" width="100px" />
-					</td>
-					<td class="influencer-desc">
-						<p class="influencer-data influencer-name">{{ influentialPost.4th.name }}</p>
-                	<p class="influencer-data">USERNAME: {{ influentialPost.4th.username }}</p>
-                	<p class="influencer-data">RETWEET: {{ influentialPost.4th.retweets }}</p>
-                	<p class="influencer-data">LIKES: {{ influentialPost.4th.favorites }}</p>
-					</td>
-					<td class="influencer-tweet">
-    					<p>{{ influentialPost.4th.tweet }}</p>
-					</td>
-				</tr>
-				
-				<tr>
-					<td class="influencer-img">
-						<img src="{{ influentialPost.5th.profileimage }}" height="100px" width="100px" />
-					</td>
-					<td class="influencer-desc">
-						<p class="influencer-data influencer-name">{{ influentialPost.5th.name }}</p>
-                	<p class="influencer-data">USERNAME: {{ influentialPost.5th.username }}</p>
-                	<p class="influencer-data">RETWEET: {{ influentialPost.5th.retweets }}</p>
-                	<p class="influencer-data">LIKES: {{ influentialPost.5th.favorites }}</p>
-					</td>
-					<td class="influencer-tweet">
-    					<p>{{ influentialPost.5th.tweet }}</p>
-					</td>
-				</tr>
-			</table>
-    	</div>
+	<!-- footer -->
+	<div id="footerSection">
+		<div id="pointwestContainer">
+			<a href="#" class="pointwest-link right">Pointwest</a>
+		</div>
+		<div id="contactHelpContainer">
+			<a href="#" class="contact-help-link">Contact</a>
+			<a href="#" class="contact-help-link">Help</a>
+		</div>
 	</div>
 </body>
 
