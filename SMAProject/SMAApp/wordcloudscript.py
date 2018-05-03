@@ -10,6 +10,7 @@ import pandas as pd
 from wordcloud import WordCloud
 from wordcloud import ImageColorGenerator
 from PIL import Image
+#from django.contrib.sessions.backends.db import SessionStore
 import numpy as np
 import nltk
 lemma = nltk.wordnet.WordNetLemmatizer()
@@ -54,7 +55,7 @@ def count_word(message):
     return list_
 
 
-def return_wordcloud(data):
+def return_wordcloud(data, sessionid):
     message = ''
     for i in list(range(0, len(data))):
         speech = re.sub(r'@\w+', ' ', data['tweet'][int(i)])
@@ -137,4 +138,7 @@ def return_wordcloud(data):
     wc.generate(message)
     wc.recolor(color_func = image_colors)
     #saves wordcloud as png files
-    wc.to_file("C:/Users/christian.dy/Documents/GitHub/SMA/SMAProject/SMAApp/static/images/wordcloud.png")
+
+    filename = "wordcloud-" + sessionid + ".png"
+    path = "C:/Users/christian.dy/Documents/GitHub/SMA/SMAProject/SMAApp/static/images/wordcloud/"
+    wc.to_file(str(path+filename))

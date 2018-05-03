@@ -17,76 +17,49 @@
 <body>
     <!--header -->
 	<div class="panel-heading">
-    	<div class="header-panel-item">
-    		<a href="#search.html" class="" target="_blank">
-    			<img id="fly" src="{% static 'images/logo-light2.png' %}" height="50">
-    		</a>
-		</div>
-		<div class="header-panel-item right-item" id="homeServicesItem">
-    		<a href="#" class="item-link">Home</a>
-    		<a href="#" class="item-link">Services</a>
-    		<!-- <form method="post"> -->
-    		<!--	<input type="text" placeholder="Search #hashtag" id="searchHashtag"> -->
-         <!-- </form> -->
-         
-         <form id="searchForm" class="form-wrapper cf" action="/diagnostics/" method="post">
-				<input type="text" placeholder="Search #hashtag" id="searchHashtag">
-				{% csrf_token %}
-				<button type="submit" id="searchButton">Search</button>
-			</form>
-		</div>
+			{% include  'header.html'%}
 	</div>
 	
-	<div id="content">
-    	<div id = "sn" class="sidenav">
-    		<a href="{% url 'diagnostics' %}" class="tab active">DIAGNOSTICS</a>
-    		<a href="{% url 'influencers' %}" class="tab">INFLUENCERS</a>
-    		<a href="{% url 'influentialposts' %}" class="tab">INFLUENTIAL POSTS</a>
-    		<a href="{% url 'topics' %}" class="tab">TOPICS</a>
-    		<a href="{% url 'sentiments' %}" class="tab">SENTIMENTS</a>
-    		<div id="poweredBy">
-        		<p class="powered-by-text">Powered by: <br> Pointwest Innovation Corp.</p>
-        		<img id="pointwestLogo" src="{% static 'images/Pointwest_Agility Defined.png' %}" height="40" align="middle">
-    		</div>
-    	</div>
+	<div id="content">    	
     	<!-- sidebar -->
 		{% include  'sidebar.html'%}
 		
     	<div class="main">
     		<p id="eng_title">ENGAGEMENTS</p>
     		<div id="posts">
-    			<p id="postsCount">{{ engagements.tweets }}</p>
+				<p id="postsCount">{{ all_data.engagements.tweets }}</p>
+				<p id="postsCount">{{ formattedData.engagements.tweets }}</p>
     			<p id="postsLabel">POSTS</p>
     		</div>
     		<div id="users">
-    			<p id="usersCount">{{ engagements.users }}</p>
+    			<p id="usersCount">{{ all_data.engagements.users }}</p>
     			<p id="usersLabel">USERS</p>
     		</div>
     		<div id="audience">
-    			<p id="audienceCount">{{ engagements.reach }}</p>
+    			<p id="audienceCount">{{ all_data.engagements.reach }}</p>
     			<p id="audienceLabel">POTENTIAL AUDIENCE</p>
     		</div>
     		<div id="engagements">
-    			<p id="engagementsCount">{{ engagements.engagements }}</p>
+    			<p id="engagementsCount">{{ all_data.engagements.engagements }}</p>
     			<p id="engagementsLabel">ENGAGEMENTS</p>
     		</div>
     	</div>
 		<div id="timelineContainer">
 			<p id="tl_title">TIMELINE</p>
 			{% include_chart_jscss %}
-			{% load_chart timeline.charttype timeline.chartdata timeline.chartcontainer timeline.extra %}
-			{% include_container timeline.chartcontainer 400 1150 %}
+			{% load_chart all_data.timeline.charttype all_data.timeline.chartdata all_data.timeline.chartcontainer all_data.timeline.extra %}
+			{% include_container all_data.timeline.chartcontainer 400 1150 %}
 		</div>
 		<div id="donut_chart_container">
     		<div>
         		<p id="src_title">SOURCE</p>
-        		{% load_chart source.charttype source.chartdata source.chartcontainer source.extra %}
-        		{% include_container source.chartcontainer 400 500 %}
+        		{% load_chart all_data.source.charttype all_data.source.chartdata all_data.source.chartcontainer all_data.source.extra %}
+        		{% include_container all_data.source.chartcontainer 400 500 %}
     		</div>
     		<div>
         		<p id="comp_title">COMPOSITION</p>
-        		{% load_chart composition.charttype composition.chartdata composition.chartcontainer source.extra %}
-        		{% include_container composition.chartcontainer 400 500 %}
+        		{% load_chart all_data.composition.charttype all_data.composition.chartdata all_data.composition.chartcontainer all_data.source.extra %}
+        		{% include_container all_data.composition.chartcontainer 400 500 %}
     		</div>
 		
 		</div>

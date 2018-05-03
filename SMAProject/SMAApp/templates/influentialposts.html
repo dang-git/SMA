@@ -8,22 +8,7 @@
 <body>
 	<!--header -->
 	<div class="panel-heading">
-			<div class="header-panel-item">
-				<a href="#search.html" class="" target="_blank">
-					<img id="fly" src="{% static 'images/logo-light2.png' %}" height="50">
-				</a>
-			</div>
-			<div class="header-panel-item right-item" id="homeServicesItem">
-				<a href="#" class="item-link">Home</a>
-				<a href="#" class="item-link">Services</a>
-				<!-- <form method="post"> -->
-			 <!-- </form> -->
-            <form id="searchForm" class="form-wrapper cf" action="/diagnostics/" method="post">
-    				<input type="text" placeholder="Search #hashtag" id="searchHashtag">
-    				{% csrf_token %}
-    				<button type="submit" id="searchButton">Search</button>
-    			</form>
-			</div>
+			{% include  'header.html'%}
 		</div>
 		<!-- sidebar -->
 		{% include  'sidebar.html'%}

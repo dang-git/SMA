@@ -9,32 +9,17 @@
 <body>
 	<!--header -->
 	<div class="panel-heading">
-			<div class="header-panel-item">
-				<a href="#search.html" class="" target="_blank">
-					<img id="fly" src="{% static 'images/logo-light2.png' %}" height="50">
-				</a>
-			</div>
-			<div class="header-panel-item right-item" id="homeServicesItem">
-				<a href="#" class="item-link">Home</a>
-				<a href="#" class="item-link">Services</a>
-				<!-- <form method="post"> -->
-				<form id="searchForm" class="form-wrapper cf" action="/diagnostics/" method="post">
-    				<input type="text" placeholder="Search #hashtag" id="searchHashtag">
-    				{% csrf_token %}
-    				<button type="submit" id="searchButton">Search</button>
-    			</form>
-			 <!-- </form> -->
-			</div>
+			{% include  'header.html'%}	
 		</div>
 		<!-- sidebar -->
 		{% include  'sidebar.html'%}
 	<div class="main">
 			{% include_chart_jscss %}
-			{% load_chart polar.charttype polar.chartdata polar.chartcontainer polar.extra %}
-			{% include_container polar.chartcontainer 500 1150 %}
+			{% load_chart sentiments.polar.charttype sentiments.polar.chartdata sentiments.polar.chartcontainer sentiments.polar.extra %}
+			{% include_container sentiments.polar.chartcontainer 500 1150 %}
 	</div>
 	<div class="polarity">
-		{% for key, values in polarityTable.items %}
+		{% for key, values in sentiments.polarityTable.items %}
 		<table class="polarity-table">
 			<tr>
 				<td>
