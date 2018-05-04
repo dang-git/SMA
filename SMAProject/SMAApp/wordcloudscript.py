@@ -137,4 +137,6 @@ def return_wordcloud(data, sessionid):
     wc.generate(message)
     wc.recolor(color_func = image_colors)
     #saves wordcloud as png files
-    wc.to_file("C:/Users/christian.dy/Documents/GitHub/SMA/SMAProject/SMAApp/static/images/wordcloud.png")
+    filename = "wordcloud-" + sessionid + ".png"
+    path = "C:/Users/christian.dy/Documents/GitHub/SMA/SMAProject/SMAApp/static/images/wordcloud/"
+    wc.to_file(str(path+filename))
