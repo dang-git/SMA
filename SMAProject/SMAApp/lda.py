@@ -53,7 +53,7 @@ def further_process(sentences):
     corpus = [dictionary.doc2bow(text) for text in texts]
     return corpus, dictionary
 
-def lda_model(data):
+def lda_model(data, sessionid):
     corpus, dictionary = further_process(data.tweet)
     lda = models.LdaModel(corpus, num_topics=4, id2word=dictionary, update_every=5,
                           chunksize=10000, passes=100)
@@ -66,5 +66,7 @@ def lda_model(data):
         all_topics[len(all_topics)+1] = ", ".join(topic)
     p = pyLDAvis.gensim.prepare(lda, corpus, dictionary)
     # save as viz html file
-    pyLDAvis.save_html(p, 'lda.html')
+    filename = "lda-" + sessionid + ".html"
+    path = "C:/Users/christian.dy/Documents/GitHub/SMA/SMAProject/SMAApp/templates/lda/"
+    pyLDAvis.save_html(p, path+filename)
     #return all_topics

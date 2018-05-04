@@ -10,27 +10,28 @@
 <body>
 	<!--header -->
 	<div class="panel-heading">
-		{% include  'header.html'%}
-	</div>
-
-	<div id="content">
-		<!-- sidebar -->
-		{% include 'sidebar.html'%}
-		<div class="topic-main-container cloud-topic-container">
-			<div class="topic-title">WORDCLOUD</div>
-			<div id="wordcloudImageContainer">
-				<img src="{% static 'images/wordcloud.png' %}" />
-				<div id="uploadImageContainer">
-					<!-- 						<label class="image-file-upload">
-								<input type="file" accept="image/*"/>
-								Upload image
-							</label> -->
-					<input type="file" name="uploadImageFileBtn" id="uploadImageFileBtn" accept="image/x-png,image/gif,image/jpeg" />
-				</div>
-				<div class="search-insight-container">
-					<input type="text" placeholder="Type insights here" class="search-insights-input">
-				</div>
-				<!-- <div id='wordcloud'></div>
+			{% include  'header.html'%}
+		</div>
+	<!-- sidebar -->
+		{% include  'sidebar.html'%}
+	<div class="main">
+			<div class="topic-main-container cloud-topic-container">
+					<div class="topic-title">WORDCLOUD</div>
+					<div id="wordcloudImageContainer">
+		{% with 'images/wordcloud/wordcloud-'|add:sessionid|add:'.png' as wordcloud_image %}
+		<img src="{% static wordcloud_image %}"/>
+		{% endwith %}
+		<div id="uploadImageContainer">
+			<!-- 						<label class="image-file-upload">
+						<input type="file" accept="image/*"/>
+						Upload image
+					</label> -->
+			<input type="file" name="uploadImageFileBtn" id="uploadImageFileBtn" accept="image/x-png,image/gif,image/jpeg" />
+		</div>
+		<div class="search-insight-container">
+			<input type="text" placeholder="Type insights here" class="search-insights-input">
+		</div>
+		<!-- <div id='wordcloud'></div>
 		<script>
 		  d3.wordcloud()
 			.size([800, 400])
@@ -60,7 +61,11 @@
 			</div>
 		</div>
 	</div>
-
+	<div class="lda">
+			{% with 'lda-'|add:sessionid|add:'.html' as lda_page %}
+			{% include 'lda/'|add:lda_page %}
+			{% endwith %}
+	</div>
 	{% include  'footer.html'%}
 </body>
 

@@ -54,7 +54,7 @@ def count_word(message):
     return list_
 
 
-def return_wordcloud(data):
+def return_wordcloud(data, sessionid):
     message = ''
     for i in list(range(0, len(data))):
         speech = re.sub(r'@\w+', ' ', data['tweet'][int(i)])
