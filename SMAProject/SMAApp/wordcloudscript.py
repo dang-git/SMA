@@ -12,6 +12,7 @@ from wordcloud import ImageColorGenerator
 from PIL import Image
 import numpy as np
 import nltk
+import os
 lemma = nltk.wordnet.WordNetLemmatizer()
 stopwords = nltk.corpus.stopwords.words('english')
 stopwords.extend(["rt", "n't", "'s", "ve", "amp"])
@@ -139,4 +140,5 @@ def return_wordcloud(data, sessionid):
     #saves wordcloud as png files
     filename = "wordcloud-" + sessionid + ".png"
     path = "C:/Users/christian.dy/Documents/GitHub/SMA/SMAProject/SMAApp/static/images/wordcloud/"
-    wc.to_file(str(path+filename))
+    if not os.path.isfile(path+filename):
+        wc.to_file(str(path+filename))

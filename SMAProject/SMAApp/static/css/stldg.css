@@ -79,7 +79,7 @@ body {
 }
 	
 .main {
-	margin-left: 18vw;
+	/* margin-left: 18vw; */
 	margin-top: 8vw;
 }
 
@@ -356,7 +356,7 @@ p.influencer-data.influencer-name{
 } 
 
 .lda{
-    margin-left: 300px;
+    /* margin-left: 300px; */
     margin-bottom: 40px;
 }
 
@@ -377,7 +377,8 @@ p.influencer-data.influencer-name{
 }
 
 .donut-chart-right{
-    margin-left: 100px;
+    /* margin-left: 100px; */
+    overflow-wrap: inherit;
     border: 2px solid #1f77b4;
 }
 

@@ -1,4 +1,4 @@
-{% load staticfiles %}
+{% load staticfiles %}  {% load nvd3_tags %}
 <!DOCTYPE html>
 <html>
 <title>TWITTER SEARCH</title>
@@ -18,9 +18,9 @@
 			<div class="topic-main-container cloud-topic-container">
 					<div class="topic-title">WORDCLOUD</div>
 					<div id="wordcloudImageContainer">
-		{% with 'images/wordcloud/wordcloud-'|add:sessionid|add:'.png' as wordcloud_image %}
-		<img src="{% static wordcloud_image %}"/>
-		{% endwith %}
+							{% with 'images/wordcloud/wordcloud-'|add:sessionid|add:'.png' as wordcloud_image %}
+							<img src="{% static wordcloud_image %}"/>
+							{% endwith %}
 		<div id="uploadImageContainer">
 			<!-- 						<label class="image-file-upload">
 						<input type="file" accept="image/*"/>
@@ -40,14 +40,22 @@
 			.start();
 		</script> -->
 			</div>
+			<div class="donut-chart-right">
+				<div class="topic-title">TOP HASHTAGS</div>
+				{% include_chart_jscss %} 
+				{% load_chart data.charttype data.chartdata data.chartcontainer data.extra%} 
+				{% include_container data.chartcontainer 400 500 %}
+				<div class="search-insight-container">
+					<input type="text" placeholder="Type insights here" class="search-insights-input">
+				</div>
 		</div>
 
 		<div class="lda">
 			<div class="topic-title">TOPICS</div>
 			<div id="wordcloudImageContainer">
-				{% with 'lda-'|add:sessionid|add:'.html' as lda_page %}
-				{% include 'lda/'|add:lda_page %}
-				{% endwith %}
+					{% with 'lda-'|add:sessionid|add:'.html' as lda_page %}
+					{% include 'lda/'|add:lda_page %}
+					{% endwith %}
 				<div class="search-insight-container">
 					<input type="text" placeholder="Type insights here for topic 1" class="search-insights-input">
 				</div>

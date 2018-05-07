@@ -13,6 +13,7 @@ stemmer = SnowballStemmer("english")
 lemma = nltk.wordnet.WordNetLemmatizer()
 import pyLDAvis
 import pyLDAvis.gensim
+import os.path
 
 stopwords = nltk.corpus.stopwords.words('english')
 stopwords.extend(["rt", "n't", "'s", "ve", "amp"])
@@ -66,6 +67,7 @@ def lda_model(data, sessionid):
         all_topics[len(all_topics)+1] = ", ".join(topic)
     p = pyLDAvis.gensim.prepare(lda, corpus, dictionary)
     # save as viz html file
+    
     filename = "lda-" + sessionid + ".html"
     path = "C:/Users/christian.dy/Documents/GitHub/SMA/SMAProject/SMAApp/templates/lda/"
     pyLDAvis.save_html(p, path+filename)

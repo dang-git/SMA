@@ -5,10 +5,11 @@ from django.shortcuts import render
 from django.views.generic import TemplateView
 from django.http import HttpResponseRedirect, JsonResponse
 from .forms import SearchForm
-from SMAApp import extract, engagements, wordcloudscript, lda
+from SMAApp import extract, engagements, wordcloudscript, lda,hashtags
 import pandas as pd
 import json
 import uuid
+import os
 # Create your views here.
 
 def home(request):
@@ -27,6 +28,8 @@ def get_keyword(request):
 			data = engagements.return_engagements(df)
 			formattedData = formatData(data)
 			all_data = {}
+			hs = hashtags.hash_(df)
+			print(hs)
 			all_data["engagements"] = formattedData
 			timeline = engagements.return_timeline(df)
 			all_data["timeline"] = demo_linechart(request, timeline)
@@ -99,12 +102,20 @@ def open_topics(request):
 	if request.method == 'POST':
 		get_keyword(request)
 	else:
-		wordcloudscript.return_wordcloud(request.session["df"], request.session["user_id"])
-		lda.lda_model(request.session["df"], request.session["user_id"])
+		chartdata = hashtags.hash_(request.session["df"])
+		data = {}
+		data["barchart"] = demo_horizontalBarChart(chartdata)
 		sessionid = request.session["user_id"]
+		filename = "lda-" + sessionid + ".html"
+		path = "C:/Users/christian.dy/Documents/GitHub/SMA/SMAProject/SMAApp/templates/lda/"
+		imageFilename = "wordcloud-" + sessionid + ".png"
+		imagePath = "C:/Users/christian.dy/Documents/GitHub/SMA/SMAProject/SMAApp/static/images/wordcloud/"
+		if not os.path.isfile(path+filename) or not os.path.isfile(imagePath+imageFilename):
+			wordcloudscript.return_wordcloud(request.session["df"], request.session["user_id"])
+			lda.lda_model(request.session["df"], request.session["user_id"])
 		form = SearchForm()
 		form.fields['keyword'].widget.attrs['placeholder'] = "Search #hashtag"
-	return render(request, 'topics.html',{'sessionid':sessionid,'form':form})
+	return render(request, 'topics.html',{'data':data["barchart"], 'sessionid':sessionid,'form':form})
 
 def formatData(data):
  	return	{'users': "{:,}".format(data['users']),
@@ -190,6 +201,35 @@ def sourcePiechartConverter(data):
                 'labelType':'\"percent\"',
             }
         }
+    }
+    return data
+
+def demo_horizontalBarChart(chartdata):
+    #nb_element = 10
+    xdata = [i["hashtag"] for i in chartdata]
+    ydata = [i["count"] for i in chartdata] #[i + random.randint(-10, 10) for i in range(nb_element)]
+    #ydata2 = map(lambda x: x * 2, ydata)
+
+    extra_serie = {"tooltip": {"y_start": "", "y_end": " tweets"}}
+    kwargs1 = {'color': 'green'}
+    chartdata = {
+        'x': xdata,
+        'name1': 'series 1', 'y1': ydata, 'extra1': extra_serie, **kwargs1
+        #'name2': 'series 2', 'y2': ydata2, 'extra2': extra_serie,
+    }
+
+    charttype = "multiBarHorizontalChart"
+    chartcontainer = 'multibarhorizontalchart_container'  # container name
+    data = {
+        'charttype': charttype,
+        'chartdata': chartdata,
+        'chartcontainer': chartcontainer,
+        'extra': {
+            'x_is_date': False,
+            'x_axis_format': '',
+            'tag_script_js': True,
+            'jquery_on_ready': True,
+        },
     }
     return data
 
