@@ -69,6 +69,6 @@ def lda_model(data, sessionid):
     # save as viz html file
     
     filename = "lda-" + sessionid + ".html"
-    path = "C:/Users/christian.dy/Documents/GitHub/SMA/SMAProject/SMAApp/templates/lda/"
+    path = "C:/Users/christian.dy/Documents/GitHub/SMALab/SMAProject/SMAApp/templates/lda/"
     pyLDAvis.save_html(p, path+filename)
     #return all_topics

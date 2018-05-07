@@ -107,10 +107,11 @@ def open_topics(request):
 		data["barchart"] = demo_horizontalBarChart(chartdata)
 		sessionid = request.session["user_id"]
 		filename = "lda-" + sessionid + ".html"
-		path = "C:/Users/christian.dy/Documents/GitHub/SMA/SMAProject/SMAApp/templates/lda/"
+		path = "C:/Users/christian.dy/Documents/GitHub/SMALab/SMAProject/SMAApp/templates/lda/"
 		imageFilename = "wordcloud-" + sessionid + ".png"
-		imagePath = "C:/Users/christian.dy/Documents/GitHub/SMA/SMAProject/SMAApp/static/images/wordcloud/"
+		imagePath = "C:/Users/christian.dy/Documents/GitHub/SMALab/SMAProject/SMAApp/static/images/wordcloud/"
 		if not os.path.isfile(path+filename) or not os.path.isfile(imagePath+imageFilename):
+            
 			wordcloudscript.return_wordcloud(request.session["df"], request.session["user_id"])
 			lda.lda_model(request.session["df"], request.session["user_id"])
 		form = SearchForm()
