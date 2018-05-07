@@ -29,7 +29,7 @@ def tokenize_only(text):
     filtered_tokens = " ".join(filtered_tokens)
     return filtered_tokens
 
-
+ 
 def tokenize_and_stem(text):
     tokens = [word for sent in nltk.sent_tokenize(text) for word in nltk.word_tokenize(sent)]
     filtered_tokens = []

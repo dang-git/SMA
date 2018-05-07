@@ -9,5 +9,5 @@ $(document).ready(function(){
     }else{
         $('.' + pathname).addClass("active");
     }
-})
+}) 
 

@@ -22,4 +22,4 @@ def hash_(data):
     top = counter.most_common(5)
     for i in top:
         ls_.append({"hashtag": i[0], "count": i[1]})
-    return ls_ 
+    return ls_
