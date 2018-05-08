@@ -26,12 +26,18 @@ function initMap(coordinates) {
           map: map
         });
 
-        // google.maps.event.addListener(marker, 'click', (function(marker, i) {
-        //     return function() {
-        //       infowindow.setContent(mapCoordinates[i][0]);
-        //       infowindow.open(map, marker);
-        //     }
-        //   })(marker, i));
+        var infowindow = new google.maps.InfoWindow({
+            content: "Username: " + mapCoordinates[i].user + "<br>Tweet: " + mapCoordinates[i].tweet
+          });
+    
+
+
+        google.maps.event.addListener(marker, 'click', (function(marker, i) {
+            return function() {
+            //   infowindow.setContent(mapCoordinates[i][0]);
+              infowindow.open(map, marker);
+            }
+          })(marker, i));
     }
   
     // var marker = new google.maps.Marker({
