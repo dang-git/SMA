@@ -47,9 +47,10 @@ def return_source(df):
 
 def return_geocode(df):
     data = {}
-    for i in df.coordinates:
-        if i != None:
-            data[len(data)] = {"lat": i[1], "long": i[0]}
+    for i in range(len(df)):
+        if df.coordinates[i] != None:
+            data[len(data)] = {"lat": df.coordinates[i][1], "long": df.coordinates[i][0],\
+                 "tweet": df.tweet[i]}
     return data
 
 
