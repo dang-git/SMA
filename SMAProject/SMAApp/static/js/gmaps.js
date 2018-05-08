@@ -19,18 +19,17 @@ function initMap(coordinates) {
         } 
     });
 
+    var markers = []
     var coorLength = Object.keys(coordinates).length;
     for (var i = 0; i < coorLength; i++) {  
         var marker = new google.maps.Marker({
           position: new google.maps.LatLng(mapCoordinates[i].lat, mapCoordinates[i].long),
           map: map
         });
-
+        markers.push(marker);
         var infowindow = new google.maps.InfoWindow({
             content: "Username: " + mapCoordinates[i].user + "<br>Tweet: " + mapCoordinates[i].tweet
           });
-    
-
 
         google.maps.event.addListener(marker, 'click', (function(marker, i) {
             return function() {
@@ -39,6 +38,9 @@ function initMap(coordinates) {
             }
           })(marker, i));
     }
+    //    For marker clustering
+    // var markerCluster = new MarkerClusterer(map, markers,
+    //     {imagePath: imagePath});
   
     // var marker = new google.maps.Marker({
     //     position : {
