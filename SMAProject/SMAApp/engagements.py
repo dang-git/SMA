@@ -50,7 +50,7 @@ def return_geocode(df):
     for i in range(len(df)):
         if df.coordinates[i] != None:
             data[len(data)] = {"lat": df.coordinates[i][1], "long": df.coordinates[i][0],\
-                 "tweet": df.tweet[i]}
+                 "user": df.username[i], "tweet": df.tweet[i]}
     return data
 
 
