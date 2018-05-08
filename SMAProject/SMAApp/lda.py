@@ -18,7 +18,7 @@ import os.path
 stopwords = nltk.corpus.stopwords.words('english')
 stopwords.extend(["rt", "n't", "'s", "ve", "amp"])
 
-#def replace_unicodes(text):
+#def replace_unicodes(text): 
 #    for i in unicode_chars:
         #text = str(text.encode('utf-8')).replace(i, "")[2:-1]
 #        text = text.encode('utf-8').decode('ascii', 'ignore')
