@@ -5,7 +5,6 @@
 
 <head>
 	<link href="{% static 'css/stldg.css' %}" rel='stylesheet' type='text/css'>
-	<script src="{% static 'js/dgn1.js' %}" type='text/javascript'></script>
 </head>
 
 <body>
@@ -35,10 +34,10 @@
 						<p class="follower-text-details">USERNAME:
 							<em>{{values.username}}</em>
 						</p>
-						<p class="follower-text-details">FOLLOWERS: {{values.followers}}</p>
-						<p class="follower-text-details">POSTS: {{values.post}}</p>
-						<p class="follower-text-details">LIKES: {{values.favorites}}</p>
-						<p class="follower-text-details">RETWEET: {{values.retweets}}</p>
+						<p class="follower-text-details">FOLLOWERS: <span class="follower-text-details commaSeparation">{{values.followers}}</span></p>
+						<p class="follower-text-details">POSTS: <span class="follower-text-details commaSeparation">{{values.post}}</span></p>
+						<p class="follower-text-details">LIKES: <span class="follower-text-details commaSeparation">{{values.favorites}}</span></p>
+						<p class="follower-text-details">RETWEET: <span class="follower-text-details commaSeparation">{{values.retweets}}</span></p>
 					</td>
 				</table>
 				{% endfor %}
@@ -58,10 +57,10 @@
 						<p class="follower-text-details">USERNAME:
 							<em>{{values.username}}</em>
 						</p>
-						<p class="follower-text-details">FOLLOWERS: {{values.followers}}</p>
-						<p class="follower-text-details">POSTS: {{values.post}}</p>
-						<p class="follower-text-details">LIKES: {{values.favorites}}</p>
-						<p class="follower-text-details">RETWEET: {{values.retweets}}</p>
+						<p class="follower-text-details">FOLLOWERS: <span class="follower-text-details commaSeparation"> {{values.followers}}</span></p>
+						<p class="follower-text-details">POSTS: <span class="follower-text-details commaSeparation"> {{values.post}}</span></p>
+						<p class="follower-text-details">LIKES: <span class="follower-text-details commaSeparation"> {{values.favorites}}</span></p>
+						<p class="follower-text-details">RETWEET: <span class="follower-text-details commaSeparation">{{values.retweets}}</span></p>
 					</td>
 				</table>
 				{% endfor %}
@@ -71,5 +70,5 @@
 
 	{% include  'footer.html'%}
 </body>
-
+<script src="{% static 'js/dgn1.js' %}" type='text/javascript'></script>
 </html>
