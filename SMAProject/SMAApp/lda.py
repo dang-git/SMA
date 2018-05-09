@@ -11,6 +11,7 @@ import re
 from nltk.stem.snowball import SnowballStemmer
 stemmer = SnowballStemmer("english")
 lemma = nltk.wordnet.WordNetLemmatizer()
+from django.conf import settings
 import pyLDAvis
 import pyLDAvis.gensim
 import os.path
@@ -69,6 +70,7 @@ def lda_model(data, sessionid):
     # save as viz html file
     
     filename = "lda-" + sessionid + ".html"
-    path = "C:/Users/christian.dy/Documents/GitHub/SMALab/SMAProject/SMAApp/templates/lda/"
-    pyLDAvis.save_html(p, path+filename)
+    #path = "C:/Users/christian.dy/Documents/GitHub/SMALab/SMAProject/SMAApp/templates/lda/"
+    ldaPath = os.path.join(settings.BASE_DIR, "SMAApp\\templates\\lda\\" + filename)
+    pyLDAvis.save_html(p, ldaPath)
     #return all_topics

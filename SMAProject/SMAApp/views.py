@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 from django.shortcuts import render
 from django.views.generic import TemplateView
 from django.http import HttpResponseRedirect, JsonResponse
+from django.conf import settings
 from .forms import SearchForm
 from SMAApp import extract, engagements, wordcloudscript, lda,hashtags
 import pandas as pd
@@ -28,8 +29,6 @@ def get_keyword(request):
 			data = engagements.return_engagements(df)
 			formattedData = formatData(data)
 			all_data = {}
-			hs = hashtags.hash_(df)
-			print(hs)
 			all_data["engagements"] = formattedData
 			timeline = engagements.return_timeline(df)
 			all_data["timeline"] = demo_linechart(request, timeline)
@@ -105,13 +104,15 @@ def open_topics(request):
 		chartdata = hashtags.hash_(request.session["df"])
 		data = {}
 		data["barchart"] = demo_horizontalBarChart(chartdata)
+         
 		sessionid = request.session["user_id"]
-		filename = "lda-" + sessionid + ".html"
-		path = "C:/Users/christian.dy/Documents/GitHub/SMALab/SMAProject/SMAApp/templates/lda/"
+		sessionFilename = "lda-" + sessionid + ".html"
+		#path = "C:/Users/christian.dy/Documents/GitHub/SMALab/SMAProject/SMAApp/templates/lda/"
 		imageFilename = "wordcloud-" + sessionid + ".png"
-		imagePath = "C:/Users/christian.dy/Documents/GitHub/SMALab/SMAProject/SMAApp/static/images/wordcloud/"
-		if not os.path.isfile(path+filename) or not os.path.isfile(imagePath+imageFilename):
-            
+		#imagePath = "C:/Users/christian.dy/Documents/GitHub/SMALab/SMAProject/SMAApp/static/images/wordcloud/"
+		imagePath = os.path.join(settings.BASE_DIR, "SMAApp\\static\\images\wordcloud\\" + imageFilename)
+		ldaPath = os.path.join(settings.BASE_DIR, "SMAApp\\templates\\lda\\" + sessionFilename)
+		if not os.path.isfile(ldaPath) or not os.path.isfile(imagePath):
 			wordcloudscript.return_wordcloud(request.session["df"], request.session["user_id"])
 			lda.lda_model(request.session["df"], request.session["user_id"])
 		form = SearchForm()

@@ -13,6 +13,7 @@ from PIL import Image
 import numpy as np
 import nltk
 import os
+from django.conf import settings
 lemma = nltk.wordnet.WordNetLemmatizer()
 stopwords = nltk.corpus.stopwords.words('english')
 stopwords.extend(["rt", "n't", "'s", "ve", "amp"])
@@ -130,7 +131,7 @@ def return_wordcloud(data, sessionid):
         message = message + ' ' + words[i]
     # return count_word(message)
     #wordcloud background picture
-    img = Image.open('C:/Users/christian.dy/Documents/GitHub/SMALab/SMAProject/SMAApp/bg2.jpg')
+    img = Image.open(os.path.join(settings.BASE_DIR, 'SMAApp\\bg2.jpg'))
     img = img.resize((900,550), Image.ANTIALIAS)
     hcmask = np.array(img)
     image_colors = ImageColorGenerator(hcmask)
@@ -139,6 +140,6 @@ def return_wordcloud(data, sessionid):
     wc.recolor(color_func = image_colors)
     #saves wordcloud as png files
     filename = "wordcloud-" + sessionid + ".png"
-    path = "C:/Users/christian.dy/Documents/GitHub/SMALab/SMAProject/SMAApp/static/images/wordcloud/"
-    if not os.path.isfile(path+filename):
-        wc.to_file(str(path+filename))
+    imagePath = os.path.join(settings.BASE_DIR, "SMAApp\static\images\wordcloud\\" + filename)
+    if not os.path.isfile(imagePath):
+        wc.to_file(str(imagePath))
