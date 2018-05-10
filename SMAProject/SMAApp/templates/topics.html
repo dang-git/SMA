@@ -13,6 +13,7 @@
 </head>
 
 <body>
+		{% include 'loadingpage.html' %}
 	<!--header -->
 	<div class="panel-heading">
 			{% include  'header.html'%}
@@ -34,7 +35,7 @@
 			<input type="file" name="uploadImageFileBtn" id="uploadImageFileBtn" accept="image/x-png,image/gif,image/jpeg" />
 		</div>
 		<div class="search-insight-container">
-			<input type="text" placeholder="Type insights here" class="search-insights-input">
+			<input type="text" id="wordcloudInsight" placeholder="Type insights here" class="search-insights-input">
 		</div>
 		<!-- <div id='wordcloud'></div>
 		<script>
@@ -51,28 +52,28 @@
 				{% load_chart data.charttype data.chartdata data.chartcontainer data.extra%} 
 				{% include_container data.chartcontainer 400 500 %}
 				<div class="search-insight-container">
-					<input type="text" placeholder="Type insights here" class="search-insights-input">
+					<input type="text" id="topHastagsInsight" placeholder="Type insights here" class="search-insights-input">
 				</div>
 		</div>
  
 		<div class="lda">
 			<div class="topic-title">TOPICS</div>
 			<div id="wordcloudImageContainer">
-				<!-- to test lda.html, only remove the 3 lines and replace with {% include 'lda/lda.html' %}  -->
+				<!-- to test lda.html, only remove the 3 lines and replace with {# include 'lda/lda.html' #}  -->
 					{# with 'lda-'|add:sessionid|add:'.html' as lda_page #}
 					{# include 'lda/'|add:lda_page #}
 					{# endwith #}
 				<div class="search-insight-container">
-					<input type="text" placeholder="Type insights here for topic 1" class="search-insights-input">
+					<input type="text" id="topic1Insight" placeholder="Type insights here for topic 1" class="search-insights-input">
 				</div>
 				<div class="search-insight-container">
-					<input type="text" placeholder="Type insights here for topic 2" class="search-insights-input">
+					<input type="text" id="topic2Insight" placeholder="Type insights here for topic 2" class="search-insights-input">
 				</div>
 				<div class="search-insight-container">
-					<input type="text" placeholder="Type insights here for topic 3" class="search-insights-input">
+					<input type="text" id="topic3Insight" placeholder="Type insights here for topic 3" class="search-insights-input">
 				</div>
 				<div class="search-insight-container">
-					<input type="text" placeholder="Type insights here for topic 4" class="search-insights-input">
+					<input type="text" id="topic4Insight" placeholder="Type insights here for topic 4" class="search-insights-input">
 				</div>
 			</div>
 		</div>

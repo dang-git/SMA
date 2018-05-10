@@ -7,13 +7,7 @@
 	<script src="{% static 'js/jquery-3.3.1.min.js' %}"></script>
 </head>
 <body class="">
-	<div id="loadingPage" class="loading-page" style="display: none;">
-		<div class="loading-page-box">
-			<img src="{% static 'images/loading.gif'%}" class="loading-gif"/>
-			<br/>
-			<p>Loading tweets for: </p><p id="loadingKeyword"></p>
-		</div>
-	</div>
+	{% include 'loadingpage.html' %}
 	<div id="all" class="panel panel-default">
 		<div class="panel-heading">
 			<a href="#HOME" target="_blank">
