@@ -5,7 +5,7 @@ $(document).ready(function(){
     
     $('.tab').removeClass("active");
     if(pathname == ''){
-        $('.diagnostics').addClass("active")
+        $('.diagnostics').addClass("active");
     }else{
         $('.' + pathname).addClass("active");
     }
@@ -35,4 +35,28 @@ function addCommaSeparation(){
         $(this).text(comma);
     });
 }
+
+
+$('#searchButton').on('click', function(){
+// alert("heyo");
+});
+
+
+function displayLoadingScreen(){
+        $.ajax({
+            url: '/ajax/get_tweets_count/',
+            success: function (data) {
+            //var obj = JSON.parse(data);
+            updateCount(data);
+            }
+        });
+}
+
+function updateCount(count){
+
+}
+
+
+
+
 
