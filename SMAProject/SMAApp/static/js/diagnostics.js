@@ -22,7 +22,8 @@ function generateldaPage(){
         success: function (data) {
         //var obj = JSON.parse(data);
         // make a notif its done?
-        console.log("page done");
+        window.sessionStorage['lda_data'] = data;
+        console.log("lda done");
         }
     });
 }

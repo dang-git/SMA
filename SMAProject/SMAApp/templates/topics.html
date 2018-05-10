@@ -5,6 +5,11 @@
 
 <head>
 	<link href="{% static 'css/stldg.css' %}" rel='stylesheet' type='text/css'>
+	<script>
+		// lda data to be used by the lda page
+		 var lda_data = window.sessionStorage['lda_data'];
+	// var lda_data = JSON.parse(test.replace(/&quot;/g,'"'));
+	</script>
 </head>
 
 <body>
@@ -53,9 +58,10 @@
 		<div class="lda">
 			<div class="topic-title">TOPICS</div>
 			<div id="wordcloudImageContainer">
-					{% with 'lda-'|add:sessionid|add:'.html' as lda_page %}
-					{% include 'lda/'|add:lda_page %}
-					{% endwith %}
+				<!-- to test lda.html, only remove the 3 lines and replace with {% include 'lda/lda.html' %}  -->
+					{# with 'lda-'|add:sessionid|add:'.html' as lda_page #}
+					{# include 'lda/'|add:lda_page #}
+					{# endwith #}
 				<div class="search-insight-container">
 					<input type="text" placeholder="Type insights here for topic 1" class="search-insights-input">
 				</div>

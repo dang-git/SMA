@@ -66,11 +66,11 @@ def generate_wordcloud_image(request):
 	return HttpResponse(True)
 
 def generate_lda_page(request):
-	sessionFilename = "lda-" + request.session["user_id"] + ".html"
-	ldaPath = os.path.join(settings.BASE_DIR, "SMAApp\\templates\\lda\\" + sessionFilename)	
-	if not os.path.isfile(ldaPath):
-		lda.lda_model(request.session["df"], request.session["user_id"])
-	return HttpResponse(True)
+	#sessionFilename = "lda-" + request.session["user_id"] + ".html"
+	#ldaPath = os.path.join(settings.BASE_DIR, "SMAApp\\templates\\lda\\" + sessionFilename)	
+	#if not os.path.isfile(ldaPath):
+	lda_data = lda.lda_model(request.session["df"], request.session["user_id"])
+	return JsonResponse(lda_data,safe=False)
 
 # def return_wordcloud(request):
 #     words = wordcloudscript.return_wordcloud(request.session["df"])

@@ -8,6 +8,7 @@ Created on Wed Apr 25 11:10:23 2018
 import nltk
 from gensim import corpora, models
 import re
+import json
 from nltk.stem.snowball import SnowballStemmer
 stemmer = SnowballStemmer("english")
 lemma = nltk.wordnet.WordNetLemmatizer()
@@ -68,9 +69,11 @@ def lda_model(data, sessionid):
         all_topics[len(all_topics)+1] = ", ".join(topic)
     p = pyLDAvis.gensim.prepare(lda, corpus, dictionary)
     # save as viz html file
-    
-    filename = "lda-" + sessionid + ".html"
+    lda_data = json.dumps(p.to_dict())
+    return lda_data
+    # print(prin)
+    # filename = "lda-" + sessionid + ".html"
     #path = "C:/Users/christian.dy/Documents/GitHub/SMALab/SMAProject/SMAApp/templates/lda/"
-    ldaPath = os.path.join(settings.BASE_DIR, "SMAApp\\templates\\lda\\" + filename)
-    pyLDAvis.save_html(p, ldaPath)
+    #ldaPath = os.path.join(settings.BASE_DIR, "SMAApp\\templates\\lda\\" + filename)
+    #pyLDAvis.save_json(p, ldaPath)
     #return all_topics
