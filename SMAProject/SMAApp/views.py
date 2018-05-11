@@ -3,7 +3,7 @@ from __future__ import unicode_literals
  
 from django.shortcuts import render
 from django.views.generic import TemplateView
-from django.http import HttpResponseRedirect, JsonResponse
+from django.http import HttpResponseRedirect, JsonResponse, HttpResponse
 from django.conf import settings
 from .forms import SearchForm
 from SMAApp import extract, engagements, wordcloudscript, lda,hashtags
@@ -13,12 +13,12 @@ import uuid
 import os
 # Create your views here.
 
+tweetCounts = 0
+
 def home(request):
 	return get_keyword(request)
 
 def get_keyword(request):
-	if request.session:
-		request.session.clear()
 	if request.method == 'POST':
 		form = SearchForm(request.POST)
 		if form.is_valid():
@@ -48,9 +48,29 @@ def get_keyword(request):
 		form = SearchForm()
 	return render(request, 'search.html', {'form': form})
 
+# Returns lat, lang, user, tweet
 def return_geocode(request):
 	geoCodes = engagements.return_geocode(request.session["df"])
 	return JsonResponse(geoCodes)  
+
+def return_tweets_count(request):
+	global tweetCounts
+	tweetCounts = engagements.return_geocode(request.session["df"])
+	return HttpResponse(tweetCounts)
+
+def generate_wordcloud_image(request):
+	imageFilename = "wordcloud-" + request.session["user_id"] + ".png"
+	imagePath = os.path.join(settings.BASE_DIR, "SMAApp\\static\\images\\wordcloud\\" + imageFilename)
+	if not os.path.isfile(imagePath):
+		wordcloudscript.return_wordcloud(request.session["df"], request.session["user_id"])
+	return HttpResponse(True)
+
+def generate_lda_page(request):
+	#sessionFilename = "lda-" + request.session["user_id"] + ".html"
+	#ldaPath = os.path.join(settings.BASE_DIR, "SMAApp\\templates\\lda\\" + sessionFilename)	
+	#if not os.path.isfile(ldaPath):
+	lda_data = lda.lda_model(request.session["df"], request.session["user_id"])
+	return JsonResponse(lda_data,safe=False)
 
 # def return_wordcloud(request):
 #     words = wordcloudscript.return_wordcloud(request.session["df"])
@@ -108,15 +128,14 @@ def open_topics(request):
 		data["barchart"] = demo_horizontalBarChart(chartdata)
          
 		sessionid = request.session["user_id"]
-		sessionFilename = "lda-" + sessionid + ".html"
-		#path = "C:/Users/christian.dy/Documents/GitHub/SMALab/SMAProject/SMAApp/templates/lda/"
-		imageFilename = "wordcloud-" + sessionid + ".png"
+				#path = "C:/Users/christian.dy/Documents/GitHub/SMALab/SMAProject/SMAApp/templates/lda/"
 		#imagePath = "C:/Users/christian.dy/Documents/GitHub/SMALab/SMAProject/SMAApp/static/images/wordcloud/"
-		imagePath = os.path.join(settings.BASE_DIR, "SMAApp\\static\\images\wordcloud\\" + imageFilename)
-		ldaPath = os.path.join(settings.BASE_DIR, "SMAApp\\templates\\lda\\" + sessionFilename)
-		if not os.path.isfile(ldaPath) or not os.path.isfile(imagePath):
-			wordcloudscript.return_wordcloud(request.session["df"], request.session["user_id"])
-			lda.lda_model(request.session["df"], request.session["user_id"])
+		
+		# Checks if lda.html or wordcloud image has not yet been been created
+		# if not os.path.isfile(imagePath) or not os.path.isfile(ldaPath):
+		# 	return HttpResponse(False)
+			# wordcloudscript.return_wordcloud(request.session["df"], request.session["user_id"])
+			# lda.lda_model(request.session["df"], request.session["user_id"])
 		form = SearchForm()
 		form.fields['keyword'].widget.attrs['placeholder'] = "Search #hashtag"
 	return render(request, 'topics.html',{'data':data["barchart"], 'sessionid':sessionid,'form':form})

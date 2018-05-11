@@ -1,6 +1,5 @@
 $(document).ready(function(){
     var pathname = window.location.pathname;
-    
     pathname = pathname.replace(/\//g, '');
     
     $('.tab').removeClass("active");
@@ -29,10 +28,12 @@ $(document).ready(function(){
 })
 
 // display loading screen on search
-$( "#searchButton" ).on( "click", function() {
+$( "#searchButton, #searchAgainButton" ).on( "click", function() {
     $("#loadingPage").css("display","block");
     $("#loadingKeyword").text($("#id_keyword").val());
+    window.sessionStorage.clear();
   });
+
 
 
 // Adds commas to digit values

@@ -142,4 +142,5 @@ def return_wordcloud(data, sessionid):
     filename = "wordcloud-" + sessionid + ".png"
     imagePath = os.path.join(settings.BASE_DIR, "SMAApp\static\images\wordcloud\\" + filename)
     if not os.path.isfile(imagePath):
+        # wc.to_image()
         wc.to_file(str(imagePath))

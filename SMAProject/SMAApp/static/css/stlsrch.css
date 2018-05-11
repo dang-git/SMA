@@ -168,3 +168,40 @@ body {
 	background-color: #ff9800;
 	color: #ffffff;
 }
+
+#loadingPage{
+    z-index: 1;
+    position: fixed;
+    background-color: rgba(0, 0, 0, 0.5);
+    height: 100%;
+    width: 100%;
+}
+
+.loading-gif{
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#loadingPage p{
+    text-align: center;
+}
+
+#loadingPage img .loading-gif{
+    text-align: center;
+}
+
+.loading-page-box{
+    position: fixed;
+    z-index: 999;
+    height: 23em;
+    width: 27em;
+    overflow: show;
+    margin: auto;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    display: block;
+    background-color: #ffffff;
+}
