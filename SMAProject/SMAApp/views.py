@@ -17,6 +17,8 @@ def home(request):
 	return get_keyword(request)
 
 def get_keyword(request):
+	if request.session:
+		request.session.clear()
 	if request.method == 'POST':
 		form = SearchForm(request.POST)
 		if form.is_valid():

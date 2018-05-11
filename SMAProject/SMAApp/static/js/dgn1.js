@@ -22,8 +22,8 @@ $(document).ready(function(){
         $('#id_keyword').val('');
     }else{
         $('#id_keyword').val(window.localStorage['search_val']);
-    }
-    
+        
+    }  
 })
 
 function addCommaSeparation(){
