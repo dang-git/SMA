@@ -387,6 +387,10 @@ p.influencer-data.influencer-name{
     margin-top: 50px;
 }
 
+.wordcloud-image{
+    width:850px;
+}
+
 /* loading page */
 #loadingPage{
     z-index: 1;

@@ -69,8 +69,10 @@ def generate_lda_page(request):
 	#sessionFilename = "lda-" + request.session["user_id"] + ".html"
 	#ldaPath = os.path.join(settings.BASE_DIR, "SMAApp\\templates\\lda\\" + sessionFilename)	
 	#if not os.path.isfile(ldaPath):
-	lda_data = lda.lda_model(request.session["df"], request.session["user_id"])
-	return JsonResponse(lda_data,safe=False)
+	if("lda_data" not in request.session):
+		lda_data = lda.lda_model(request.session["df"], request.session["user_id"])
+		request.session["lda_data"] = lda_data
+	return JsonResponse(request.session["lda_data"],safe=False)
 
 # def return_wordcloud(request):
 #     words = wordcloudscript.return_wordcloud(request.session["df"])
