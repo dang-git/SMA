@@ -21,7 +21,7 @@ def home(request):
 def get_keyword(request):
 	if request.method == 'POST':
 		form = SearchForm(request.POST)
-		if request.session:
+		if 'user_id' in request.session:
 			del request.session['user_id']
 			del request.session['engagements_data']
 			del request.session['df']
