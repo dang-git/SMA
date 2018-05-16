@@ -8,6 +8,7 @@
 </head>
 
 <body>
+		{% include 'loadingpage.html' %}
 	<!--header -->
 	<div class="panel-heading">
 		{% include 'header.html'%}
@@ -24,7 +25,7 @@
 				{% for key, values in influentialPost.items %}
 				<tr>
 					<td class="influencer-img">
-						<img class="profile-image" src="{{ values.profileimage }}" height="100px" width="100px" />
+						<img class="profile-image" src="{{ values.profileimage }}" onerror="influentialPostImageError({{ forloop.counter }})" id="influential-post-image{{ forloop.counter }}" height="100px" width="100px" />
 					</td>
 
 					<td class="influencer-desc">
@@ -46,5 +47,5 @@
 {% include  'footer.html'%}
 
 </body>
-
+<script src="{% static 'js/dgn1.js' %}" type='text/javascript'></script>
 </html>

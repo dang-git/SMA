@@ -5,11 +5,10 @@
 
 <head>
 	<link href="{% static 'css/stldg.css' %}" rel='stylesheet' type='text/css'>
-	<script src="{% static 'js/dgn1.js' %}" type='text/javascript'></script>
 </head>
 
 <body>
-
+		{% include 'loadingpage.html' %}
 	<!--header -->
 	<div class="panel-heading">
 			{% include  'header.html'%}
@@ -26,7 +25,7 @@
 				{% for key, values in folData.items %}
 				<table class="follower-table">
 					<td class="follower-img">
-						<img src="{{values.profileimage}}" class="profile-image" height="100px" width="100px" />
+						<img src="{{values.profileimage}}" onerror="numberFollowersImageError({{ forloop.counter }})" id="number-followers-image{{ forloop.counter }}" class="profile-image" height="100px" width="100px" />
 					</td>
 					<td class="follower-desc">
 						<p class="follower-text-details username-text">
@@ -35,10 +34,10 @@
 						<p class="follower-text-details">USERNAME:
 							<em>{{values.username}}</em>
 						</p>
-						<p class="follower-text-details">FOLLOWERS: {{values.followers}}</p>
-						<p class="follower-text-details">POSTS: {{values.post}}</p>
-						<p class="follower-text-details">LIKES: {{values.favorites}}</p>
-						<p class="follower-text-details">RETWEET: {{values.retweets}}</p>
+						<p class="follower-text-details">FOLLOWERS: <span class="follower-text-details commaSeparation">{{values.followers}}</span></p>
+						<p class="follower-text-details">POSTS: <span class="follower-text-details commaSeparation">{{values.post}}</span></p>
+						<p class="follower-text-details">LIKES: <span class="follower-text-details commaSeparation">{{values.favorites}}</span></p>
+						<p class="follower-text-details">RETWEET: <span class="follower-text-details commaSeparation">{{values.retweets}}</span></p>
 					</td>
 				</table>
 				{% endfor %}
@@ -49,7 +48,7 @@
 				{% for key, values in engData.items %}
 				<table class="engagement-table">
 					<td class="engagement-img">
-						<img src="{{values.profileimage}}" height="100px" width="100px" class="profile-image" />
+						<img src="{{values.profileimage}}" onerror="engagementGainedImageError({{ forloop.counter }})" id="engagement-gained-image{{ forloop.counter }}" height="100px" width="100px" class="profile-image" />
 					</td>
 					<td class="engagement-details">
 						<p class="follower-text-details username-text">
@@ -58,10 +57,10 @@
 						<p class="follower-text-details">USERNAME:
 							<em>{{values.username}}</em>
 						</p>
-						<p class="follower-text-details">FOLLOWERS: {{values.followers}}</p>
-						<p class="follower-text-details">POSTS: {{values.post}}</p>
-						<p class="follower-text-details">LIKES: {{values.favorites}}</p>
-						<p class="follower-text-details">RETWEET: {{values.retweets}}</p>
+						<p class="follower-text-details">FOLLOWERS: <span class="follower-text-details commaSeparation"> {{values.followers}}</span></p>
+						<p class="follower-text-details">POSTS: <span class="follower-text-details commaSeparation"> {{values.post}}</span></p>
+						<p class="follower-text-details">LIKES: <span class="follower-text-details commaSeparation"> {{values.favorites}}</span></p>
+						<p class="follower-text-details">RETWEET: <span class="follower-text-details commaSeparation">{{values.retweets}}</span></p>
 					</td>
 				</table>
 				{% endfor %}
@@ -71,5 +70,5 @@
 
 	{% include  'footer.html'%}
 </body>
-
+<script src="{% static 'js/dgn1.js' %}" type='text/javascript'></script>
 </html>
