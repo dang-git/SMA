@@ -60,7 +60,7 @@ FOR INFLUENCERS TAB DATA
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::"""
 
 # set value for filter_ to engagements and flcount only
-def return_influencers(df, filter_):
+def return_influencers(df, filter_="engagements"):
     cols = ["name", "username", "rtcount", "fvcount", "type", "profileimage", "flcount"]
     df = df[cols].reset_index()
     del df['index']
@@ -70,9 +70,9 @@ def return_influencers(df, filter_):
     df = df.groupby(['name', 'username', 'flcount', 'profileimage'], sort=False)['rtcount', 'fvcount'].sum().reset_index()
     df = pd.merge(df, postcount, how='left', on=['username'])
     df['engagements'] = df['rtcount'] + df['fvcount']
-    df = df.sort_values(filter_, ascending=False).head(10).reset_index()
+    df = df.sort_values(filter_, ascending=False).reset_index()
     data = {}
-    for i in range(5):
+    for i in range(len(df)):
         data[i] = {"name": df['name'][i], "username": "@%s" % df['username'][i], "profileimage": df['profileimage'][i].replace('_normal',''), "post": df['postcount'][i], "favorites": df['fvcount'][i], "retweets": df['rtcount'][i], "followers": df['flcount'][i]}
     # data = {"1st": {"name": df['name'][0], "username": "@%s" % df['username'][0], "profileimage": df['profileimage'][0], "post": df['postcount'][0], "favorites": df['fvcount'][0], "retweets": df['rtcount'][0], "followers": df['flcount'][0]},
     #            "2nd": {"name": df['name'][1], "username": "@%s" % df['username'][1], "profileimage": df['profileimage'][1], "post": df['postcount'][1], "favorites": df['fvcount'][1], "retweets": df['rtcount'][1], "followers": df['flcount'][1]},
