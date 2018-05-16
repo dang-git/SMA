@@ -25,6 +25,11 @@ $(document).ready(function(){
     }
     
     loadInsightValues();
+
+    $('.profile-image').on('error' ,function(){
+        $(this).attr('src', 'https://vignette.wikia.nocookie.net/citrus/images/6/60/No_Image_Available.png/revision/latest?cb=20170129011325')
+    });
+    
 })
 
 // display loading screen on search
@@ -84,3 +89,7 @@ $('.search-insights-input').on('change', function(){
     var insight = $(this).attr('id');
     window.sessionStorage[insight] = $(this).val();
 });
+
+function imageError(){
+    $('.profile-image').attr('src', '/images/noimagefound.jpg');
+}
