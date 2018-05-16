@@ -25,7 +25,7 @@
 				{% for key, values in folData.items %}
 				<table class="follower-table">
 					<td class="follower-img">
-						<img src="{{values.profileimage}}" class="profile-image" height="100px" width="100px" />
+						<img src="{{values.profileimage}}" onerror="numberFollowersImageError({{ forloop.counter }})" id="number-followers-image{{ forloop.counter }}" class="profile-image" height="100px" width="100px" />
 					</td>
 					<td class="follower-desc">
 						<p class="follower-text-details username-text">
@@ -48,7 +48,7 @@
 				{% for key, values in engData.items %}
 				<table class="engagement-table">
 					<td class="engagement-img">
-						<img src="{{values.profileimage}}" height="100px" width="100px" class="profile-image" />
+						<img src="{{values.profileimage}}" onerror="engagementGainedImageError({{ forloop.counter }})" id="engagement-gained-image{{ forloop.counter }}" height="100px" width="100px" class="profile-image" />
 					</td>
 					<td class="engagement-details">
 						<p class="follower-text-details username-text">

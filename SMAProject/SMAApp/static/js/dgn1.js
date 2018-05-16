@@ -26,9 +26,9 @@ $(document).ready(function(){
     
     loadInsightValues();
 
-    $('.profile-image').on('error' ,function(){
-        $(this).attr('src', 'https://vignette.wikia.nocookie.net/citrus/images/6/60/No_Image_Available.png/revision/latest?cb=20170129011325')
-    });
+   // $('.profile-image').on('error' ,function(){
+   //     $(this).attr('src', 'https://vignette.wikia.nocookie.net/citrus/images/6/60/No_Image_Available.png/revision/latest?cb=20170129011325')
+   // });
     
 })
 
@@ -90,6 +90,14 @@ $('.search-insights-input').on('change', function(){
     window.sessionStorage[insight] = $(this).val();
 });
 
-function imageError(){
-    $('.profile-image').attr('src', '/images/noimagefound.jpg');
+function numberFollowersImageError(index){
+    $('#number-followers-image' + index).attr('src', 'https://vignette.wikia.nocookie.net/citrus/images/6/60/No_Image_Available.png/revision/latest?cb=20170129011325');
+}
+
+function engagementGainedImageError(index){
+    $('#engagement-gained-image' + index).attr('src', 'https://vignette.wikia.nocookie.net/citrus/images/6/60/No_Image_Available.png/revision/latest?cb=20170129011325');
+}
+
+function influentialPostImageError(index){
+    $('#influential-post-image' + index).attr('src', 'https://vignette.wikia.nocookie.net/citrus/images/6/60/No_Image_Available.png/revision/latest?cb=20170129011325');
 }
