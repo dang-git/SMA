@@ -11,14 +11,13 @@ consumer_secret = 'k94YFxtT3PYfAxjZO8bznHZd9dPF7QrT38vJLXhpDz5dqM4HJ5'
 access_token = '2399374735-Y0Zw6m1CoRbE0hLzGOYUjRIx4eyl3hZ9SML9o8N'
 access_secret = 'dC87GLGLU4PLuVsM1ddKONKo9YMxJSXTunibROrXibZ0E'
 proxy = 'cache.srv.pointwest.com.ph:3128'
+auth = OAuthHandler(consumer_key, consumer_secret)
+auth.set_access_token(access_token, access_secret)
+api = tweepy.API(auth, proxy=proxy)
 
 def searchKeyWord(input):
     date_extracted = datetime.datetime.today().strftime("%m-%d-%Y %H:%M:%S")
-    auth = OAuthHandler(consumer_key, consumer_secret)
-    auth.set_access_token(access_token, access_secret)
-    api = tweepy.API(auth, proxy=proxy)
     keys = input.split(',')
-    print(input)
     key = '("' + '") OR ("'.join(keys) + '")'
     lapse = 1
     start = time.time()
@@ -26,9 +25,12 @@ def searchKeyWord(input):
     df = pd.DataFrame()
     rows_list = []
     tweetid = []
+    request_start = 0
+    remaining = 0
     while run:
         try:
-            new_tweets = tweepy.Cursor(api.search, q=key, lang='en').items(1000)
+            request_start = api.rate_limit_status()['resources']['search']['/search/tweets']['remaining']
+            new_tweets = tweepy.Cursor(api.search, q=key, lang='en').items(1000000)
             for tweet in new_tweets:
                 runtime = time.time() - start
                 if tweet.id not in tweetid and runtime < lapse*60:
@@ -74,6 +76,7 @@ def searchKeyWord(input):
                     rows_list.append(row)
                 else:
                     run = False
+            remaining = api.rate_limit_status()['resources']['search']['/search/tweets']['remaining']
         except tweepy.TweepError as e:
             outfile = open("errors.txt", "a")
             outfile.write("\n")
@@ -86,4 +89,10 @@ def searchKeyWord(input):
         df = pd.DataFrame(rows_list)
         df["dateextracted"] = date_extracted
         df["keywords"] = input
-        return df
+        requests_consumed = request_start - remaining
+        requests_ = {'requests_consumed': requests_consumed, 'tweet_count': len(df)}
+        outfile = open("requests.txt", "a")
+        outfile.write("\n")
+        outfile.write(str(requests_))
+        outfile.close()
+        return df, requests_
