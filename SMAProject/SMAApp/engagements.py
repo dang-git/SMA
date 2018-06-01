@@ -27,9 +27,8 @@ def return_timeline(df):
     del tl['index']
     tl["int"] = [1000*(t.replace(tzinfo=None)-datetime(1970,1,1)).total_seconds() for t in tl.datehour]
     tl.to_csv("tl.csv")
-    chartdata = {'x': tl["int"],
-        'name': 'Volume', 'y1': tl['dateofposting'], 'kwargs1': { 'color': '#ef6c00' }
-    }
+    extra_serie = {"tooltip": {"y_start": "", "y_end": "Volume"}}        
+    chartdata = {'x': tl["int"], 'name1': 'Volume', 'y1': tl['dateofposting'], 'kwargs1': { 'color': '#000000' }, 'extra1' : extra_serie}
     return chartdata
 
 def return_composition(df):

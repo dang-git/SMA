@@ -38,6 +38,8 @@ def get_keyword(request):
 			all_data["engagements"] = formattedData
 			timeline = engagements.return_timeline(df)
 			all_data["timeline"] = demo_linechart(request, timeline)
+			print("dri")
+			print(all_data["timeline"])
 			request.session['engagements_data'] = all_data
 			sourceData = engagements.return_source(df)
 			sourceFormattedData = sourcePiechartConverter(sourceFormatData(sourceData))
@@ -173,9 +175,12 @@ def demo_linechart(request, chartdata):
             'x_is_date': True,
             'x_axis_format': '%b-%d %H:%m',
             'tag_script_js': True,
-            'jquery_on_ready': False,
-        }
+            'jquery_on_ready': False
+		}
+
+        
     }
+
     return data
 
 def demo_donutchart(chartdata):
@@ -243,8 +248,7 @@ def demo_horizontalBarChart(chartdata):
     kwargs1 = {'color': 'green'}
     chartdata = {
         'x': xdata,
-        'name1': 'series 1', 'y1': ydata, 'extra1': extra_serie, **kwargs1
-        #'name2': 'series 2', 'y2': ydata2, 'extra2': extra_serie,
+        'name1': 'Tweets', 'y1': ydata, 'extra1': extra_serie
     }
 
     charttype = "multiBarHorizontalChart"
@@ -258,7 +262,10 @@ def demo_horizontalBarChart(chartdata):
             'x_axis_format': '',
             'tag_script_js': True,
             'jquery_on_ready': True,
-        },
+			'staggerLabels' : True,
+			'margin_left' : 120
+        }
+		
     }
     return data
 

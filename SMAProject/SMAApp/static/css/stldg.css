@@ -277,15 +277,16 @@ table.polarity-table, table.polarity-table td {
 .topic-main-container{
     /* border: 1px solid #1f77b4; */
     /* border: 2px solid lightseagreen; */
-    margin-left: 300px;
+    margin-left: 268px;
     margin-top: 130px;
     margin-bottom: 40px;
 }
 
 .topic-title{
+    width: 98%;
     background-color: #1f77b4;
     border: 1px solid #1f77b4;
-    color: #ef6c00;
+    color: #fbfaf9;
     padding: 10px;
     font-family: "Helvetica";
     font-weight: bold;
@@ -301,6 +302,7 @@ table.polarity-table, table.polarity-table td {
     display: inline-block;
     vertical-align: middle;
     width: auto;
+
 }
 
 div.polarity{
@@ -339,6 +341,7 @@ p.influencer-data.influencer-name{
 #wordcloudImageContainer{
     border: 2px solid #1f77b4;
     width: 99.6%;
+    margin-bottom: 3%;
 }
 
 #uploadImageContainer{
@@ -352,19 +355,28 @@ p.influencer-data.influencer-name{
 }
 
 .cloud-topic-container{
-    width: 60%;
+    width: 80%;
 } 
 
+.top-hashtag-container{
+    border: 2px solid #1f77b4;
+    margin-bottom: 3%;
+    width: 99.6%;
+
+}
+#multibarhorizontalchart_container{
+    margin-left: 5px;
+}
 .lda{
     /* margin-left: 300px; */
     margin-bottom: 40px;
-    width: 1210px;
+    width: 100%;
 }
 
 /* diagnostics */
 #QuickStatContainer{
     border: 2px solid #1f77b4;
-    width: 99.6%;
+    width:  99.5%;
     display: inline-block;
 }
 
@@ -375,12 +387,21 @@ p.influencer-data.influencer-name{
 .donut-chart-left{
     margin-left: 300px;
     border: 2px solid #1f77b4;
+    width: 35%;
+} 
+.sources-title {
+    width: 96%;
 } 
 
 .donut-chart-right{
     /* margin-left: 100px; */
     overflow-wrap: inherit;
     border: 2px solid #1f77b4;
+    width: 35%;
+}
+
+.composition-title {
+    width: 96%;
 }
 
 .location-topic-container{

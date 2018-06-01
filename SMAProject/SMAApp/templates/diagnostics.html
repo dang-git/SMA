@@ -70,7 +70,7 @@
 
 		<div id="donut_chart_container">
 			<div class="donut-chart-left">
-				<div class="topic-title">SOURCES</div>
+				<div class="topic-title sources-title">SOURCES</div>
 				{% load_chart all_data.source.charttype all_data.source.chartdata all_data.source.chartcontainer all_data.source.extra %}
 				{% include_container all_data.source.chartcontainer 400 500 %}
 				<div class="search-insight-container">
@@ -78,7 +78,7 @@
 				</div>
 			</div>
 			<div class="donut-chart-right">
-				<div class="topic-title">COMPOSITION</div>
+				<div class="topic-title composition-title">COMPOSITION</div>
 				{% load_chart all_data.composition.charttype all_data.composition.chartdata all_data.composition.chartcontainer all_data.source.extra%} 
 				{% include_container all_data.composition.chartcontainer 400 500 %}
 				<div class="search-insight-container">
