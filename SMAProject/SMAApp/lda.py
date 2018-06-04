@@ -56,7 +56,7 @@ def further_process(sentences):
     corpus = [dictionary.doc2bow(text) for text in texts]
     return corpus, dictionary
 
-def lda_model(data, sessionid):
+def lda_model(data):
     corpus, dictionary = further_process(data.tweet)
     lda = models.LdaModel(corpus, num_topics=4, id2word=dictionary, update_every=5,
                           chunksize=10000, passes=100)

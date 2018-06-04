@@ -19,7 +19,7 @@ def searchKeyWord(input):
     date_extracted = datetime.datetime.today().strftime("%m-%d-%Y %H:%M:%S")
     keys = input.split(',')
     key = '("' + '") OR ("'.join(keys) + '")'
-    lapse = 1
+    lapse = 5
     start = time.time()
     run = True
     df = pd.DataFrame()
@@ -95,4 +95,4 @@ def searchKeyWord(input):
         outfile.write("\n")
         outfile.write(str(requests_))
         outfile.close()
-        return df, requests_
+        return [df, requests_]

@@ -3,10 +3,16 @@ from __future__ import unicode_literals
  
 from django.shortcuts import render
 from django.views.generic import TemplateView
+from django.template.loader import render_to_string
 from django.http import HttpResponseRedirect, JsonResponse, HttpResponse
 from django.conf import settings
 from .forms import SearchForm
-from SMAApp import extract, engagements, wordcloudscript, lda,hashtags
+from SMAApp import extract, engagements, wordcloudscript, lda, hashtags, tasks
+from background_task import background
+from django.core import serializers
+from celery import shared_task
+from celery.result import AsyncResult
+from celery.task.control import revoke
 import pandas as pd
 import json
 import uuid
@@ -22,36 +28,46 @@ def get_keyword(request):
 	if request.method == 'POST':
 		form = SearchForm(request.POST)
 		if 'user_id' in request.session:
+			print("NUREMA")
 			del request.session['user_id']
 			del request.session['engagements_data']
 			del request.session['df']
 		if form.is_valid():
+			print("get_keyword")
 			print('extracting')
 			request.session['user_id'] = str(uuid.uuid4())
 			request.session['engagements_data'] = ""
-			#df = extract.searchKeyWord(form.cleaned_data['keyword'])
-			df = pd.read_pickle("file.pkl")
+			#df = extract.searchKeyWord(form.cleaned_data['keyword'])[0]
+			pickling = os.path.join(settings.BASE_DIR, "SMAApp\\static\\images\\wordcloud\\SM.pkl")
+			#df.to_pickle(pickling)
+			df = pd.read_pickle(pickling)
 			request.session["df"] = df
 			data = engagements.return_engagements(df)
 			formattedData = formatData(data)
 			all_data = {}
+			request.session['ldaTriggered'] = {}
+			#for key, value in request.session.items(): print('{}'.format(key))
 			all_data["engagements"] = formattedData
 			timeline = engagements.return_timeline(df)
 			all_data["timeline"] = demo_linechart(request, timeline)
-			print("dri")
-			print(all_data["timeline"])
 			request.session['engagements_data'] = all_data
 			sourceData = engagements.return_source(df)
-			sourceFormattedData = sourcePiechartConverter(sourceFormatData(sourceData))
+			sourceFormattedData = sourcePiechartConverter(sourceData)
 			all_data["source"] = sourceFormattedData
 			composition = engagements.return_composition(df)
-			compositionFormattedData = compositionPiechartConverter(compositionFormatData(composition))
+			compositionFormattedData = compositionPiechartConverter(composition)
 			all_data["composition"] = compositionFormattedData
 			request.session["df"] = df
+
+			#Polarity Part
+			# request.session["polarity_chartdata"] = engagements.return_polarity_chartdata(df)
+			# request.session["polarity_table"] = engagements.return_polarity(df)
+			#start_background_tasks(request, df)
 			return render(request, 'diagnostics.html',
                 {'all_data':all_data,'form':form})
 	else:
 		form = SearchForm()
+		print("get_keyword else")
 	return render(request, 'search.html', {'form': form})
 
 # Returns lat, lang, user, tweet
@@ -68,17 +84,75 @@ def generate_wordcloud_image(request):
 	imageFilename = "wordcloud-" + request.session["user_id"] + ".png"
 	imagePath = os.path.join(settings.BASE_DIR, "SMAApp\\static\\images\\wordcloud\\" + imageFilename)
 	if not os.path.isfile(imagePath):
+		print("image not in path")
 		wordcloudscript.return_wordcloud(request.session["df"], request.session["user_id"])
-	return HttpResponse(True)
+		return HttpResponse(False)
+	else:
+		return HttpResponse(True)
 
 def generate_lda_page(request):
 	#sessionFilename = "lda-" + request.session["user_id"] + ".html"
 	#ldaPath = os.path.join(settings.BASE_DIR, "SMAApp\\templates\\lda\\" + sessionFilename)	
-	#if not os.path.isfile(ldaPath):
-	if("lda_data" not in request.session):
-		lda_data = lda.lda_model(request.session["df"], request.session["user_id"])
-		request.session["lda_data"] = lda_data
-	return JsonResponse(request.session["lda_data"],safe=False)
+	#if not os.path.isfile(ldaPath): 
+	#if("lda_data" not in request.session and request.session["ldaTriggered"] != 'Y'):
+		# print("up")
+		# print(request.session["ldaTriggered"])
+		# print("nasa if")
+		# request.session["ldaTriggered"] = 'Y'
+		# print(request.session["ldaTriggered"])
+		# lda_data = lda.lda_model(request.session["df"], request.session["user_id"])
+		# request.session["lda_data"] = lda_data
+		# request.session["ldaTriggered"] = 'N'
+		# print("after shock")
+		# print(request.session["ldaTriggered"])
+	ldapath = os.path.join(settings.BASE_DIR, "SMAApp\\templates\\lda.html")
+	html = render_to_string(ldapath)
+	return HttpResponse(html)
+		# return JsonResponse(request.session["lda_data"],safe=False)
+	# else:
+	# 	ldapath = os.path.join(settings.BASE_DIR, "SMAApp\\templates\\lda.html")
+	# 	html = render_to_string(ldapath, {'ldajson':request.session["lda_data"]})
+	# 	return HttpResponse(html)
+
+def test_lda(request):
+    df = request.session["df"]
+    lda_data = tasks.generate_lda_data.delay(df.to_json())
+    request.session["lda_data_id"] = lda_data
+    print("GOT")
+    print(request.session.get('lda_data_id'))
+    # if request.session.get("lda_data_id",False):
+    #     print("LOOBSA")
+    #     revoke(str(request.session.get('lda_data_id')),terminate=True,signal='SIGKILL')
+    #     print("terminated")
+    request.session["lda_data"] = lda_data.get()
+    request.session.save()
+    #return JsonResponse(request.session["lda_data"],safe=False)
+
+def check_lda_status(request):
+	if request.session.get("lda_data",False):
+		return JsonResponse(request.session["lda_data"],safe=False)
+	else: 
+		return HttpResponse(False)
+
+def start_background_tasks(request):
+	df = request.session["df"]
+	request.session["sentiments_data_id"] = tasks.generate_sentiments_data.delay(df.to_json())
+	request.session["lda_data_id"] = tasks.generate_lda_data.delay(df.to_json())
+	request.session.save()
+
+def get_sentiments(request):
+	df = request.session["df"]
+	polarity_chartdata = engagements.return_polarity_chartdata(df)
+	request.session["polarity_chartdata"] = polarity_chartdata 
+	polarity_table = engagements.return_polarity(df)
+	request.session["polarity_table"] = polarity_table
+	request.session.save()
+	if request.session.get("polarity_chartdata",False) and request.session.get("polarity_table",False):
+		return HttpResponse(True)
+	else: 
+		return HttpResponse(False)
+    #request.session["sentiments_chartdata"] = sentiments_data.get()
+	
 
 # def return_wordcloud(request):
 #     words = wordcloudscript.return_wordcloud(request.session["df"])
@@ -88,12 +162,12 @@ def open_diagnostics(request):
 	if request.method == 'POST':
 		get_keyword(request)
 	else:
+		df = request.session["df"]
 		all_data = request.session['engagements_data']
 		form = SearchForm()
 		form.fields['keyword'].widget.attrs['placeholder'] = "Search #hashtag"
 	return render(request, 'diagnostics.html',
-               {'all_data':all_data,'form':form})  
-    #template_name = "diagnostics.html"
+               {'all_data':all_data,'form':form})
 
 def open_influencers(request):
 	if request.method == 'POST':
@@ -119,9 +193,22 @@ def open_sentiments(request):
 	if request.method == 'POST':
 		get_keyword(request)
 	else:
-		chartdata = engagements.return_polarity_chartdata(request.session["df"])
+		# print(request.session.get('sentiments_data_id', False))
+		# sentiments_id = request.session.get('sentiments_data_id', False)
+		#sentiments = AsyncResult(str(sentiments_id))
+		# Tempo Start
+		if not request.session.get("polarity_chartdata",False) or not request.session.get("polarity_table",False):
+			polarity_chartdata = engagements.return_polarity_chartdata(request.session["df"])
+			request.session["polarity_chartdata"] = polarity_chartdata 
+			polarity_table = engagements.return_polarity(request.session["df"])
+			request.session["polarity_table"] = polarity_table
+		# Tempo End
+		chartdata = request.session.get('polarity_chartdata', False)
+		
+		#engagements.return_polarity_chartdata(request.session["df"])
 		data = {}
-		data['polarityTable'] = engagements.return_polarity(request.session["df"])
+		data['polarityTable'] = request.session.get('polarity_table', False)
+		#engagements.return_polarity(request.session["df"])
 		data['polar'] = demo_donutchart(chartdata)
 		form = SearchForm()
 		form.fields['keyword'].widget.attrs['placeholder'] = "Search #hashtag"
@@ -207,16 +294,16 @@ def demo_donutchart(chartdata):
     }
     return data
 
-def sourcePiechartConverter(data):
+def sourcePiechartConverter(chartdata):
     """
     pieChart page
     """
-    
-    xdata = ["Web Client", "Android", "iPhone", "Others"]
-    ydata = [data["webClient"], data["android"], data["iPhone"], data["others"]]
-
-    extra_serie = {"tooltip": {"y_start": "", "y_end": ""}}
-    chartdata = {'x': xdata, 'y1': ydata, 'extra1': extra_serie}
+    # {'Web Client': 393, 'Android': 669, 'iPhone': 670, 'Others': 929}
+    # xdata = ["Web Client", "Android", "iPhone", "Others"]
+    # ydata = [data["webClient"], data["android"], data["iPhone"], data["others"]]
+    #ydata = [393, 669, 670, 929]
+    #extra_serie = {"tooltip": {"y_start": "", "y_end": ""}}
+    #chartdata = {'x': xdata, 'y1': ydata, 'extra1': extra_serie}
     charttype = "pieChart"
     chartcontainer = 'source_piechart_container'
 
@@ -245,7 +332,7 @@ def demo_horizontalBarChart(chartdata):
     #ydata2 = map(lambda x: x * 2, ydata)
 
     extra_serie = {"tooltip": {"y_start": "", "y_end": " tweets"}}
-    kwargs1 = {'color': 'green'}
+    
     chartdata = {
         'x': xdata,
         'name1': 'Tweets', 'y1': ydata, 'extra1': extra_serie
@@ -262,7 +349,6 @@ def demo_horizontalBarChart(chartdata):
             'x_axis_format': '',
             'tag_script_js': True,
             'jquery_on_ready': True,
-			'staggerLabels' : True,
 			'margin_left' : 120
         }
 		
@@ -275,16 +361,17 @@ def compositionFormatData(data):
             'reply': "{:,}".format(data['reply']),
             } 
     
-def compositionPiechartConverter(data):
+def compositionPiechartConverter(chartdata):
     """
     pieChart page
     """
     
-    xdata = ["Retweet", "Original", "Reply"]
-    ydata = [data["retweet"], data["original"], data["reply"]]
+    #xdata = ["Retweet", "Original", "Reply"]
+    #ydata = [1307,950,316]
+    #ydata = [data["retweet"], data["original"], data["reply"]]
 
-    extra_serie = {"tooltip": {"y_start": "", "y_end": ""}}
-    chartdata = {'x': xdata, 'y1': ydata, 'extra1': extra_serie}
+    #extra_serie = {"tooltip": {"y_start": "", "y_end": ""}}
+    #chartdata = {'x': xdata, 'y1': ydata, 'extra1': extra_serie}
     charttype = "pieChart"
     chartcontainer = 'composition_piechart_container'
 

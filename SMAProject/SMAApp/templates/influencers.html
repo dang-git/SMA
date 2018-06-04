@@ -5,6 +5,7 @@
 
 <head>
 	<link href="{% static 'css/stldg.css' %}" rel='stylesheet' type='text/css'>
+	<link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Raleway"/>
 </head>
 
 <body>
@@ -21,7 +22,7 @@
 		<div class="topic-main-container">
 			<!-- Followers -->
 			<div class="followers">
-				<div class="topic-title">BY NUMBER OF FOLLOWERS</div>
+				<div class="topic-title-influencers">BY NUMBER OF FOLLOWERS</div>
 				{% for key, values in folData.items %}
 				<table class="follower-table">
 					<td class="follower-img">
@@ -44,7 +45,7 @@
 			</div>
 			<!-- engagements -->
 			<div class="engagements">
-				<div class="topic-title">BY ENGAGEMENTS GAINED</div>
+				<div class="topic-title-influencers">BY ENGAGEMENTS GAINED</div>
 				{% for key, values in engData.items %}
 				<table class="engagement-table">
 					<td class="engagement-img">

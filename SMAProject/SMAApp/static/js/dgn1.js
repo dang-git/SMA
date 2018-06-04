@@ -91,13 +91,13 @@ $('.search-insights-input').on('change', function(){
 });
 
 function numberFollowersImageError(index){
-    $('#number-followers-image' + index).attr('src', 'https://vignette.wikia.nocookie.net/citrus/images/6/60/No_Image_Available.png/revision/latest?cb=20170129011325');
+    $('#number-followers-image' + index).attr('src', 'http://127.0.0.1:8000/static/images/social-fly-logo.png');
 }
 
 function engagementGainedImageError(index){
-    $('#engagement-gained-image' + index).attr('src', 'https://vignette.wikia.nocookie.net/citrus/images/6/60/No_Image_Available.png/revision/latest?cb=20170129011325');
+    $('#engagement-gained-image' + index).attr('src', 'http://127.0.0.1:8000/static/images/social-fly-logo.png');
 }
 
 function influentialPostImageError(index){
-    $('#influential-post-image' + index).attr('src', 'https://vignette.wikia.nocookie.net/citrus/images/6/60/No_Image_Available.png/revision/latest?cb=20170129011325');
+    $('#influential-post-image' + index).attr('src', 'http://127.0.0.1:8000/static/images/social-fly-logo.png');
 }

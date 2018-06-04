@@ -2,6 +2,7 @@
 
 import pandas as pd
 from datetime import datetime
+import json
 
 
 """::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -28,12 +29,16 @@ def return_timeline(df):
     tl["int"] = [1000*(t.replace(tzinfo=None)-datetime(1970,1,1)).total_seconds() for t in tl.datehour]
     tl.to_csv("tl.csv")
     extra_serie = {"tooltip": {"y_start": "", "y_end": "Volume"}}        
-    chartdata = {'x': tl["int"], 'name1': 'Volume', 'y1': tl['dateofposting'], 'kwargs1': { 'color': '#000000' }, 'extra1' : extra_serie}
+    chartdata = {'x': tl["int"], 'name1': 'Volume', 'y1': tl['dateofposting'], 'kwargs1': { 'color': '#ef6c00' }, 'extra1' : extra_serie}
     return chartdata
 
 def return_composition(df):
     data = dict(df.type.value_counts())
-    return data
+    ydata = list(data.values())
+    ydata = [int(i) for i in ydata]
+    extra_serie = {"tooltip": {"y_start": "", "y_end": ""}}
+    chartdata = {'x': [*data], 'name1': 'Volume', 'y1': ydata, 'extra1':extra_serie}
+    return chartdata
 
 def return_source(df):
     src = dict(df.source.value_counts())
@@ -42,7 +47,11 @@ def return_source(df):
     src_["Android"]  = src["Twitter for Android"]
     src_["iPhone"]  = src["Twitter for iPhone"]
     src_["Others"]  = sum(src.values()) - src_["Web Client"] - src_["Android"] - src_["iPhone"]
-    return src_
+    ydata = list(src_.values())
+    ydata = [int(i) for i in ydata]
+    extra_serie = {"tooltip": {"y_start": "", "y_end": ""}}
+    chartdata = {'x': [*src_], 'y1': ydata, 'name1':ydata, 'extra1': extra_serie}
+    return chartdata
 
 def return_geocode(df):
     data = {}
@@ -59,7 +68,8 @@ FOR INFLUENCERS TAB DATA
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::"""
 
 # set value for filter_ to engagements and flcount only
-def return_influencers(df, filter_="engagements"):
+# def return_influencers(df, filter_="engagements"):
+def return_influencers(df, filter_):
     cols = ["name", "username", "rtcount", "fvcount", "type", "profileimage", "flcount"]
     df = df[cols].reset_index()
     del df['index']
@@ -71,7 +81,8 @@ def return_influencers(df, filter_="engagements"):
     df['engagements'] = df['rtcount'] + df['fvcount']
     df = df.sort_values(filter_, ascending=False).reset_index()
     data = {}
-    for i in range(len(df)):
+    # for i in range(len(df)):
+    for i in range(5):
         data[i] = {"name": df['name'][i], "username": "@%s" % df['username'][i], "profileimage": df['profileimage'][i].replace('_normal',''), "post": df['postcount'][i], "favorites": df['fvcount'][i], "retweets": df['rtcount'][i], "followers": df['flcount'][i]}
     # data = {"1st": {"name": df['name'][0], "username": "@%s" % df['username'][0], "profileimage": df['profileimage'][0], "post": df['postcount'][0], "favorites": df['fvcount'][0], "retweets": df['rtcount'][0], "followers": df['flcount'][0]},
     #            "2nd": {"name": df['name'][1], "username": "@%s" % df['username'][1], "profileimage": df['profileimage'][1], "post": df['postcount'][1], "favorites": df['fvcount'][1], "retweets": df['rtcount'][1], "followers": df['flcount'][1]},
@@ -129,11 +140,21 @@ def return_polarity_chartdata(df):
     ydata = list(data.values())
     ydata = [int(i) for i in ydata]
     extra_serie = {"tooltip": {"y_start": "", "y_end": ""}}
-    chartdata = {'x': xdata, 'y1': ydata, 'name':'Volume', 'extra1': extra_serie
+    chartdata = {'x': xdata, 'y1': ydata, 'name1':'Tweets', 'extra1': extra_serie
     }
     return chartdata
     
 def return_polarity(df):
     df['polarity'] = [polarize.polarity(i) for i in df.tweet]
     data = dict(df.polarity.value_counts())
+    # Parse values from int64 to int
+    # for values in data:
+    #     data[values] = int(data[values])
     return data
+
+    # data = [int(i) for i in list(data.values())]
+
+    #data = dict(df.polarity.value_counts())
+    # xdata = [*data]
+    # ydata = list(data.values())
+    

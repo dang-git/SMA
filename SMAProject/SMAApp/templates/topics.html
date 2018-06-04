@@ -6,17 +6,12 @@
 <head>
 	<link href="{% static 'css/stldg.css' %}" rel='stylesheet' type='text/css'>
 	<script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
-	<script src="{% static 'js/diagnostics.js' %}" type='text/javascript'></script>
+	<script async src="{% static 'js/diagnostics.js' %}" type='text/javascript'></script>
 	<script>
 		// lda data to be used by the lda page
 		 var lda_data = window.sessionStorage['lda_data'];
 	// var lda_data = JSON.parse(test.replace(/&quot;/g,'"'));
 	</script>
-	<style>
-		.nv-series {
-			display: none;
-		}
-	</style>
 </head>
 
 <body>
@@ -30,6 +25,7 @@
 	<div class="main">
 			<div class="topic-main-container cloud-topic-container">
 					<div class="topic-title">WORDCLOUD</div>
+						<p id="imagePlaceholder">Loading Wordcloud Image <img id="miniLoading" src="{% static 'images/mini-loading.gif' %}" height="25"></p>
 					<div id="wordcloudImageContainer">
 							{% with 'images/wordcloud/wordcloud-'|add:sessionid|add:'.png' as wordcloud_image %}
 							<img src="{% static wordcloud_image %}" class="wordcloud-image"/>
@@ -67,11 +63,17 @@
 			<div class="topic-title">TOPICS</div>
 			<div id="wordcloudImageContainer">
 				<!-- to test lda.html, only remove the 3 lines and replace with {# include 'lda/lda.html' #}  -->
-				<!-- {% include 'lda.html' %}
+				<div id="ldaPlaceholder">
+					<p>Loading Topic Clusters 
+					<img id="miniLoading" src="{% static 'images/mini-loading.gif' %}" height="25">
+					</p>
+				</div>
+				<div id="ldaPage">
+				{# include 'lda.html' #}
+				</div>
 					{# with 'lda-'|add:sessionid|add:'.html' as lda_page #}
 					{# include 'lda/'|add:lda_page #}
-					{# endwith #} -->
-				{% include 'lda.html' %}
+					{# endwith #}
 				<div class="search-insight-container">
 					<input type="text" id="topic1Insight" placeholder="Type insights here for topic 1" class="search-insights-input">
 				</div>
