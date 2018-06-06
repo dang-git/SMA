@@ -4,10 +4,12 @@
 <title>TWITTER SEARCH</title>
 
 <head>
+		<link rel="stylesheet" type="text/css" href="{% static 'bootstrap/css/bootstrap.css' %}">
 	<link href="{% static 'css/stldg.css' %}" rel='stylesheet' type='text/css'>
 	<!-- <script src="{% static 'js/markerclusterer.js' %}" type='text/javascript'></script> -->
 	<link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Raleway" />
 	<script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+	<script src="{% static 'bootstrap/js/bootstrap.js' %}"></script>
 	<!-- <script>
 		var imagePath = "{% static 'images/m1.png' %}";
 	</script> -->
@@ -25,28 +27,29 @@
 	<div class="panel-heading">
 		{% include 'header.html'%}
 	</div>
+		<!-- sidebar -->
+		<div class="container-fluid">
+	{% include 'sidebar.html'%}
 
 	<div id="content">
-		<!-- sidebar -->
-		{% include 'sidebar.html'%}
 
 		<div class="topic-main-container">
 			<div class="topic-title">QUICK STATISTICS</div>
-			<div id="QuickStatContainer">
-				<div id="posts">
+			<div id="QuickStatContainer" class="col-sm-6">
+				<div id="posts" class="col-md-3">
 					<p id="postsCount">{{ all_data.engagements.tweets }}</p>
 					<p id="postsCount">{{ formattedData.engagements.tweets }}</p>
 					<p id="postsLabel">POSTS</p>
 				</div>
-				<div id="users">
+				<div id="users" class="col-md-6">
 					<p id="usersCount">{{ all_data.engagements.users }}</p>
 					<p id="usersLabel">USERS</p>
 				</div>
-				<div id="audience">
+				<div id="audience" class="col-md-6">
 					<p id="audienceCount">{{ all_data.engagements.reach }}</p>
 					<p id="audienceLabel">POTENTIAL AUDIENCE</p>
 				</div>
-				<div id="engagements">
+				<div id="engagements" class="col-md-6">
 					<p id="engagementsCount">{{ all_data.engagements.engagements }}</p>
 					<p id="engagementsLabel">ENGAGEMENTS</p>
 				</div>
@@ -55,7 +58,7 @@
 				</div>
 			</div>
 		</div>
-
+		</div>
 		<div class="topic-main-container timeline-topic-container">
 			<div class="topic-title">TIMELINE</div>
 			<div id="timelineContainer">

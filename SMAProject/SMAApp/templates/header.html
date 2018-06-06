@@ -1,17 +1,22 @@
 {% load staticfiles %}
 <div class="header-panel-item">
-        <a href="#search.html" class="" target="_blank">
-            <img id="fly" src="{% static 'images/logo-light2.png' %}" height="50">
-        </a>
+    <a href="#search.html" class="" target="_blank">
+        <img id="fly" src="{% static 'images/logo-light2.png' %}" height="50">
+    </a>
+</div>
+<div class="header-panel-item right-item" id="homeServicesItem">
+    <a href="#" class="item-link">Home</a>
+    <a href="#" class="item-link">Services</a>
+    
+            <form id="searchForm" class="form-wrapper cf" action="/" method="post">
+                <!-- <input type="text" placeholder="Search #hashtag" id="searchHashtag"> -->
+                <div class="form-group">
+                        <div class="input-group mb-3">
+                {% csrf_token %} {{form}}
+                <div class="input-group-append">
+                <button type="submit" id="searchAgainButton">Search</button>
+            </div>
+            </form>
+        </div>
     </div>
-    <div class="header-panel-item right-item" id="homeServicesItem">
-        <a href="#" class="item-link">Home</a>
-        <a href="#" class="item-link">Services</a>
-     
-     <form id="searchForm" class="form-wrapper cf" action="/" method="post">
-            <!-- <input type="text" placeholder="Search #hashtag" id="searchHashtag"> -->
-            {% csrf_token %}
-            {{form}}
-            <button type="submit" id="searchAgainButton">Search</button>
-        </form>
-    </div> 
+</div>

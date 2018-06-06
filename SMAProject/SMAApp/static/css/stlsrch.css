@@ -54,7 +54,7 @@ body {
 /* Form text input */
 .form-wrapper input {
     width: 35.15vw;
-    height: 1.5vw;
+    /* height: 1.5vw; */
 	margin-top: .6vw;
     padding: .8vw .36vw;
     float: left;   
