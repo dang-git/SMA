@@ -4,6 +4,7 @@
 <title>TWITTER SEARCH</title>
 
 <head>
+	<link rel="stylesheet" type="text/css" href="{% static 'bootstrap/css/bootstrap.css' %}">
 	<link href="{% static 'css/stldg.css' %}" rel='stylesheet' type='text/css'>
 	<link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Raleway"/>
 </head>
@@ -14,33 +15,34 @@
 	<div class="panel-heading">
 		{% include 'header.html'%}
 	</div>
-
-	<div id="content">
-	<!-- sidebar -->
-	{% include 'sidebar.html'%}
-	<div class="topic-main-container">
+	<div class="row">
+		<!-- sidebar -->
+		{% include 'sidebar.html'%}
+		<div id="content " class="col-lg-10 col-xs-10">
+		<div class="topic-main-container ">
 			<div class="topic-title">BY ENGAGEMENTS GAINED</div>
-		<div id="influencer-data-container">
+			<div id="influencer-data-container">
 
-			<table class="follower-table">
-				{% for key, values in influentialPost.items %}
-				<tr>
-					<td class="influencer-img">
-						<img class="profile-image" src="{{ values.profileimage }}" onerror="influentialPostImageError({{ forloop.counter }})" id="influential-post-image{{ forloop.counter }}" height="100px" width="100px" />
-					</td>
+				<table class="follower-table">
+					{% for key, values in influentialPost.items %}
+					<tr>
+						<td class="influencer-img">
+							<img class="profile-image" src="{{ values.profileimage }}" onerror="influentialPostImageError({{ forloop.counter }})" id="influential-post-image{{ forloop.counter }}" height="100px" width="100px" />
+						</td>
 
-					<td class="influencer-desc">
-						<p class="influencer-data influencer-name">{{ values.name }}</p>
-						<p class="influencer-data">USERNAME: {{ values.username }}</p>
-						<p class="influencer-data">RETWEET: {{ values.retweets }}</p>
-						<p class="influencer-data">LIKES: {{ values.favorites }}</p>
-					</td>
-					<td class="influencer-tweet">
-						<p>{{ values.tweet }}</p>
-					</td>
-				</tr>
-				{% endfor %}
-			</table>
+						<td class="influencer-desc">
+							<p class="influencer-data influencer-name">{{ values.name }}</p>
+							<p class="influencer-data">USERNAME: {{ values.username }}</p>
+							<p class="influencer-data">RETWEET: {{ values.retweets }}</p>
+							<p class="influencer-data">LIKES: {{ values.favorites }}</p>
+						</td>
+						<td class="influencer-tweet">
+							<p>{{ values.tweet }}</p>
+						</td>
+					</tr>
+					{% endfor %}
+				</table>
+			</div>
 		</div>
 	</div>
 </div>

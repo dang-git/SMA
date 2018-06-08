@@ -4,6 +4,7 @@
 <title>TWITTER SEARCH</title>
 
 <head>
+	<link rel="stylesheet" type="text/css" href="{% static 'bootstrap/css/bootstrap.css' %}">
 	<link href="{% static 'css/stldg.css' %}" rel='stylesheet' type='text/css'>
 </head>
 
@@ -15,34 +16,36 @@
 	</div>
 
 	<!-- sidebar -->
-	<div id="content">
-		{% include 'sidebar.html'%}
-		<div class="topic-main-container">
-			<div class="topic-title">POLARITY</div>
-			<div id="polarityMapContainer">
-				{% include_chart_jscss %} 
-				{% load_chart sentiments.polar.charttype sentiments.polar.chartdata sentiments.polar.chartcontainer sentiments.polar.extra %}
-				{% include_container sentiments.polar.chartcontainer 500 500 %}
-				<div class="polarity">
-					<table class="polarity-table">
-						<tr>
-							<td class="polarity-table-heading">polarity</td>
-							<td class="polarity-table-heading">score</td>
-						</tr>
-						{% for key, values in sentiments.polarityTable.items %}
-						<tr>
-							<td>
-								{{key}}
-							</td>
-							<td>
-								{{values}}
-							</td>
-						</tr>
-						{% endfor %}
-					</table>
-				</div>
-				<div class="search-insight-container">
-					<input type="text" id="polarityInsight" placeholder="Type insights here" class="search-insights-input">
+	<div class="row" >
+	{% include 'sidebar.html'%}
+		<div id="content col-lg-10 col-xs-10" >
+			<div class="topic-main-container ">
+				<div class="topic-title">POLARITY</div>
+				<div id="polarityMapContainer">
+					{% include_chart_jscss %} 
+					{% load_chart sentiments.polar.charttype sentiments.polar.chartdata sentiments.polar.chartcontainer sentiments.polar.extra %}
+					{% include_container sentiments.polar.chartcontainer 500 500 %}
+					<div class="polarity">
+						<table class="polarity-table">
+							<tr>
+								<td class="polarity-table-heading">polarity</td>
+								<td class="polarity-table-heading">score</td>
+							</tr>
+							{% for key, values in sentiments.polarityTable.items %}
+							<tr>
+								<td>
+									{{key}}
+								</td>
+								<td>
+									{{values}}
+								</td>
+							</tr>
+							{% endfor %}
+						</table>
+					</div>
+					<div class="search-insight-container">
+						<input type="text" id="polarityInsight" placeholder="Type insights here" class="search-insights-input">
+					</div>
 				</div>
 			</div>
 		</div>

@@ -18,31 +18,37 @@ p {
 }
 .panel-heading {
 	background-image: url("bg2.png");
-	position: fixed;
 	top: 0px;
-	width: 100%;
-	display: inline-block;
+    width: 100%;
+    margin: 0px;
 }
 
 .header-panel-item{
     width: 35%;
     display: inline-block;
 }
-
+.search-input-group{
+    padding-top: 7%;
+    padding-left: 2%;
+    float: right;
+    min-width: 250px;
+}
 .item-link{
 	font-family: "Raleway-Bold";
 	text-decoration: none;
 	color: rgb(229,211,176);
-	margin-left: 20px;
-	margin-right: 20px;
+	padding: 20px;
+	
 	
 }
-
-.right-item{
-    margin-left: 300px;
-    margin-bottom: 9px;
+.header-right-item{
+    float: right;
     display: inline-flex;
+    padding-right:20px;
 }
+ .right-item{
+    min-width: 434px;
+} 
 
 #searchHashtag{
     width: 220px;
@@ -51,19 +57,17 @@ p {
 }
 
 #fly {
-	margin-top: 2vw;
-	margin-left: 1.5vw;
+	padding-top: 3%;
+	padding-left: 5%;
 }
 
 .sidenav {
     height: 100%; /* Full-height: remove this if you want "auto" height */
     width: 18vw; /* Set the width of the sidebar */
-    position: fixed; /* Fixed Sidebar (stay in place on scroll) */
+    height: 82.5vh;
     z-index: 0; /* Stay on top */
-    top: 6.6vw; /* Stay at the top */
     left: 0;
     background-color: #454545;
-    overflow-y: hidden; /* Disable horizontal scroll */
     padding-top: 0vw;
 }
 
@@ -82,8 +86,7 @@ p {
 }
 	
 .main {
-	/* margin-left: 18vw; */
-	margin-top: 8vw;
+	/* margin-top: 8vw; */
 }
 
 #posts, #users, #audience, #engagements {
@@ -127,15 +130,23 @@ p {
 }
 
 div.engagements {
-	float: right;
-    margin-left: 60px;
+	margin-left: 60px;
     border: 2px solid #1f77b4;
+    padding: 0px;
 }
 
 div.followers {
-	float: left;
-    margin-left: 60px;
+	margin-left: 36px;
     border: 2px solid #1f77b4;
+    padding: 0px;
+}
+
+.data-follower{
+    margin-left:2vw;
+}
+
+.data-engagement{
+    margin-left:2vw;
 }
 
 .username-text{
@@ -150,21 +161,29 @@ svg.nvd3-svg{
 
 #content{
     display: inline-block;
+    overflow-y: auto;
+    overflow-x: hidden;
+    height: 82.5vh;
+    padding-right: 10px;
+   
 }
 
 #footerSection{
-    width: 100%;
+    width: 100%; 
     height: auto;
     bottom: 0;
     position: relative;
 }
 
 #pointwestContainer{
-    width: 7.8vw;
+    min-width: 150px;
     background-color: #FFF;
     display: table-cell;
     margin: 0;
-    padding-left: 150px;
+    padding-top: 1.5%;
+    padding-left: 9%;
+    padding-bottom: 1%;
+
 }
 
 /*.right{
@@ -173,10 +192,12 @@ svg.nvd3-svg{
 */
 #contactHelpContainer{
     background-color: #ef6c00;
-    width: 80.5vw;
+    min-width: 500px;
     display: table-cell;
     margin: 0;
-    padding: 20px;
+    padding-top: 1.5%;
+    padding-left: 5%;
+    padding-bottom: 1%; 
 }
 
 .pointwest-link, .contact-help-link{
@@ -206,7 +227,7 @@ svg.nvd3-svg{
 #timelineContainer{
     /* padding-left: 260px; */
     border: 2px solid #1f77b4;
-    width: 99.6%;
+    width: 100%;
 }
 
 .follower-table, .engagement-table{
@@ -231,8 +252,7 @@ td.engagement-details{
     width: 30px;
 }
 #donut_chart_container{
-    /* padding-left:260px; */
-    display: flex;
+   padding-left: 20px;
 }
 
 #src_title, #comp_title{
@@ -278,25 +298,23 @@ table.polarity-table, table.polarity-table td {
 }
 
 .topic-main-container{
-    /* border: 1px solid #1f77b4; */
-    /* border: 2px solid lightseagreen; */
-    margin-left: 268px;
-    margin-top: 130px;
-    margin-bottom: 40px;
+   margin-bottom: 20px;
+   margin-top: 20px;
+   margin-left: 20px;
 }
 
 .topic-title{
-    width: 98%;
     background-color: #1f77b4;
     border: 1px solid #1f77b4;
     color: #fbfaf9;
     padding: 10px;
     font-family: "Helvetica";
     font-weight: bold;
+    width: 100%;
 }
 
 .topic-title-influencers{
-    width: 94.5%;
+    width: 100%;
     background-color: #1f77b4;
     border: 1px solid #1f77b4;
     color: #fbfaf9;
@@ -395,7 +413,6 @@ p.influencer-data.influencer-name{
 /* diagnostics */
 #QuickStatContainer{
     border: 2px solid #1f77b4;
-    width:  99.5%;
     display: inline-block;
 }
 
@@ -404,23 +421,24 @@ p.influencer-data.influencer-name{
 }
 
 .donut-chart-left{
-    margin-left: 300px;
     border: 2px solid #1f77b4;
-    width: 35%;
+    padding-right: 0px;
+    padding-left:0px;
 } 
+
 .sources-title {
-    width: 96%;
+    width: 100%;
 } 
 
 .donut-chart-right{
-    /* margin-left: 100px; */
     overflow-wrap: inherit;
     border: 2px solid #1f77b4;
-    width: 35%;
+    padding-right: 0px;
+    padding-left: 0px;
 }
 
 .composition-title {
-    width: 96%;
+    width: 100%;
 }
 
 .location-topic-container{

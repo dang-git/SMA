@@ -4,6 +4,7 @@
 <title>TWITTER SEARCH</title>
 
 <head>
+	<link rel="stylesheet" type="text/css" href="{% static 'bootstrap/css/bootstrap.css' %}">
 	<link href="{% static 'css/stldg.css' %}" rel='stylesheet' type='text/css'>
 	<link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Raleway"/>
 </head>
@@ -16,55 +17,58 @@
 	</div>
 
 	<!--body -->
-	<div id="content">
-		<!-- sidebar -->
+	
+	<!-- sidebar -->
+	<div class="row">
 		{% include 'sidebar.html'%}
-		<div class="topic-main-container">
-			<!-- Followers -->
-			<div class="followers">
-				<div class="topic-title-influencers">BY NUMBER OF FOLLOWERS</div>
-				{% for key, values in folData.items %}
-				<table class="follower-table">
-					<td class="follower-img">
-						<img src="{{values.profileimage}}" onerror="numberFollowersImageError({{ forloop.counter }})" id="number-followers-image{{ forloop.counter }}" class="profile-image" height="100px" width="100px" />
-					</td>
-					<td class="follower-desc">
-						<p class="follower-text-details username-text">
-								{{values.name}}
-						</p>
-						<p class="follower-text-details">USERNAME:
-							<em>{{values.username}}</em>
-						</p>
-						<p class="follower-text-details">FOLLOWERS: <span class="follower-text-details commaSeparation">{{values.followers}}</span></p>
-						<p class="follower-text-details">POSTS: <span class="follower-text-details commaSeparation">{{values.post}}</span></p>
-						<p class="follower-text-details">LIKES: <span class="follower-text-details commaSeparation">{{values.favorites}}</span></p>
-						<p class="follower-text-details">RETWEET: <span class="follower-text-details commaSeparation">{{values.retweets}}</span></p>
-					</td>
-				</table>
-				{% endfor %}
-			</div>
-			<!-- engagements -->
-			<div class="engagements">
-				<div class="topic-title-influencers">BY ENGAGEMENTS GAINED</div>
-				{% for key, values in engData.items %}
-				<table class="engagement-table">
-					<td class="engagement-img">
-						<img src="{{values.profileimage}}" onerror="engagementGainedImageError({{ forloop.counter }})" id="engagement-gained-image{{ forloop.counter }}" height="100px" width="100px" class="profile-image" />
-					</td>
-					<td class="engagement-details">
-						<p class="follower-text-details username-text">
-								{{values.name}}
-						</p>
-						<p class="follower-text-details">USERNAME:
-							<em>{{values.username}}</em>
-						</p>
-						<p class="follower-text-details">FOLLOWERS: <span class="follower-text-details commaSeparation"> {{values.followers}}</span></p>
-						<p class="follower-text-details">POSTS: <span class="follower-text-details commaSeparation"> {{values.post}}</span></p>
-						<p class="follower-text-details">LIKES: <span class="follower-text-details commaSeparation"> {{values.favorites}}</span></p>
-						<p class="follower-text-details">RETWEET: <span class="follower-text-details commaSeparation">{{values.retweets}}</span></p>
-					</td>
-				</table>
-				{% endfor %}
+		<div id="content" class="col-lg-10 col-xs-10">
+			<div class="topic-main-container row">
+				<!-- Followers -->
+				<div class="followers col-lg-4 col-xs-4">
+					<div class="topic-title-influencers">BY NUMBER OF FOLLOWERS</div>
+					{% for key, values in folData.items %}
+					<table class="follower-table data-follower">
+						<td class="follower-img">
+							<img src="{{values.profileimage}}" onerror="numberFollowersImageError({{ forloop.counter }})" id="number-followers-image{{ forloop.counter }}" class="profile-image" height="100px" width="100px" />
+						</td>
+						<td class="follower-desc">
+							<p class="follower-text-details username-text">
+									{{values.name}}
+							</p>
+							<p class="follower-text-details">USERNAME:
+								<em>{{values.username}}</em>
+							</p>
+							<p class="follower-text-details">FOLLOWERS: <span class="follower-text-details commaSeparation">{{values.followers}}</span></p>
+							<p class="follower-text-details">POSTS: <span class="follower-text-details commaSeparation">{{values.post}}</span></p>
+							<p class="follower-text-details">LIKES: <span class="follower-text-details commaSeparation">{{values.favorites}}</span></p>
+							<p class="follower-text-details">RETWEET: <span class="follower-text-details commaSeparation">{{values.retweets}}</span></p>
+						</td>
+					</table>
+					{% endfor %}
+				</div>
+				<!-- engagements -->
+				<div class="engagements col-lg-4 col-xs-4">
+					<div class="topic-title-influencers">BY ENGAGEMENTS GAINED</div>
+					{% for key, values in engData.items %}
+					<table class="engagement-table data-engagement">
+						<td class="engagement-img">
+							<img src="{{values.profileimage}}" onerror="engagementGainedImageError({{ forloop.counter }})" id="engagement-gained-image{{ forloop.counter }}" height="100px" width="100px" class="profile-image" />
+						</td>
+						<td class="engagement-details">
+							<p class="follower-text-details username-text">
+									{{values.name}}
+							</p>
+							<p class="follower-text-details">USERNAME:
+								<em>{{values.username}}</em>
+							</p>
+							<p class="follower-text-details">FOLLOWERS: <span class="follower-text-details commaSeparation"> {{values.followers}}</span></p>
+							<p class="follower-text-details">POSTS: <span class="follower-text-details commaSeparation"> {{values.post}}</span></p>
+							<p class="follower-text-details">LIKES: <span class="follower-text-details commaSeparation"> {{values.favorites}}</span></p>
+							<p class="follower-text-details">RETWEET: <span class="follower-text-details commaSeparation">{{values.retweets}}</span></p>
+						</td>
+					</table>
+					{% endfor %}
+				</div>
 			</div>
 		</div>
 	</div>
