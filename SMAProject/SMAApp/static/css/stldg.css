@@ -128,7 +128,7 @@ p {
 }
 
 div.engagements {
-	margin-left: 60px;
+	margin-left: 36px;
     border: 2px solid #1f77b4;
     padding: 0px;
 }
@@ -161,8 +161,8 @@ svg.nvd3-svg{
     display: inline-block;
     overflow-y: auto;
     overflow-x: hidden;
-    height: 75.5vh;
-    padding-right: 10px;
+    height: 82.5vh;
+    /* padding-right: 10px; */
    
 }
 
@@ -326,7 +326,7 @@ table.polarity-table, table.polarity-table td {
     width: 100%;
 }
 
-#piechart_container{
+#polarity_piechart_container{
     /* border: 1px solid #000; */
     display: inline-block;
     vertical-align: middle;
@@ -399,7 +399,7 @@ p.influencer-data.influencer-name{
 
 /* hide Serie 1 text */
 .top-hashtag-container #multibarhorizontalchart_container .nv-series {
-	display: none;
+	/* display: none; */
 }
 
 .lda{
@@ -444,7 +444,7 @@ p.influencer-data.influencer-name{
 }
 
 .wordcloud-image{
-    width:850px;
+    width:100%;
 }
 
 /* loading page */
@@ -528,3 +528,71 @@ p.influencer-data.influencer-name{
     from {bottom: 30px; opacity: 1;}
     to {bottom: 0; opacity: 0;}
 }
+
+
+/* Bootstrap changes */
+
+.row {
+    margin-right: 0;
+}
+
+
+/* bar chart */
+
+.bar {
+    fill: #35978f;
+  }
+  
+  
+  
+.bar:hover {
+fill: #8c510a;
+}
+
+.axis {
+font: 10px sans-serif;
+}
+
+.axis path,
+.axis line {
+fill: none;
+stroke: #000;
+shape-rendering: crispEdges;
+}
+
+#hashtagChart {
+display: block;
+width: 100%;
+height: 400px;
+/* position: absolute; */
+float: left;
+}
+
+.d3-tip {
+line-height: 1;
+font: 14px sans-serif;
+padding: 12px;
+background: rgba(0, 0, 0, 0.8);
+color: rgb(185, 185, 185);
+border-radius: 2px;
+}
+
+/* Creates a small triangle extender for the tooltip */
+.d3-tip:after {
+box-sizing: border-box;
+display: inline;
+font-size: 10px;
+width: 100%;
+line-height: 1;
+color: rgba(0, 0, 0, 0.8);
+content: "\25BC";
+position: absolute;
+text-align: center;
+}
+
+.d3-tip.n:after {
+margin: -1px 0 0 0;
+top: 100%;
+left: 0;
+}
+  

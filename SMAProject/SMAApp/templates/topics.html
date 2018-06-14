@@ -7,6 +7,8 @@
 	<link rel="stylesheet" type="text/css" href="{% static 'bootstrap/css/bootstrap.css' %}">
 	<link href="{% static 'css/stldg.css' %}" rel='stylesheet' type='text/css'>
 	<script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
+	<script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
 	<script async src="{% static 'js/diagnostics.js' %}" type='text/javascript'></script>
 	<script>
 		// lda data to be used by the lda page
@@ -55,9 +57,7 @@
 					</div>
 					<div class="top-hashtag-container">
 						<div class="topic-title">TOP HASHTAGS</div>
-						{% include_chart_jscss %} 
-						{% load_chart data.charttype data.chartdata data.chartcontainer data.extra %} 
-						{% include_container data.chartcontainer 400 1100 %}
+						<svg id="hashtagChart"></svg>
 						<div class="search-insight-container">
 							<input type="text" id="topHastagsInsight" placeholder="Type insights here" class="search-insights-input">
 						</div>
@@ -67,11 +67,11 @@
 					<div class="topic-title">TOPICS</div>
 					<div id="wordcloudImageContainer">
 						<!-- to test lda.html, only remove the 3 lines and replace with {# include 'lda/lda.html' #}  -->
-						<!-- <div id="ldaPlaceholder">
+						<div id="ldaPlaceholder">
 							<p>Loading Topic Clusters 
 							<img id="miniLoading" src="{% static 'images/mini-loading.gif' %}" height="25">
 							</p>
-						</div> -->
+						</div>
 						<div>
 						{% include 'lda.html' %}
 						</div>
@@ -99,4 +99,5 @@
 	{% include  'footer.html'%}
 </body>
 <script src="{% static 'js/dgn1.js' %}" type='text/javascript'></script>
+<script src="{% static 'js/tophashtagsbarchart.js' %}" type='text/javascript'></script>
 </html>

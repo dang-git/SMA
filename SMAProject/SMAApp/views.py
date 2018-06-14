@@ -126,9 +126,11 @@ def test_lda(request):
     #     print("terminated")
     request.session["lda_data"] = lda_data.get()
     request.session.save()
+    print("LDA should be settled")
     #return JsonResponse(request.session["lda_data"],safe=False)
 
 def check_lda_status(request):
+	print(request.session.get("lda_data_id",False))
 	if request.session.get("lda_data",False):
 		return JsonResponse(request.session["lda_data"],safe=False)
 	else: 
@@ -275,7 +277,7 @@ def demo_donutchart(chartdata):
     pieChart page
     """
     charttype = "pieChart"
-    chartcontainer = 'piechart_container'  # container name
+    chartcontainer = 'polarity_piechart_container'  # container name
     data = {
         'charttype': charttype,
         'chartdata': chartdata,

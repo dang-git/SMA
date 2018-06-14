@@ -66,7 +66,7 @@
 					<div id="timelineContainer">
 						{% include_chart_jscss %} 
 						{% load_chart all_data.timeline.charttype all_data.timeline.chartdata all_data.timeline.chartcontainer all_data.timeline.extra %} 
-						{% include_container all_data.timeline.chartcontainer 400 1150 %}
+						{% include_container all_data.timeline.chartcontainer 400 '100%' %}
 						<div class="search-insight-container">
 							<input type="text" id="timelineInsight" placeholder="Type insights here" class="search-insights-input">
 						</div>
@@ -78,7 +78,7 @@
 				<div class="donut-chart-left col-lg-5">
 					<div class="topic-title sources-title">SOURCES</div>
 					{% load_chart all_data.source.charttype all_data.source.chartdata all_data.source.chartcontainer all_data.source.extra %}
-					{% include_container all_data.source.chartcontainer 400 500 %}
+					{% include_container all_data.source.chartcontainer 400 '100%' %}
 					<div class="search-insight-container">
 						<input type="text" id="sourcesInsight" placeholder="Type insights here" class="search-insights-input">
 					</div>
@@ -86,7 +86,7 @@
 				<div class="donut-chart-right col-lg-5">
 					<div class="topic-title composition-title">COMPOSITION</div>
 					{% load_chart all_data.composition.charttype all_data.composition.chartdata all_data.composition.chartcontainer all_data.source.extra%} 
-					{% include_container all_data.composition.chartcontainer 400 500 %}
+					{% include_container all_data.composition.chartcontainer 400 '100%' %}
 					<div class="search-insight-container">
 						<input type="text" id="compositionInsight" placeholder="Type insights here" class="search-insights-input">
 					</div>
