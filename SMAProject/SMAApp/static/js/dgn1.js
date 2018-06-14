@@ -30,7 +30,6 @@ $(document).ready(function(){
    // $('.profile-image').on('error' ,function(){
    //     $(this).attr('src', 'https://vignette.wikia.nocookie.net/citrus/images/6/60/No_Image_Available.png/revision/latest?cb=20170129011325')
    // });
-    
 })
 
 // display loading screen on search
@@ -81,9 +80,6 @@ function displayLoadingScreen(){
         });
 }
 
-function updateCount(count){
-
-}
 
 // Saves insights to session
 $('.search-insights-input').on('change', function(){
@@ -92,15 +88,15 @@ $('.search-insights-input').on('change', function(){
 });
 
 function numberFollowersImageError(index){
-    $('#number-followers-image' + index).attr('src', 'http://127.0.0.1:8000/static/images/social-fly-logo.png');
+    $('#number-followers-image' + index).attr('src', profileImage);
 }
 
 function engagementGainedImageError(index){
-    $('#engagement-gained-image' + index).attr('src', 'http://127.0.0.1:8000/static/images/social-fly-logo.png');
+    $('#engagement-gained-image' + index).attr('src', profileImage);
 }
 
 function influentialPostImageError(index){
-    $('#influential-post-image' + index).attr('src', 'http://127.0.0.1:8000/static/images/social-fly-logo.png');
+    $('#influential-post-image' + index).attr('src', profileImage);
 }
 
 
@@ -167,7 +163,7 @@ function resizeTimeline(){
 
 }
 
-window.addEventListener("resize", resizeCharts);
+// window.addEventListener("resize", resizeCharts);
 
 // Added debounce to improve chart resizing performance
 // It delays the function execution
@@ -334,6 +330,7 @@ function resizeCharts(){
         // resizeHashtagChart();
     // }
 }
+}
 
 function resizePolarity(){
 
@@ -390,4 +387,5 @@ function resizePolarity(){
             .call(chart);
         });
 }
+
 

@@ -367,9 +367,9 @@ p.influencer-data.influencer-name{
 }
 
 /* topics */
-#wordcloudImageContainer{
+#wordcloudImageContainer, #ldaContainer{
     border: 2px solid #1f77b4;
-    width: 99.6%;
+    width: 100%;
     margin-bottom: 3%;
 }
 
@@ -595,4 +595,19 @@ margin: -1px 0 0 0;
 top: 100%;
 left: 0;
 }
-  
+
+
+/* lda related */
+#ldavis_el84844464070221763284634421, #ldavis_el84844464070221763284634421-top {
+    width: 50% !important;
+    min-width: auto !important;
+}
+
+#ldavis_el84844464070221763284634421-lambdaInput{
+    float: none !important;
+}
+
+#topicsBody{
+    min-width: 1000px;
+    width: auto !important;
+}
