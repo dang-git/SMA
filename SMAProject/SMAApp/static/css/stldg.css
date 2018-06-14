@@ -63,8 +63,6 @@ p {
 
 .sidenav {
     height: 100%; /* Full-height: remove this if you want "auto" height */
-    width: 18vw; /* Set the width of the sidebar */
-    height: 82.5vh;
     z-index: 0; /* Stay on top */
     left: 0;
     background-color: #454545;
@@ -163,7 +161,7 @@ svg.nvd3-svg{
     display: inline-block;
     overflow-y: auto;
     overflow-x: hidden;
-    height: 82.5vh;
+    height: 75.5vh;
     padding-right: 10px;
    
 }

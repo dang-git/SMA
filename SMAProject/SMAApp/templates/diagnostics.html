@@ -29,81 +29,81 @@
 	{% include 'header.html'%}
 	
 		<!-- sidebar -->
-	<div class="row">
+	
 	{% include 'sidebar.html'%}
-
-	<div id="content" class="col-lg-10 col-xs-10">
-		<div class="row">
-			<div class="topic-main-container col-lg-12 col-xs-12">
-				<div class="topic-title col-lg-12">QUICK STATISTICS</div>
-				<div id="QuickStatContainer" class="col-lg-12">
-					<div id="posts" class="col-md-3">
-						<p id="postsCount">{{ all_data.engagements.tweets }}</p>
-						<p id="postsCount">{{ formattedData.engagements.tweets }}</p>
-						<p id="postsLabel">POSTS</p>
+	<div class="row">
+		<div id="content" class="col-lg-12 col-xs-12">
+			<div class="row">
+				<div class="topic-main-container col-lg-12 col-xs-12">
+					<div class="topic-title col-lg-12">QUICK STATISTICS</div>
+					<div id="QuickStatContainer" class="col-lg-12">
+						<div id="posts" class="col-md-3">
+							<p id="postsCount">{{ all_data.engagements.tweets }}</p>
+							<p id="postsCount">{{ formattedData.engagements.tweets }}</p>
+							<p id="postsLabel">POSTS</p>
+						</div>
+						<div id="users" class="col-md-6">
+							<p id="usersCount">{{ all_data.engagements.users }}</p>
+							<p id="usersLabel">USERS</p>
+						</div>
+						<div id="audience" class="col-md-6">
+							<p id="audienceCount">{{ all_data.engagements.reach }}</p>
+							<p id="audienceLabel">POTENTIAL AUDIENCE</p>
+						</div>
+						<div id="engagements" class="col-md-6">
+							<p id="engagementsCount">{{ all_data.engagements.engagements }}</p>
+							<p id="engagementsLabel">ENGAGEMENTS</p>
+						</div>
+						<div class="search-insight-container">
+							<input type="text" id="quickStatisticsInsight" placeholder="Type insights here" class="search-insights-input">
+						</div>
 					</div>
-					<div id="users" class="col-md-6">
-						<p id="usersCount">{{ all_data.engagements.users }}</p>
-						<p id="usersLabel">USERS</p>
+				</div>
+			</div>	
+			<div class="row">
+				<div class="topic-main-container timeline-topic-container col-lg-12">
+					<div class="topic-title">TIMELINE</div>
+					<div id="timelineContainer">
+						{% include_chart_jscss %} 
+						{% load_chart all_data.timeline.charttype all_data.timeline.chartdata all_data.timeline.chartcontainer all_data.timeline.extra %} 
+						{% include_container all_data.timeline.chartcontainer 400 1150 %}
+						<div class="search-insight-container">
+							<input type="text" id="timelineInsight" placeholder="Type insights here" class="search-insights-input">
+						</div>
 					</div>
-					<div id="audience" class="col-md-6">
-						<p id="audienceCount">{{ all_data.engagements.reach }}</p>
-						<p id="audienceLabel">POTENTIAL AUDIENCE</p>
-					</div>
-					<div id="engagements" class="col-md-6">
-						<p id="engagementsCount">{{ all_data.engagements.engagements }}</p>
-						<p id="engagementsLabel">ENGAGEMENTS</p>
-					</div>
+				</div>
+			</div>
+			
+			<div id="donut_chart_container" class="row">
+				<div class="donut-chart-left col-lg-5">
+					<div class="topic-title sources-title">SOURCES</div>
+					{% load_chart all_data.source.charttype all_data.source.chartdata all_data.source.chartcontainer all_data.source.extra %}
+					{% include_container all_data.source.chartcontainer 400 500 %}
 					<div class="search-insight-container">
-						<input type="text" id="quickStatisticsInsight" placeholder="Type insights here" class="search-insights-input">
+						<input type="text" id="sourcesInsight" placeholder="Type insights here" class="search-insights-input">
 					</div>
 				</div>
-			</div>
-		</div>	
-		<div class="row">
-			<div class="topic-main-container timeline-topic-container col-lg-12">
-				<div class="topic-title">TIMELINE</div>
-				<div id="timelineContainer">
-					{% include_chart_jscss %} 
-					{% load_chart all_data.timeline.charttype all_data.timeline.chartdata all_data.timeline.chartcontainer all_data.timeline.extra %} 
-					{% include_container all_data.timeline.chartcontainer 400 1150 %}
+				<div class="donut-chart-right col-lg-5">
+					<div class="topic-title composition-title">COMPOSITION</div>
+					{% load_chart all_data.composition.charttype all_data.composition.chartdata all_data.composition.chartcontainer all_data.source.extra%} 
+					{% include_container all_data.composition.chartcontainer 400 500 %}
 					<div class="search-insight-container">
-						<input type="text" id="timelineInsight" placeholder="Type insights here" class="search-insights-input">
+						<input type="text" id="compositionInsight" placeholder="Type insights here" class="search-insights-input">
 					</div>
 				</div>
 			</div>
-		</div>
-		
-		<div id="donut_chart_container" class="row">
-			<div class="donut-chart-left col-lg-5">
-				<div class="topic-title sources-title">SOURCES</div>
-				{% load_chart all_data.source.charttype all_data.source.chartdata all_data.source.chartcontainer all_data.source.extra %}
-				{% include_container all_data.source.chartcontainer 400 500 %}
+			
+			<div class="topic-main-container location-topic-container">
+				<div class="topic-title">LOCATIONS</div>
+				<div id="map">
+
+				</div>
 				<div class="search-insight-container">
-					<input type="text" id="sourcesInsight" placeholder="Type insights here" class="search-insights-input">
+					<input type="text" id="locationsInsight" placeholder="Type insights here" class="search-insights-input">
 				</div>
 			</div>
-			<div class="donut-chart-right col-lg-5">
-				<div class="topic-title composition-title">COMPOSITION</div>
-				{% load_chart all_data.composition.charttype all_data.composition.chartdata all_data.composition.chartcontainer all_data.source.extra%} 
-				{% include_container all_data.composition.chartcontainer 400 500 %}
-				<div class="search-insight-container">
-					<input type="text" id="compositionInsight" placeholder="Type insights here" class="search-insights-input">
-				</div>
-			</div>
-		</div>
-		
-		<div class="topic-main-container location-topic-container">
-			<div class="topic-title">LOCATIONS</div>
-			<div id="map">
-
-			</div>
-			<div class="search-insight-container">
-				<input type="text" id="locationsInsight" placeholder="Type insights here" class="search-insights-input">
-			</div>
-		</div>
-	</div> 
-
+		</div> 
+	</div>
 	{% include  'footer.html'%}
 </div>
 </body>
