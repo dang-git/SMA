@@ -1,11 +1,11 @@
 
-    // var datum = data_multibarhorizontalchart_container;
-    var datum = data_multibarhorizontalchart_container=[
-        {"x": "#awesm", "y": 319}, 
-        {"x": "#smsupermalls", "y": 20}, 
-        {"x": "#everythingshereatsm", "y": 20}, 
-        {"x": "#pinoysmiles", "y": 13}, 
-        {"x": "#nationalsupermomsday2018", "y": 2}];
+    var datum = data_multibarhorizontalchart_container;
+    // var datum = data_multibarhorizontalchart_container=[
+    //     {"x": "#awesm", "y": 319}, 
+    //     {"x": "#smsupermalls", "y": 20}, 
+    //     {"x": "#everythingshereatsm", "y": 20}, 
+    //     {"x": "#pinoysmiles", "y": 13}, 
+    //     {"x": "#nationalsupermomsday2018", "y": 2}];
 
     var margin = {top: 30, right: 60, bottom: 20, left: 160},
     width = parseInt(d3.select("#hashtagChart").style("width")) - margin.left - margin.right,
@@ -39,15 +39,15 @@ var tip = d3.tip()
     .attr('class', 'd3-tip')
     .offset([-10, 0])
     .html(function(d) {
-      return "<div><span>Tweets:</span> <span style='color:white'>" + d["y"] + "</span></div>"
+      return "<div><span>Tweets:</span> <span style='color:white'>" + d["count"] + "</span></div>"
             //   "<div><span>Name:</span> <span style='color:white'>" + d.Name + "</span></div>" +
             //  "<div><span>Total Sales:</span> <span style='color:white'>" + "$"+ dollarFormatter(d.total) + "</span></div>";
     })
 
    svg.call(tip);
-   datum = datum.sort(function(a,b) {return a["y"] - b["y"]});
-   yScale.domain(datum.map(function(d) { return d["x"]; }));
-  xScale.domain([0, d3.max(datum, function(d) { return d["y"]; })]);
+   datum = datum.sort(function(a,b) {return a["hashtag"] - b["count"]});
+   yScale.domain(datum.map(function(d) { return d["hashtag"]; }));
+  xScale.domain([0, d3.max(datum, function(d) { return d["count"]; })]);
 
 
     svg.append("g")
@@ -67,8 +67,8 @@ var tip = d3.tip()
       .data(datum)
     .enter().append("rect")
       .attr("class", "bar")
-      .attr("width", function(d) { return xScale(d["y"]);})
-      .attr("y", function(d) { return yScale(d["x"]); })
+      .attr("width", function(d) { return xScale(d["count"]);})
+      .attr("y", function(d) { return yScale(d["hashtag"]); })
       .attr("height", yScale.rangeBand())
       .on('mouseover', tip.show)
       .on('mouseout', tip.hide);
@@ -97,8 +97,8 @@ function resize() {
   
     // Force D3 to recalculate and update the line
     svg.selectAll(".bar")
-      .attr("width", function(d) { return xScale(d["y"]); })
-      .attr("y", function(d) { return yScale(d["x"]); })
+      .attr("width", function(d) { return xScale(d["count"]); })
+      .attr("y", function(d) { return yScale(d["hashtag"]); })
       .attr("height", yScale.rangeBand());
   };
 

@@ -72,7 +72,8 @@ function startldaDataPull() {
 function generateldaData() {
     $.ajax({
         beforeSend: function () {
-            if (window.sessionStorage['lda_page'] == null && window.sessionStorage['lda_data'] != null) {
+            if (window.sessionStorage['lda_page'] == null 
+                && window.sessionStorage['lda_data'] != null) {
                 generateldaPage();
             }
         },
@@ -83,9 +84,10 @@ function generateldaData() {
     });
 }
 
+// Periodically check data for lda from server every 10 secs.
 function processldaData(data) {
     if (data == "False") {
-        window.setTimeout(generateldaData, 5000);
+        window.setTimeout(generateldaData, 10000);
         console.log("Getting LDA Again");
     } else {
         window.sessionStorage['lda_data'] = data;
@@ -98,7 +100,6 @@ function processldaData(data) {
 
 function generateldaPage() {
     console.log("inside lda page");
-
     $.ajax({
         url: '/ajax/get_lda_page/',
         success: function (data) {
@@ -132,7 +133,6 @@ function generateSentiments() {
 
 function startBackgroundTasks() {
     console.log("Starting Background Task");
-
     $.ajax({
         beforeSend: function () {
             window.sessionStorage['bg-started'] == 'Y';
