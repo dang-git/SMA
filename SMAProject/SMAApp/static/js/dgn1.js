@@ -33,13 +33,17 @@ $(document).ready(function(){
 })
 
 // display loading screen on search
-$( "#searchButton, #searchAgainButton" ).on( "click", function() {
+$( "#searchButton, #searchAgainButton" ).on( "click", function(event) {
     $("#loadingPage").css("display","block");
+    $(".load-tweet-text").css("display","block");
     $("#loadingKeyword").text($("#id_keyword").val());
+    console.log(event.target.id);
     window.sessionStorage.clear();
   });
 
-
+function displayLoadingScreen(){
+    
+}
 
 // Adds commas to digit values
 function addCommaSeparation(){
@@ -58,7 +62,7 @@ $('#searchButton').on('click', function(){
 });
 
 // Checks every input box with "search-insights-input" class
-// and returns their values if they have data saved on session
+// and returns their values if they have data saved on session by using inputId
 function loadInsightValues(){
     $("input").each(function(){
         var inputId = $(this).attr('id');
@@ -70,15 +74,16 @@ function loadInsightValues(){
     });
 }
 
-function displayLoadingScreen(){
-        $.ajax({
-            url: '/ajax/get_tweets_count/',
-            success: function (data) {
-            //var obj = JSON.parse(data);
-            updateCount(data);
-            }
-        });
-}
+// Unused
+// function displayLoadingScreen(){
+//         $.ajax({
+//             url: '/ajax/get_tweets_count/',
+//             success: function (data) {
+//             //var obj = JSON.parse(data);
+//             updateCount(data);
+//             }
+//         });
+// }
 
 
 // Saves insights to session
@@ -163,7 +168,7 @@ function resizeTimeline(){
 
 }
 
-// window.addEventListener("resize", resizeCharts);
+window.addEventListener("resize", resizeCharts);
 
 // Added debounce to improve chart resizing performance
 // It delays the function execution
@@ -305,16 +310,15 @@ function resizeComposition(){
 
 // typeof $('#container') != null --> checks if an element with this id exists
 
-var resizeAllCharts = debounce(function() {
-    resizeCharts();
-}, 250);
+// var resizeAllCharts = debounce(function() {
+//     resizeCharts();
+// }, 250);
 
 function resizeCharts(){
     var lineChart = document.getElementById('linechart_container');
     var sourceChart = document.getElementById('source_piechart_container');
     var compositionChart = document.getElementById('composition_piechart_container');
     if(lineChart != null) {
-        console.log("INNER");
         resizeTimeline();
     }
 
@@ -386,6 +390,57 @@ function resizePolarity(){
             // .attr("transform", "translate(" + Math.min(width,height) / 2 + "," + Math.min(width,height) / 2 + ")")
             .call(chart);
         });
+}
+
+// Used by save snapshot to keep csrf token safe
+function csrfSafeMethod(method) {
+    // these HTTP methods do not require CSRF protection
+    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+}
+
+function saveSnapshot(){
+    var csrftoken = $("[name=csrfmiddlewaretoken]").val();
+    // var snapshotName = $('#snapshotName').val();
+    var insights = [];
+    var send_data = {
+        snapshotName :  $('#snapshotName').val(),
+        insights : []
+    }
+    // var snapshotName = $('#snapshotName').val();
+    for (var i = 0; i< sessionStorage.length; i++) {
+        // -1 is returned by indexOf if there are no words that contains "Insight"
+        if(sessionStorage.key(i).indexOf("Insight") != -1){
+            send_data.insights.push({
+                "insight_container" : sessionStorage.key(i),
+                "insight_value" : sessionStorage.getItem(sessionStorage.key(i))
+            });
+        }
+    }
+    $.ajax({
+        beforeSend: function (xhr, settings) {
+            $("#loadingPage").css("display","block");
+            $(".saving-snapshot-text").css("display","block");
+            if(!csrfSafeMethod(settings.type) && !this.crossDomain){
+                xhr.setRequestHeader("X-CSRFToken",csrftoken);
+            }
+        },
+        type: 'POST',
+        url: '/ajax/save_snapshot/',
+        data: { 'send_data': JSON.stringify(send_data)   //snapshotName : $('#snapshotName').val(), 
+               // insight : insights
+         },
+        // contentType: 'application/json',
+        dataType: 'json',
+        complete: console.log("naipasa na"),
+        success: function (data) {
+            if (data == "True") {
+                $(".saving-snapshot-text").css("display", "block");
+                $("#savingStatus").text(data);
+            }
+        },
+        error: function(xhr){
+            alert("An error occured: " + xhr.status + " " + xhr.statusText);
+    }});
 }
 
 

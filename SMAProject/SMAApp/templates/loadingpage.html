@@ -1,8 +1,15 @@
-{% load staticfiles %}  
+{% load staticfiles %}
 <div id="loadingPage" class="loading-page" style="display: none;">
     <div class="loading-page-box">
         <img src="{% static 'images/loading.gif'%}" class="loading-gif" />
         <br/>
-        <p>Loading tweets for: </p><p id="loadingKeyword"></p>
+        <div class="load-tweet-text" style="display: none">
+            <p>Loading tweets for: </p>
+            <p id="loadingKeyword"></p>
+        </div>
+        <div class="saving-snapshot-text" style="display: none">
+            <p>Saving Snapshot Please wait...</p>
+            <p id="savingStatus"></p>
+        </div>
     </div>
 </div>

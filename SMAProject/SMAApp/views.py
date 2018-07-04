@@ -8,6 +8,7 @@ from django.http import HttpResponseRedirect, JsonResponse, HttpResponse
 from django.conf import settings
 from .forms import SearchForm
 from SMAApp import extract, engagements, wordcloudscript, lda, hashtags, tasks
+from SMAApp.models import Snapshot, User
 from background_task import background
 from django.core import serializers
 from celery import shared_task
@@ -17,6 +18,7 @@ import pandas as pd
 import json
 import uuid
 import os
+import time
 # Create your views here.
 
 tweetCounts = 0
@@ -28,7 +30,6 @@ def get_keyword(request):
 	if request.method == 'POST':
 		form = SearchForm(request.POST)
 		if 'user_id' in request.session:
-			print("NUREMA")
 			del request.session['user_id']
 			del request.session['engagements_data']
 			del request.session['df']
@@ -42,21 +43,57 @@ def get_keyword(request):
 			#df.to_pickle(pickling)
 			df = pd.read_pickle(pickling)
 			request.session["df"] = df
+			# Test
+			# dict_df = json.loads(df.to_json())
+			# diagnostics_data = request.session['engagements_data']
+			# # chart_data = Chart()
+			# request.session['search_keyword'] = form.cleaned_data['keyword']
+			# snapshot = Snapshot()
+			# snapshot.keyword = form.cleaned_data['keyword']
+			# snapshot.platform = 'twitter'
+			# # snapshot.snapshot_name = request.GET['name']
+			# snapshot.extracted_data = dict_df
+			# snapshot.save()
+			# print("Heres the id")
+			# print(snapshot.pk)
+
+			# user = User()
+			# user.snapshots = [snapshot.pk]
+			# user.save()
+			# Append a Snapshot id reference to User
+			# User.objects(id='5b34ed4355d14c2e2c426280').update_one(push__snapshots=snapshot.pk)
+			#Test End
+
+
 			data = engagements.return_engagements(df)
 			formattedData = formatData(data)
 			all_data = {}
-			request.session['ldaTriggered'] = {}
-			#for key, value in request.session.items(): print('{}'.format(key))
+			# for key, value in request.session.items(): print('{}'.format(key))
 			all_data["engagements"] = formattedData
 			timeline = engagements.return_timeline(df)
-			all_data["timeline"] = demo_linechart(request, timeline)
-			request.session['engagements_data'] = all_data
+			all_data["timeline"] = demo_linechart(timeline)
+			t1 = time.clock()
 			sourceData = engagements.return_source(df)
+			t2 = time.clock()
+			total = t2 - t1
+			print("Source data")
+			print(total)
 			sourceFormattedData = sourcePiechartConverter(sourceData)
 			all_data["source"] = sourceFormattedData
+			t1 = time.clock()
 			composition = engagements.return_composition(df)
+			t2 = time.clock()
+			total = t2 - t1
+			print("Composition data")
+			print(total)
 			compositionFormattedData = compositionPiechartConverter(composition)
 			all_data["composition"] = compositionFormattedData
+			request.session['engagements_data'] = all_data
+			for snapshotObj in Snapshot.objects(_id='5b3c763c55d14c1cc841393e'):
+				print("sash")
+				data = snapshotObj.extracted_data
+				df = pd.DataFrame(data)
+				# print(pd.DataFrame(data))
 			request.session["df"] = df
 
 			#Polarity Part
@@ -67,18 +104,12 @@ def get_keyword(request):
                 {'all_data':all_data,'form':form})
 	else:
 		form = SearchForm()
-		print("get_keyword else")
 	return render(request, 'search.html', {'form': form})
 
 # Returns lat, lang, user, tweet
 def return_geocode(request):
 	geoCodes = engagements.return_geocode(request.session["df"])
 	return JsonResponse(geoCodes)  
-
-def return_tweets_count(request):
-	global tweetCounts
-	tweetCounts = engagements.return_geocode(request.session["df"])
-	return HttpResponse(tweetCounts)
 
 def generate_wordcloud_image(request):
 	imageFilename = "wordcloud-" + request.session["user_id"] + ".png"
@@ -103,7 +134,6 @@ def generate_lda_page(request):
 		# lda_data = lda.lda_model(request.session["df"], request.session["user_id"])
 		# request.session["lda_data"] = lda_data
 		# request.session["ldaTriggered"] = 'N'
-		# print("after shock")
 		# print(request.session["ldaTriggered"])
 	ldapath = os.path.join(settings.BASE_DIR, "SMAApp\\templates\\lda.html")
 	html = render_to_string(ldapath)
@@ -118,23 +148,62 @@ def test_lda(request):
     df = request.session["df"]
     lda_data = tasks.generate_lda_data.delay(df.to_json())
     request.session["lda_data_id"] = lda_data
-    print("GOT")
-    print(request.session.get('lda_data_id'))
     # if request.session.get("lda_data_id",False):
-    #     print("LOOBSA")
     #     revoke(str(request.session.get('lda_data_id')),terminate=True,signal='SIGKILL')
     #     print("terminated")
     request.session["lda_data"] = lda_data.get()
+    for key, value in request.session.items(): print('{}'.format(key))
     request.session.save()
+    for key, value in request.session.items(): print('{}'.format(key))
+    request.session.modified = True
+    # request.session.modified = True
     print("LDA should be settled")
     #return JsonResponse(request.session["lda_data"],safe=False)
 
 def check_lda_status(request):
-	print(request.session.get("lda_data_id",False))
+	# print(request.session.get("lda_data_id",False))
 	if request.session.get("lda_data",False):
 		return JsonResponse(request.session["lda_data"],safe=False)
 	else: 
 		return HttpResponse(False)
+
+def save_snapshot(request):
+	if request.method == 'POST':
+		if request.is_ajax():
+			dictio = json.loads(request.POST.get('send_data'))
+						# snapshotname = request.POST['snapshotName']
+			# insights = request.POST.getlist('insight')
+	else:
+		return False
+	# data_dict = json.JSONDecoder().decode(dictio)
+	snapshotName = dictio['snapshotName']
+	insights = dictio['insights']
+	# chartdata = []
+	# diagnostics data
+	df = request.session['df']
+# # Convert df to dict to save it to db in a Dictfield
+	# # dict_df = 
+	# # diagnostics_data = request.session['engagements_data']
+
+	# Save chart details
+	# chart_data = Chart()
+	# chart_data.chart_container = 
+
+
+	# snapshot = Snapshot()
+	# snapshot.keyword = request.session['search_keyword']
+	# snapshot.platform = 'twitter'
+	# snapshot.snapshot_name = snapshotName
+	# snapshot.insights = insights
+	# snapshot.extracted_data = json.loads(df.to_json(orient='records'))
+	# snapshot.date_extracted = df['dateextracted'][0]
+	# # snapshot.wordcloud_image = 
+	# snapshot.save()
+	# for snapshotObj in Snapshot.objects(_id='5b3c763c55d14c1cc841393e'):
+	# 	print("sash")
+	# 	data = snapshotObj.extracted_data
+	# 	print(pd.DataFrame(data))
+	return True
 
 def start_background_tasks(request):
 	df = request.session["df"]
@@ -144,11 +213,18 @@ def start_background_tasks(request):
 
 def get_sentiments(request):
 	df = request.session["df"]
+	print("polarity start")
+	t0 = time.clock()
 	polarity_chartdata = engagements.return_polarity_chartdata(df)
+	t1 = time.clock()
+	print("polarity finish")
+	total = t1 - t0
+	print(total)
 	request.session["polarity_chartdata"] = polarity_chartdata 
 	polarity_table = engagements.return_polarity(df)
 	request.session["polarity_table"] = polarity_table
-	request.session.save()
+	# request.session.save()
+	request.session.modified = True
 	if request.session.get("polarity_chartdata",False) and request.session.get("polarity_table",False):
 		return HttpResponse(True)
 	else: 
@@ -205,6 +281,7 @@ def open_sentiments(request):
 			polarity_table = engagements.return_polarity(request.session["df"])
 			request.session["polarity_table"] = polarity_table
 		# Tempo End
+		# for key, value in request.session.items(): print('{}'.format(key))
 		chartdata = request.session.get('polarity_chartdata', False)
 		
 		#engagements.return_polarity_chartdata(request.session["df"])
@@ -220,9 +297,10 @@ def open_topics(request):
 	if request.method == 'POST':
 		get_keyword(request)
 	else:
-		chartdata = hashtags.hash_(request.session["df"])
 		data = {}
-		data["barchart"] = demo_horizontalBarChart(chartdata)
+		data["barchart"] = hashtags.hash_(request.session["df"])
+		
+		# data["barchart"] = demo_horizontalBarChart(chartdata)
          
 		sessionid = request.session["user_id"]
 				#path = "C:/Users/christian.dy/Documents/GitHub/SMALab/SMAProject/SMAApp/templates/lda/"
@@ -235,7 +313,7 @@ def open_topics(request):
 			# lda.lda_model(request.session["df"], request.session["user_id"])
 		form = SearchForm()
 		form.fields['keyword'].widget.attrs['placeholder'] = "Search #hashtag"
-	return render(request, 'topics.html',{'data':data["barchart"], 'sessionid':sessionid,'form':form})
+	return render(request, 'topics.html',{'tophashtagsdata':data["barchart"], 'sessionid':sessionid,'form':form})
 
 def formatData(data):
  	return	{'users': "{:,}".format(data['users']),
@@ -250,7 +328,7 @@ def sourceFormatData(data):
             'others': "{:,}".format(data['Others']),
             } 
 
-def demo_linechart(request, chartdata):
+def demo_linechart(chartdata):
     """
     lineChart page
     """

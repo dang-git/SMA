@@ -57,6 +57,8 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'SMAProject.urls'
 
+CSRF_USE_SESSIONS = True
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -83,6 +85,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        # 'ENGINE': 'django_mongodb_engine',
+        # 'NAME': 'smadb',
     }
 }
 
