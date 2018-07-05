@@ -23,6 +23,8 @@ def return_engagements(df):
 def return_timeline(df):
     # timeline
     tl = pd.DataFrame(df.dateofposting)
+    # Conversion to datetime added because retrieving from db gives an epoch time, not datetime
+    tl.dateofposting = pd.to_datetime(tl.dateofposting,unit='ms')
     tl['datehour'] = [i.replace(microsecond=0,second=0) for i in tl.dateofposting]
     tl = tl.groupby(['datehour'], as_index=False).count().reset_index()
     del tl['index']

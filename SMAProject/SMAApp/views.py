@@ -41,13 +41,20 @@ def get_keyword(request):
 			#df = extract.searchKeyWord(form.cleaned_data['keyword'])[0]
 			pickling = os.path.join(settings.BASE_DIR, "SMAApp\\static\\images\\wordcloud\\SM.pkl")
 			#df.to_pickle(pickling)
-			df = pd.read_pickle(pickling)
-			request.session["df"] = df
+			# df = pd.read_pickle(pickling)
+			# request.session["df"] = df
+
+			for snapshotObj in Snapshot.objects(_id='5b3c763c55d14c1cc841393e'):
+				print("sash")
+				data = snapshotObj.extracted_data
+			df = pd.DataFrame(data)
+			request.session['df'] = df
+				# print(pd.DataFrame(data))
 			# Test
 			# dict_df = json.loads(df.to_json())
 			# diagnostics_data = request.session['engagements_data']
 			# # chart_data = Chart()
-			# request.session['search_keyword'] = form.cleaned_data['keyword']
+			request.session['search_keyword'] = form.cleaned_data['keyword']
 			# snapshot = Snapshot()
 			# snapshot.keyword = form.cleaned_data['keyword']
 			# snapshot.platform = 'twitter'
@@ -67,11 +74,13 @@ def get_keyword(request):
 
 			data = engagements.return_engagements(df)
 			formattedData = formatData(data)
-			all_data = {}
+			quick_stats = {}
+			diag_chartdata = {}
 			# for key, value in request.session.items(): print('{}'.format(key))
-			all_data["engagements"] = formattedData
+			quick_stats["engagements"] = formattedData
 			timeline = engagements.return_timeline(df)
-			all_data["timeline"] = demo_linechart(timeline)
+			diag_chartdata["timeline"] = demo_linechart(timeline)
+			request.session['timeline_line'] = diag_chartdata["timeline"]
 			t1 = time.clock()
 			sourceData = engagements.return_source(df)
 			t2 = time.clock()
@@ -79,7 +88,7 @@ def get_keyword(request):
 			print("Source data")
 			print(total)
 			sourceFormattedData = sourcePiechartConverter(sourceData)
-			all_data["source"] = sourceFormattedData
+			diag_chartdata["source"] = sourceFormattedData
 			t1 = time.clock()
 			composition = engagements.return_composition(df)
 			t2 = time.clock()
@@ -87,21 +96,15 @@ def get_keyword(request):
 			print("Composition data")
 			print(total)
 			compositionFormattedData = compositionPiechartConverter(composition)
-			all_data["composition"] = compositionFormattedData
-			request.session['engagements_data'] = all_data
-			for snapshotObj in Snapshot.objects(_id='5b3c763c55d14c1cc841393e'):
-				print("sash")
-				data = snapshotObj.extracted_data
-				df = pd.DataFrame(data)
-				# print(pd.DataFrame(data))
-			request.session["df"] = df
-
+			diag_chartdata["composition"] = compositionFormattedData
+			request.session['engagements_quick_stats'] = quick_stats
+			request.session['engagements_chartdata'] = diag_chartdata
 			#Polarity Part
 			# request.session["polarity_chartdata"] = engagements.return_polarity_chartdata(df)
 			# request.session["polarity_table"] = engagements.return_polarity(df)
 			#start_background_tasks(request, df)
 			return render(request, 'diagnostics.html',
-                {'all_data':all_data,'form':form})
+                {'quick_stats':quick_stats,'diag_chartdata':diag_chartdata,'form':form})
 	else:
 		form = SearchForm()
 	return render(request, 'search.html', {'form': form})
@@ -189,7 +192,9 @@ def save_snapshot(request):
 	# chart_data = Chart()
 	# chart_data.chart_container = 
 
-
+	print(df.to_json(orient='records'))
+	sasa = df.to_json(orient='records')
+	print(sasa)
 	# snapshot = Snapshot()
 	# snapshot.keyword = request.session['search_keyword']
 	# snapshot.platform = 'twitter'
@@ -197,7 +202,7 @@ def save_snapshot(request):
 	# snapshot.insights = insights
 	# snapshot.extracted_data = json.loads(df.to_json(orient='records'))
 	# snapshot.date_extracted = df['dateextracted'][0]
-	# # snapshot.wordcloud_image = 
+	# snapshot.wordcloud_image = 
 	# snapshot.save()
 	# for snapshotObj in Snapshot.objects(_id='5b3c763c55d14c1cc841393e'):
 	# 	print("sash")
@@ -241,11 +246,12 @@ def open_diagnostics(request):
 		get_keyword(request)
 	else:
 		df = request.session["df"]
-		all_data = request.session['engagements_data']
+		quick_stats = request.session['engagements_quick_stats']
+		diag_chartdata = request.session['engagements_chartdata']
 		form = SearchForm()
 		form.fields['keyword'].widget.attrs['placeholder'] = "Search #hashtag"
 	return render(request, 'diagnostics.html',
-               {'all_data':all_data,'form':form})
+               {'quick_stats':quick_stats,'diag_chartdata':diag_chartdata,'form':form})
 
 def open_influencers(request):
 	if request.method == 'POST':
