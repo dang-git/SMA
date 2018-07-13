@@ -12,6 +12,9 @@ urlpatterns = [
     url(r'^topics/$', views.open_topics, name='topics'),
     url(r'^sentiments/$', views.open_sentiments, name='sentiments'),
 
+    url(r'^loadsnapshot/$', views.load_snapshot, name='loadsnapshot'),
+    
+
     # Ajax Response
     url(r'^ajax/get_geocodes/$', views.return_geocode, name='get_geocodes'),
     url(r'^ajax/get_wordcloud_image/$', views.generate_wordcloud_image, name='get_wordcloud_image'),

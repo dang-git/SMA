@@ -5,25 +5,25 @@ import datetime
 
 connect('smadb')
 
-class Snapshot(Document):
+class Snapshot(DynamicDocument):
     _id = ObjectIdField()
     keyword = StringField(max_length=60)
-    owner = ReferenceField('User')
     platform = StringField()
     # platform = ReferenceField('Ref_platform')
     snapshot_name = StringField()
     extracted_data = ListField()
     date_extracted = DateTimeField()
-    chart_data = ListField(ReferenceField('Chart')) # TODO there should be many charts in 1 snapshot
+    chart_data = ListField() # TODO there should be many charts in 1 snapshot
     insights = ListField()
     wordcloud_image = ImageField()
+    owner = StringField() #ReferenceField('User')
     date_created = DateTimeField(default=datetime.datetime.utcnow)
 
 class User(Document):
-    user_id = ObjectIdField()
+    _id = ObjectIdField()
     email = StringField() # this will be required
     password = StringField()
-    snapshots = ListField(ReferenceField('Snapshot'))
+    snapshots = ListField() #ListField(ReferenceField('Snapshot'))
 
 class Client(Document):
     client_name = StringField()
@@ -40,6 +40,8 @@ class Chart(Document):
 
 class Chart_point(Document):
     chart_point_id = ObjectIdField()
+
+    
 
 
 

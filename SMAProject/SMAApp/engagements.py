@@ -31,16 +31,22 @@ def return_timeline(df):
     tl["int"] = [1000*(t.replace(tzinfo=None)-datetime(1970,1,1)).total_seconds() for t in tl.datehour]
     tl.to_csv("tl.csv")
     extra_serie = {"tooltip": {"y_start": "", "y_end": "Volume"}}        
-    chartdata = {'x': tl["int"], 'name1': 'Volume', 'y1': tl['dateofposting'], 'kwargs1': { 'color': '#ef6c00' }, 'extra1' : extra_serie}
-    return chartdata
+    # chartdata = {'x': tl["int"], 'name1': 'Volume', 'y1': tl['dateofposting'], 'kwargs1': { 'color': '#ef6c00' }, 'extra1' : extra_serie}
+    timeline = {}
+    timeline["xdata"] = tl["int"]
+    timeline["ydata"] = tl['dateofposting']
+    return timeline
 
 def return_composition(df):
     data = dict(df.type.value_counts())
     ydata = list(data.values())
     ydata = [int(i) for i in ydata]
-    extra_serie = {"tooltip": {"y_start": "", "y_end": ""}}
-    chartdata = {'x': [*data], 'name1': 'Volume', 'y1': ydata, 'extra1':extra_serie}
-    return chartdata
+    # extra_serie = {"tooltip": {"y_start": "", "y_end": ""}}
+    # chartdata = {'x': [*data], 'name1': 'Volume', 'y1': ydata, 'extra1':extra_serie}
+    composition = {}
+    composition["xdata"] = [*data]
+    composition["ydata"] = ydata
+    return composition
 
 def return_source(df):
     src = dict(df.source.value_counts())
@@ -51,9 +57,12 @@ def return_source(df):
     src_["Others"]  = sum(src.values()) - src_["Web Client"] - src_["Android"] - src_["iPhone"]
     ydata = list(src_.values())
     ydata = [int(i) for i in ydata]
-    extra_serie = {"tooltip": {"y_start": "", "y_end": ""}}
-    chartdata = {'x': [*src_], 'y1': ydata, 'name1':ydata, 'extra1': extra_serie}
-    return chartdata
+    # extra_serie = {"tooltip": {"y_start": "", "y_end": ""}}
+    # chartdata = {'x': [*src_], 'y1': ydata, 'name1':ydata, 'extra1': extra_serie}
+    source = {}
+    source["xdata"] = [*src_]
+    source["ydata"] = ydata
+    return source
 
 def return_geocode(df):
     data = {}
@@ -141,10 +150,13 @@ def return_polarity_chartdata(df):
     xdata = [*data]
     ydata = list(data.values())
     ydata = [int(i) for i in ydata]
-    extra_serie = {"tooltip": {"y_start": "", "y_end": ""}}
-    chartdata = {'x': xdata, 'y1': ydata, 'name1':'Tweets', 'extra1': extra_serie
-    }
-    return chartdata
+    # extra_serie = {"tooltip": {"y_start": "", "y_end": ""}}
+    # chartdata = {'x': xdata, 'y1': ydata, 'name1':'Tweets', 'extra1': extra_serie
+    # }
+    polarity = {}
+    polarity["xdata"] = xdata
+    polarity["ydata"] = ydata
+    return polarity
     
 def return_polarity(df):
     df['polarity'] = [polarize.polarity(i) for i in df.tweet]

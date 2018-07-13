@@ -6,8 +6,8 @@ from django.views.generic import TemplateView
 from django.template.loader import render_to_string
 from django.http import HttpResponseRedirect, JsonResponse, HttpResponse
 from django.conf import settings
-from .forms import SearchForm
-from SMAApp import extract, engagements, wordcloudscript, lda, hashtags, tasks
+from .forms import SearchForm, SnapshotListForm
+from SMAApp import extract, engagements, wordcloudscript, lda, hashtags, tasks, globals, queries
 from SMAApp.models import Snapshot, User
 from background_task import background
 from django.core import serializers
@@ -19,6 +19,7 @@ import json
 import uuid
 import os
 import time
+import logging
 # Create your views here.
 
 tweetCounts = 0
@@ -28,87 +29,159 @@ def home(request):
 
 def get_keyword(request):
 	if request.method == 'POST':
-		form = SearchForm(request.POST)
+		searchform = SearchForm(request.POST)
 		if 'user_id' in request.session:
 			del request.session['user_id']
 			del request.session['engagements_data']
 			del request.session['df']
-		if form.is_valid():
-			print("get_keyword")
+		if searchform.is_valid():
 			print('extracting')
 			request.session['user_id'] = str(uuid.uuid4())
 			request.session['engagements_data'] = ""
-			#df = extract.searchKeyWord(form.cleaned_data['keyword'])[0]
+			#df = extract.searchKeyWord(searchform.cleaned_data['keyword'])[0]
 			pickling = os.path.join(settings.BASE_DIR, "SMAApp\\static\\images\\wordcloud\\SM.pkl")
 			#df.to_pickle(pickling)
-			# df = pd.read_pickle(pickling)
+			df = pd.read_pickle(pickling)
 			# request.session["df"] = df
 
-			for snapshotObj in Snapshot.objects(_id='5b3c763c55d14c1cc841393e'):
-				print("sash")
-				data = snapshotObj.extracted_data
-			df = pd.DataFrame(data)
+			# for snapshotObj in Snapshot.objects(_id='5b3c763c55d14c1cc841393e'):
+			# 	print("sash")
+			# 	data = snapshotObj.extracted_data
+			# df = pd.DataFrame(data)
 			request.session['df'] = df
+
+			# resultid = tasks.prepareChartData.delay(df.to_json())
+			# globals.chartdata['hashtags'] = resultid.get()
 				# print(pd.DataFrame(data))
-			# Test
-			# dict_df = json.loads(df.to_json())
-			# diagnostics_data = request.session['engagements_data']
-			# # chart_data = Chart()
-			request.session['search_keyword'] = form.cleaned_data['keyword']
-			# snapshot = Snapshot()
-			# snapshot.keyword = form.cleaned_data['keyword']
-			# snapshot.platform = 'twitter'
-			# # snapshot.snapshot_name = request.GET['name']
-			# snapshot.extracted_data = dict_df
-			# snapshot.save()
-			# print("Heres the id")
-			# print(snapshot.pk)
+			request.session['search_keyword'] = searchform.cleaned_data['keyword']
 
 			# user = User()
 			# user.snapshots = [snapshot.pk]
 			# user.save()
 			# Append a Snapshot id reference to User
 			# User.objects(id='5b34ed4355d14c2e2c426280').update_one(push__snapshots=snapshot.pk)
-			#Test End
-
 
 			data = engagements.return_engagements(df)
 			formattedData = formatData(data)
 			quick_stats = {}
 			diag_chartdata = {}
+
+			prepare_chartdata(df)
 			# for key, value in request.session.items(): print('{}'.format(key))
 			quick_stats["engagements"] = formattedData
-			timeline = engagements.return_timeline(df)
-			diag_chartdata["timeline"] = demo_linechart(timeline)
-			request.session['timeline_line'] = diag_chartdata["timeline"]
-			t1 = time.clock()
-			sourceData = engagements.return_source(df)
-			t2 = time.clock()
-			total = t2 - t1
-			print("Source data")
-			print(total)
-			sourceFormattedData = sourcePiechartConverter(sourceData)
-			diag_chartdata["source"] = sourceFormattedData
-			t1 = time.clock()
-			composition = engagements.return_composition(df)
-			t2 = time.clock()
-			total = t2 - t1
-			print("Composition data")
-			print(total)
-			compositionFormattedData = compositionPiechartConverter(composition)
-			diag_chartdata["composition"] = compositionFormattedData
+
+			diag_chartdata = create_diag_chartdata()
+			# timeline = engagements.return_timeline(df)
+			# globals.chartdata["timeline"] = pd.DataFrame(timeline).to_dict(orient='records')
+				# diag_chartdata["timeline"] = timeline_linechart(globals.chartdata["timeline"])
+				# # sourceData = engagements.return_source(df)
+				# sourceFormattedData = sourcePiechartConverter(globals.chartdata["source"])
+				# diag_chartdata["source"] = sourceFormattedData
+				# # globals.chartdata["source"] = diag_chartdata["source"]
+				# compositionFormattedData = compositionPiechartConverter(globals.chartdata["composition"])
+				# diag_chartdata["composition"] = compositionFormattedData
+			print("Comp Data", globals.chartdata["composition"])
+			globals.quick_stats = quick_stats
+			globals.diag_chartdata = diag_chartdata
+			# globals.chartdata["composition"] = diag_chartdata["composition"]
 			request.session['engagements_quick_stats'] = quick_stats
 			request.session['engagements_chartdata'] = diag_chartdata
-			#Polarity Part
-			# request.session["polarity_chartdata"] = engagements.return_polarity_chartdata(df)
-			# request.session["polarity_table"] = engagements.return_polarity(df)
-			#start_background_tasks(request, df)
-			return render(request, 'diagnostics.html',
-                {'quick_stats':quick_stats,'diag_chartdata':diag_chartdata,'form':form})
-	else:
-		form = SearchForm()
-	return render(request, 'search.html', {'form': form})
+			globals.snapshot_owner = "Dy"
+			globals.SNAPSHOT_LIST = queries.get_snapshot_list()
+			# SAVING TEST
+			print("INIT")
+			# chartdatalist.append(pd.DataFrame(globals.chartdata).to_json(orient='records'))
+			snapshot = Snapshot()
+			snapshot.keyword = request.session['search_keyword']
+			snapshot.platsearchform = 'twitter'
+			snapshot.snapshot_name = 'snapshotName'
+			snapshot.insights = []
+			snapshot.extracted_data = json.loads(df.to_json(orient='records'))
+			snapshot.date_extracted = df['dateextracted'][0]
+			# snapshot.wordcloud_image = 
+			# snapshot.chart_data = globals.hashtags
+			# snapshot.save()
+			
+			# for snapshotObj in Snapshot.objects(owner='Dy'):
+			# 	globals.usersnapshotlist.append(snapshotObj.snapshot_name)
+			# 	print("POPO")
+			# 	print(globals.usersnapshotlist)
 
+			
+			# Set list of snapshots to load snapshots dropdown
+			snapshotform = SnapshotListForm()
+			# CHOICE_GENDER = ((1, 'Male'), (2, 'Female'))
+			# globals.snapshotlist = [(snapshotObj.snapshot_name,snapshotObj.snapshot_name) for snapshotObj in Snapshot.objects(owner='Dy')]
+			# snapshotform.fields['snapshotchoices'].choices = CHOICE_GENDER #globals.snapshotlist
+			
+			return render(request, 'diagnostics.html',
+                {'quick_stats':quick_stats,'diag_chartdata':diag_chartdata,'searchform':searchform,'snapshotform':snapshotform})
+	else:
+		searchform = SearchForm()
+	return render(request, 'search.html', {'searchform': searchform})
+
+# 
+
+
+
+#  Called after selecting a snapshot from the load snapshot modal
+def load_snapshot(request):
+	diag_chartdata = {}
+	if request.method == 'POST':
+		snapshotform = SnapshotListForm(request.POST)
+		if snapshotform.is_valid():
+			searchform = SearchForm()
+			print("SASHIMI",snapshotform.errors)
+			print("heyo",snapshotform.cleaned_data.get('snapshotchoices'))
+			snapshot_id = snapshotform.cleaned_data.get('snapshotchoices')
+			# Set values from loaded snapshot
+			for snapshotObj in Snapshot.objects(_id=snapshot_id):
+				print("IN")
+				logging.info("Iterating data using snapshot id: %s", snapshot_id)
+				request.session['df'] = pd.DataFrame(snapshotObj.extracted_data)
+				print("AFTER")
+				globals.chartdata['timeline'] = pd.DataFrame(snapshotObj.chart_data[0]['timeline']).to_dict('list')
+				globals.chartdata['source'] = pd.DataFrame(snapshotObj.chart_data[0]['source']).to_dict('list')
+				globals.chartdata['composition'] = pd.DataFrame(snapshotObj.chart_data[0]['composition']).to_dict('list')
+				request.session['engagements_chartdata'] = globals.diag_chartdata
+				print("Printable", pd.DataFrame(snapshotObj.chart_data[0]['composition']).to_dict('list'))
+			diag_chartdata = create_diag_chartdata()
+	# if snapshotlistform.is_valid():
+	return render(request, 'diagnostics.html',
+            {'quick_stats':globals.quick_stats,'diag_chartdata':diag_chartdata,'searchform':searchform,'snapshotform':snapshotform})
+
+# Sets all data for charts
+def prepare_chartdata(df):
+
+    # Data for timeline linechart (Diagnostics Page)
+    globals.chartdata["timeline"] = engagements.return_timeline(df)
+
+    # Data for source donut chart (Diagnostics Page)
+    globals.chartdata["source"] = engagements.return_source(df)
+    
+
+    # Data for composition donut chart (Diagnostics Page)
+    globals.chartdata["composition"] = engagements.return_composition(df)
+
+    # Data for hashtags barchart (Topics Page)
+    globals.chartdata["hashtags"] = hashtags.hash_(df)
+
+    # Data for polarity donut chart (Sentiments Page)
+    globals.chartdata["sentiments"] = engagements.return_polarity_chartdata(df)
+
+
+# Creates the charts for diagnostics page
+def create_diag_chartdata():
+	print("Creating Diagnostics chartdata")
+	diag_chartdata = {}
+	diag_chartdata["timeline"] = timeline_linechart(globals.chartdata["timeline"])
+	# sourceData = engagements.return_source(df)
+	sourceFormattedData = sourcePiechartConverter(globals.chartdata["source"])
+	diag_chartdata["source"] = sourceFormattedData
+	# globals.chartdata["source"] = diag_chartdata["source"]
+	compositionFormattedData = compositionPiechartConverter(globals.chartdata["composition"])
+	diag_chartdata["composition"] = compositionFormattedData
+	return diag_chartdata
 # Returns lat, lang, user, tweet
 def return_geocode(request):
 	geoCodes = engagements.return_geocode(request.session["df"])
@@ -171,6 +244,7 @@ def check_lda_status(request):
 		return HttpResponse(False)
 
 def save_snapshot(request):
+	print("Saving start")
 	if request.method == 'POST':
 		if request.is_ajax():
 			dictio = json.loads(request.POST.get('send_data'))
@@ -178,10 +252,9 @@ def save_snapshot(request):
 			# insights = request.POST.getlist('insight')
 	else:
 		return False
-	# data_dict = json.JSONDecoder().decode(dictio)
 	snapshotName = dictio['snapshotName']
 	insights = dictio['insights']
-	# chartdata = []
+	chartdatalist = []
 	# diagnostics data
 	df = request.session['df']
 # # Convert df to dict to save it to db in a Dictfield
@@ -192,22 +265,53 @@ def save_snapshot(request):
 	# chart_data = Chart()
 	# chart_data.chart_container = 
 
-	print(df.to_json(orient='records'))
-	sasa = df.to_json(orient='records')
-	print(sasa)
-	# snapshot = Snapshot()
-	# snapshot.keyword = request.session['search_keyword']
-	# snapshot.platform = 'twitter'
-	# snapshot.snapshot_name = snapshotName
-	# snapshot.insights = insights
-	# snapshot.extracted_data = json.loads(df.to_json(orient='records'))
-	# snapshot.date_extracted = df['dateextracted'][0]
+	print("INIT")
+	print(globals.chartdata["timeline"])
+	globals.chartdatafordb["timeline"] = pd.DataFrame(globals.chartdata["timeline"]).to_dict(orient='records')
+
+    # Data for source donut chart (Diagnostics Page)
+	globals.chartdatafordb["source"] = pd.DataFrame(globals.chartdata["source"]).to_dict(orient='records')
+
+    # Data for composition donut chart (Diagnostics Page)
+	globals.chartdatafordb["composition"] = pd.DataFrame(globals.chartdata['composition']).to_dict(orient='records')
+
+	globals.chartdatafordb["hashtags"] = hashtags.hash_(df)
+
+	# Data for polarity donut chart (Sentiments Page)
+	globals.chartdatafordb["sentiments"] = pd.DataFrame(globals.chartdata["sentiments"]).to_dict(orient='records')
+
+	chartdatalist.append(globals.chartdatafordb)
+	# chartdatalist.append(globals.chartdata["timeline"])
+	print(chartdatalist)
+	# chartdatalist.append(pd.DataFrame(globals.chartdata).to_json(orient='records'))
+	# print(chartdatalist)
+	snapshot = Snapshot()
+	snapshot.keyword = request.session['search_keyword']
+	snapshot.platsearchform = 'twitter'
+	snapshot.snapshot_name = snapshotName
+	snapshot.insights = insights
+	snapshot.extracted_data = json.loads(df.to_json(orient='records'))
+	snapshot.date_extracted = df['dateextracted'][0]
 	# snapshot.wordcloud_image = 
-	# snapshot.save()
-	# for snapshotObj in Snapshot.objects(_id='5b3c763c55d14c1cc841393e'):
-	# 	print("sash")
-	# 	data = snapshotObj.extracted_data
-	# 	print(pd.DataFrame(data))
+	print("SASA")
+	snapshot.chart_data = chartdatalist #pd.DataFrame(globals.chartdata).to_json(orient='records') #json.loads(chartdatalist)
+	snapshot.owner = "Dy"
+	snapshot.save()
+
+	# Save snapshot id for reference
+	# user = User()
+	# user.snapshots = [snapshot.pk]
+	# user.save()
+	User.objects(_id='5b43845555d14c22b8296ce8').update_one(push__snapshots=snapshot.pk)
+	print("SAVED")
+
+	# Get Snapshot list using user id
+	usersnapshotlist = []
+	for userObj in User.objects(_id='5b43845555d14c22b8296ce8'):
+		usersnapshotlist = userObj.snapshots
+		print("POPO")
+		print(usersnapshotlist)
+
 	return True
 
 def start_background_tasks(request):
@@ -219,12 +323,8 @@ def start_background_tasks(request):
 def get_sentiments(request):
 	df = request.session["df"]
 	print("polarity start")
-	t0 = time.clock()
 	polarity_chartdata = engagements.return_polarity_chartdata(df)
-	t1 = time.clock()
 	print("polarity finish")
-	total = t1 - t0
-	print(total)
 	request.session["polarity_chartdata"] = polarity_chartdata 
 	polarity_table = engagements.return_polarity(df)
 	request.session["polarity_table"] = polarity_table
@@ -248,10 +348,12 @@ def open_diagnostics(request):
 		df = request.session["df"]
 		quick_stats = request.session['engagements_quick_stats']
 		diag_chartdata = request.session['engagements_chartdata']
-		form = SearchForm()
-		form.fields['keyword'].widget.attrs['placeholder'] = "Search #hashtag"
+		searchform = SearchForm()
+		searchform.fields['keyword'].widget.attrs['placeholder'] = "Search #hashtag"
+		snapshotform = SnapshotListForm()
+		print("HERE AGAIn")
 	return render(request, 'diagnostics.html',
-               {'quick_stats':quick_stats,'diag_chartdata':diag_chartdata,'form':form})
+               {'quick_stats':quick_stats,'diag_chartdata':diag_chartdata,'searchform':searchform,'snapshotform':snapshotform})
 
 def open_influencers(request):
 	if request.method == 'POST':
@@ -260,18 +362,18 @@ def open_influencers(request):
 		data = engagements.return_engagements(request.session["df"])
 		data['engData'] = engagements.return_influencers(request.session["df"],'engagements')
 		data['folData'] = engagements.return_influencers(request.session["df"],'flcount')
-		form = SearchForm()
-		form.fields['keyword'].widget.attrs['placeholder'] = "Search #hashtag"
-	return render(request, 'influencers.html', {'engData':data['engData'],'folData':data['folData'], 'form':form }) 
+		searchform = SearchForm()
+		searchform.fields['keyword'].widget.attrs['placeholder'] = "Search #hashtag"
+	return render(request, 'influencers.html', {'engData':data['engData'],'folData':data['folData'], 'searchform':searchform }) 
 
 def open_influentialposts(request):
 	if request.method == 'POST':
 		get_keyword(request)
 	else:
 		data = engagements.return_infl_posts(request.session["df"])
-		form = SearchForm()
-		form.fields['keyword'].widget.attrs['placeholder'] = "Search #hashtag"
-	return render(request, 'influentialposts.html',{'influentialPost':data, 'form':form})
+		searchform = SearchForm()
+		searchform.fields['keyword'].widget.attrs['placeholder'] = "Search #hashtag"
+	return render(request, 'influentialposts.html',{'influentialPost':data, 'searchform':searchform})
 
 def open_sentiments(request):
 	if request.method == 'POST':
@@ -288,24 +390,24 @@ def open_sentiments(request):
 			request.session["polarity_table"] = polarity_table
 		# Tempo End
 		# for key, value in request.session.items(): print('{}'.format(key))
-		chartdata = request.session.get('polarity_chartdata', False)
+		chartdata = globals.chartdata["sentiments"] #request.session.get('polarity_chartdata', False)
 		
 		#engagements.return_polarity_chartdata(request.session["df"])
 		data = {}
-		data['polarityTable'] = request.session.get('polarity_table', False)
+		data['polarityTable'] = engagements.return_polarity(request.session["df"])
+		# data['polarityTable'] = request.session.get('polarity_table', False)
 		#engagements.return_polarity(request.session["df"])
-		data['polar'] = demo_donutchart(chartdata)
-		form = SearchForm()
-		form.fields['keyword'].widget.attrs['placeholder'] = "Search #hashtag"
-	return render(request, 'sentiments.html', {'sentiments':data,'form':form})
+		data['polar'] = polarity_donutchart(chartdata)
+		searchform = SearchForm()
+		searchform.fields['keyword'].widget.attrs['placeholder'] = "Search #hashtag"
+	return render(request, 'sentiments.html', {'sentiments':data,'searchform':searchform})
 
 def open_topics(request):
 	if request.method == 'POST':
 		get_keyword(request)
 	else:
 		data = {}
-		data["barchart"] = hashtags.hash_(request.session["df"])
-		
+		data["barchart"] = globals.chartdata["hashtags"]
 		# data["barchart"] = demo_horizontalBarChart(chartdata)
          
 		sessionid = request.session["user_id"]
@@ -317,9 +419,9 @@ def open_topics(request):
 		# 	return HttpResponse(False)
 			# wordcloudscript.return_wordcloud(request.session["df"], request.session["user_id"])
 			# lda.lda_model(request.session["df"], request.session["user_id"])
-		form = SearchForm()
-		form.fields['keyword'].widget.attrs['placeholder'] = "Search #hashtag"
-	return render(request, 'topics.html',{'tophashtagsdata':data["barchart"], 'sessionid':sessionid,'form':form})
+		searchform = SearchForm()
+		searchform.fields['keyword'].widget.attrs['placeholder'] = "Search #hashtag"
+	return render(request, 'topics.html',{'tophashtagsdata':data["barchart"], 'sessionid':sessionid,'searchform':searchform})
 
 def formatData(data):
  	return	{'users': "{:,}".format(data['users']),
@@ -334,10 +436,12 @@ def sourceFormatData(data):
             'others': "{:,}".format(data['Others']),
             } 
 
-def demo_linechart(chartdata):
+def timeline_linechart(chartdata):
     """
     lineChart page
     """
+    extra_serie = {"tooltip": {"y_start": "", "y_end": "Volume"}}        
+    chartdata = {'x': chartdata["xdata"], 'name1': 'Volume', 'y1': chartdata["ydata"], 'kwargs1': { 'color': '#ef6c00' }, 'extra1' : extra_serie}
     charttype = "lineChart"
     chartcontainer = 'linechart_container'  # container name
     data = {
@@ -356,10 +460,13 @@ def demo_linechart(chartdata):
 
     return data
 
-def demo_donutchart(chartdata):
+def polarity_donutchart(chartdata):
     """
     pieChart page
     """
+    extra_serie = {"tooltip": {"y_start": "", "y_end": ""}}
+    chartdata = {'x': chartdata["xdata"], 'y1': chartdata["ydata"], 'name1':'Tweets', 'extra1': extra_serie
+    }
     charttype = "pieChart"
     chartcontainer = 'polarity_piechart_container'  # container name
     data = {
@@ -388,8 +495,8 @@ def sourcePiechartConverter(chartdata):
     # xdata = ["Web Client", "Android", "iPhone", "Others"]
     # ydata = [data["webClient"], data["android"], data["iPhone"], data["others"]]
     #ydata = [393, 669, 670, 929]
-    #extra_serie = {"tooltip": {"y_start": "", "y_end": ""}}
-    #chartdata = {'x': xdata, 'y1': ydata, 'extra1': extra_serie}
+    extra_serie = {"tooltip": {"y_start": "", "y_end": ""}}
+    chartdata = {'x': chartdata["xdata"], 'y1': chartdata["ydata"], 'extra1': extra_serie}
     charttype = "pieChart"
     chartcontainer = 'source_piechart_container'
 
@@ -456,8 +563,8 @@ def compositionPiechartConverter(chartdata):
     #ydata = [1307,950,316]
     #ydata = [data["retweet"], data["original"], data["reply"]]
 
-    #extra_serie = {"tooltip": {"y_start": "", "y_end": ""}}
-    #chartdata = {'x': xdata, 'y1': ydata, 'extra1': extra_serie}
+    extra_serie = {"tooltip": {"y_start": "", "y_end": ""}}
+    chartdata = {'x': chartdata["xdata"], 'y1': chartdata["ydata"], 'extra1': extra_serie}
     charttype = "pieChart"
     chartcontainer = 'composition_piechart_container'
 
