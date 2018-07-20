@@ -9,7 +9,13 @@
             <div class="header-right-item">
                 <a href="#" class="item-link">Home</a>
                 <a href="#" class="item-link">Services</a>
-                
+                <a href="{% url 'register' %}" class="item-link">Register</a>
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#saveSnapshotModal">
+                        Save as snaphot
+                </button>
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#loadSnapshotModal">
+                        Load a snapshot
+                </button>
                         <form id="searchForm" class="form-wrapper cf" action="/" method="post">
                             <!-- <input type="text" placeholder="Search #hashtag" id="searchHashtag"> -->
                             <div class="form-group ">

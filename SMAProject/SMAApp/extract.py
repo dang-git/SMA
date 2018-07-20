@@ -5,15 +5,12 @@ from tweepy import OAuthHandler
 import pandas as pd
 import datetime
 import time
+from SMAApp import smaapp_constants
 
-consumer_key = 'C07glXzPqKPa95qYwiwoJshXI'
-consumer_secret = 'k94YFxtT3PYfAxjZO8bznHZd9dPF7QrT38vJLXhpDz5dqM4HJ5'
-access_token = '2399374735-Y0Zw6m1CoRbE0hLzGOYUjRIx4eyl3hZ9SML9o8N'
-access_secret = 'dC87GLGLU4PLuVsM1ddKONKo9YMxJSXTunibROrXibZ0E'
-proxy = 'cache.srv.pointwest.com.ph:3128'
-auth = OAuthHandler(consumer_key, consumer_secret)
-auth.set_access_token(access_token, access_secret)
-api = tweepy.API(auth, proxy=proxy)
+
+auth = OAuthHandler(smaapp_constants.CONSUMER_KEY, smaapp_constants.CONSUMER_SECRET)
+auth.set_access_token(smaapp_constants.ACCESS_TOKEN, smaapp_constants.ACCESS_SECRET)
+api = tweepy.API(auth, proxy=smaapp_constants.PROXY)
 
 def searchKeyWord(input):
     date_extracted = datetime.datetime.today().strftime("%m-%d-%Y %H:%M:%S")
@@ -91,6 +88,7 @@ def searchKeyWord(input):
         df["keywords"] = input
         requests_consumed = request_start - remaining
         requests_ = {'requests_consumed': requests_consumed, 'tweet_count': len(df)}
+        print("Req Stats ",request_start, remaining)
         outfile = open("requests.txt", "a")
         outfile.write("\n")
         outfile.write(str(requests_))

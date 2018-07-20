@@ -1,4 +1,7 @@
 $(document).ready(function () {
+    if(window.sessionStorage['isSnapshot'] == true && snapshotLdadata != null){
+        processldaData(JSON.stringify(snapshotLdadata));
+    }
     // if (window.sessionStorage['bg-started'] != 'Y') {
     //     startBackgroundTasks();
     // }
@@ -7,12 +10,12 @@ $(document).ready(function () {
         || window.sessionStorage['bg_done'] != 'Y') {
         sessionStorage.setItem("bg_started", "Y")
         // window.sessionStorage['bg_started'] == 'Y';
-        generateSentiments();
+        // generateSentiments();
     }
 
     if (window.sessionStorage['lda_deployed'] != 'Y' || typeof window.sessionStorage['bg_started'] == "undefined") {
         sessionStorage.setItem("lda_deployed", "Y");
-        startldaDataPull();
+        // startldaDataPull();
     }
 
     if (window.sessionStorage['wc_image'] == null ||
@@ -26,7 +29,7 @@ $(document).ready(function () {
     // load topic clustering
     if (window.sessionStorage['lda_data'] == null ||
         typeof window.sessionStorage['lda_data'] == "undefined") {
-        generateldaData();
+        // generateldaData();
         // $('#ldaPage').css("display", "none");
     }
     else if ((window.sessionStorage['lda_data'] != null &&
@@ -152,6 +155,31 @@ function startBackgroundTasks() {
         }
     });
 }
+
+function validate_email(){
+    var form = $('#snapshotForm');
+    var emailTextbox = $('#id_email');
+    console.log("box " + emailTextbox.val());
+    // check if textbox has content
+    if(emailTextbox.val()){
+        $.ajax({
+            // "data-validate-username-url"
+            //  is a custom attribute, you put attributes at html
+            url: form.attr("data-validate-email-url"),    
+            data: form.serialize(),
+            dataType: 'json',
+            success: function (data) {
+                if(data.is_taken){
+                    alert(data.error_message);
+                } else {
+                    // alert("not taken")
+                }
+            }
+        });
+    }
+}
+
+$('#id_email').on('keydown',debounce(validate_email,2000,false));
 
 
 

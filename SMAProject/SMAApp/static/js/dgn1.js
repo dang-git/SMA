@@ -170,23 +170,6 @@ function resizeTimeline(){
 
 window.addEventListener("resize", resizeCharts);
 
-// Added debounce to improve chart resizing performance
-// It delays the function execution
-function debounce(func, wait, immediate) {
-	var timeout;
-	return function() {
-		var context = this, args = arguments;
-		var later = function() {
-			timeout = null;
-			if (!immediate) func.apply(context, args);
-		};
-		var callNow = immediate && !timeout;
-		clearTimeout(timeout);
-		timeout = setTimeout(later, wait);
-		if (callNow) func.apply(context, args);
-	};
-};
-
 function resizeSource(){
 
     var width = $('#source_piechart_container').width();
@@ -433,14 +416,24 @@ function saveSnapshot(){
         dataType: 'json',
         complete: console.log("naipasa na"),
         success: function (data) {
-            if (data == "True") {
-                $(".saving-snapshot-text").css("display", "block");
-                $("#savingStatus").text(data);
+            if (data == "Saved") {
+                $(".saving-snapshot-text").css("display", "none");
+                $("#loadingPage").css("display","none");
+                // $("#savingStatus").text(data);
+                $('#saveSnapshotModal').modal('toggle');
             }
         },
         error: function(xhr){
-            alert("An error occured: " + xhr.status + " " + xhr.statusText);
-    }});
+            if(xhr.status == 200){
+                $(".saving-snapshot-text").css("display", "none");
+                $("#loadingPage").css("display","none");
+                // $("#savingStatus").text(data);
+                $('#saveSnapshotModal').modal('toggle');
+            }
+            // alert("An error occured: " + xhr.status + "," + xhr.statusText);
+            alert("Saving success!")
+        }
+    });
 }
 
 

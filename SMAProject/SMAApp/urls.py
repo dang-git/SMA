@@ -11,7 +11,9 @@ urlpatterns = [
     url(r'^influentialposts/$', views.open_influentialposts, name='influentialposts'),
     url(r'^topics/$', views.open_topics, name='topics'),
     url(r'^sentiments/$', views.open_sentiments, name='sentiments'),
+    url(r'^register/$', views.open_registration, name='register'),
 
+    # Snapshots
     url(r'^loadsnapshot/$', views.load_snapshot, name='loadsnapshot'),
     
 
@@ -23,10 +25,14 @@ urlpatterns = [
 
     # Checks the lda status everytime.
     url(r'^ajax/check_lda_status/$', views.check_lda_status, name='check_lda_status'),
+
     url(r'^ajax/get_sentiments/$', views.get_sentiments, name='get_sentiments'),
     url(r'^ajax/start_background_tasks/$', views.start_background_tasks, name='start_background_tasks'),
 
     #url(r'^ajax/get_wordcloud/$', views.return_wordcloud, name='get_wordcloud'),
     # Save snapshot
     url(r'^ajax/save_snapshot/', views.save_snapshot, name='save_snapshot'),
+
+    # Username exists checker
+    url(r'^ajax/validate_email/', views.validate_email, name='validate_email'),
 ]
