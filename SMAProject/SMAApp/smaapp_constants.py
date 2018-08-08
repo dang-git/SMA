@@ -7,3 +7,6 @@ PROXY = 'cache.srv.pointwest.com.ph:3128'
 
 # forms.py LoginForm
 LICENSE_TYPES = (('free','Free'),('premium','Premium'))
+
+# Set how many iterations bcrypt encrypts the password
+SALT_WORK_FACTOR = 10

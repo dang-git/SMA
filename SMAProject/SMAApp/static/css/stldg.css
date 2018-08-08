@@ -1,3 +1,4 @@
+
 body {
 	background-color: #ffffff;
 	margin: 0;
@@ -33,14 +34,18 @@ p {
     float: right;
     min-width: 250px;
 }
-.item-link{
+.item-link, .active-user{
 	font-family: "Raleway-Bold";
 	text-decoration: none;
-	color: rgb(229,211,176);
+	color: rgb(240, 166, 18);
 	padding: 20px;
-	
-	
 }
+
+.active-user {
+    color: rgb(246, 200, 107);
+    padding-bottom: 0px;
+}
+
 .header-right-item{
     float: right;
     display: inline-flex;
@@ -498,15 +503,27 @@ p.influencer-data.influencer-name{
     padding: 16px;
     position: fixed;
     z-index: 1;
-    left: 50%;
+    left: 83%;
     bottom: 30px;
     font-size: 17px;
 }
 
-#snackbar.show {
+#snackbar.burst {
     visibility: visible;
     -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;
     animation: fadein 0.5s, fadeout 0.5s 2.5s;
+}
+
+#snackbar.show {
+    visibility: visible;
+    -webkit-animation: fadein 0.5s;
+    animation: fadein 0.5s;
+}
+
+#snackbar.hide {
+    visibility: hidden;
+    -webkit-animation: fadeout 0.5s 2.5s;
+    animation: fadeout 0.5s 2.5s;
 }
 
 @-webkit-keyframes fadein {
@@ -610,4 +627,12 @@ left: 0;
 #topicsBody{
     min-width: 1000px;
     width: auto !important;
+}
+
+.save-warning{
+    color: #ff0000;
+}
+
+.snapshot-choices{
+    width: 10em;
 }

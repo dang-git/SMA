@@ -9,11 +9,18 @@
               </button>
             </div>
             <div class="modal-body">
-                <input class="form-control" type="text" id="snapshotName" placeholder="Snapshot Name" required/>
+              {% if username %}
+                <input class="form-control" type="text" id="snapshotName" placeholder="Snapshot Name"/>
+              {% else %}
+              <p>In order to save this search as a snapshot, please
+                <a href="#loginModal" data-toggle="modal" data-target="#loginModal" data-dismiss="modal">login</a>
+                or <a href="{% url 'register' %}">register</a> for an account.</p>
+              {% endif %}
             </div>
             <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-              <button type="button" class="btn btn-primary" onclick="saveSnapshot()">Save changes</button>
+              {% if username %}
+              <button type="button" id="saveSnapshotBtn" class="btn btn-primary">Save changes</button>
+              {% endif %}
             </div>
           </div>
         </div>
@@ -24,23 +31,21 @@
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+        <h5 class="modal-title" id="exampleModalLabel">Load Snapshot</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
       <div class="modal-body">
-          <form id="snapshotForm" class="form-wrapper cf" action="{% url 'loadsnapshot' %}" method="post">
+          <form id="loadSnapshotForm" class="form-wrapper cf" action="{% url 'loadsnapshot' %}" method="post">
         {% csrf_token %}
         {{snapshotlistform.errors}}
         {{snapshotlistform.non_field_errors}}
         {{snapshotlistform}}
-        <button type="submit" name="load-snapshot" id="load-snapshot">Load snapshot</button>
         </form>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary" onclick="loadSnapshot()">Load this Snapshot</button>
+        <button type="button" id="loadSnapshotBtn" class="btn btn-primary">Load this Snapshot</button>
       </div>
     </div>
   </div>

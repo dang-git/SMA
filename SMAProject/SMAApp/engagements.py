@@ -3,6 +3,7 @@
 import pandas as pd
 from datetime import datetime
 import json
+import numpy as np
 
 
 """::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -94,12 +95,16 @@ def return_influencers(df, filter_):
     data = {}
     # for i in range(len(df)):
     for i in range(5):
-        data[i] = {"name": df['name'][i], "username": "@%s" % df['username'][i], "profileimage": df['profileimage'][i].replace('_normal',''), "post": df['postcount'][i], "favorites": df['fvcount'][i], "retweets": df['rtcount'][i], "followers": df['flcount'][i]}
+        data[str(i)] = {"name": df['name'][i], "username": "@%s" % df['username'][i], "profileimage": df['profileimage'][i].replace('_normal',''), "post": int(df['postcount'][i]), "favorites": int(df['fvcount'][i]), "retweets": int(df['rtcount'][i]), "followers": int(df['flcount'][i])}
     # data = {"1st": {"name": df['name'][0], "username": "@%s" % df['username'][0], "profileimage": df['profileimage'][0], "post": df['postcount'][0], "favorites": df['fvcount'][0], "retweets": df['rtcount'][0], "followers": df['flcount'][0]},
     #            "2nd": {"name": df['name'][1], "username": "@%s" % df['username'][1], "profileimage": df['profileimage'][1], "post": df['postcount'][1], "favorites": df['fvcount'][1], "retweets": df['rtcount'][1], "followers": df['flcount'][1]},
     #            "3rd": {"name": df['name'][2], "username": "@%s" % df['username'][2], "profileimage": df['profileimage'][2], "post": df['postcount'][2], "favorites": df['fvcount'][2], "retweets": df['rtcount'][2], "followers": df['flcount'][2]},
     #            "4th": {"name": df['name'][3], "username": "@%s" % df['username'][3], "profileimage": df['profileimage'][3], "post": df['postcount'][3], "favorites": df['fvcount'][3], "retweets": df['rtcount'][3], "followers": df['flcount'][3]},
     #            "5th": {"name": df['name'][4], "username": "@%s" % df['username'][4], "profileimage": df['profileimage'][4], "post": df['postcount'][4], "favorites": df['fvcount'][4], "retweets": df['rtcount'][4], "followers": df['flcount'][4]}}
+
+    
+    
+    # output = [dict([a, int(x)] for a, x in data.items())]
     return data
 
 
@@ -117,11 +122,14 @@ def return_infl_posts(df):
     df['engagements'] = df['rtcount'] + df['fvcount']
     df = df.sort_values('engagements', ascending=False).head(10).reset_index()
     del df['index']
-    data = {"1st": {"name": df['name'][0], "username": "@%s" % df['username'][0], "profileimage": df['profileimage'][0].replace('_normal',''), "favorites": df['fvcount'][0], "retweets": df['rtcount'][0], "tweet": df["tweet"][0]},
-           "2nd": {"name": df['name'][1], "username": "@%s" % df['username'][1], "profileimage": df['profileimage'][1].replace('_normal',''), "favorites": df['fvcount'][1], "retweets": df['rtcount'][1], "tweet": df["tweet"][1]},
-           "3rd": {"name": df['name'][2], "username": "@%s" % df['username'][2], "profileimage": df['profileimage'][2].replace('_normal',''), "favorites": df['fvcount'][2], "retweets": df['rtcount'][2], "tweet": df["tweet"][2]},
-           "4th": {"name": df['name'][3], "username": "@%s" % df['username'][3], "profileimage": df['profileimage'][3].replace('_normal',''), "favorites": df['fvcount'][3], "retweets": df['rtcount'][3], "tweet": df["tweet"][3]},
-           "5th": {"name": df['name'][4], "username": "@%s" % df['username'][4], "profileimage": df['profileimage'][4].replace('_normal',''), "favorites": df['fvcount'][4], "retweets": df['rtcount'][4], "tweet": df["tweet"][4]}}
+    data = {}
+    for i in range(5):
+        data[str(i)] = {"name": df['name'][i], "username": "@%s" % df['username'][i], "profileimage": df['profileimage'][i].replace('_normal',''), "favorites": int(df['fvcount'][i]), "retweets": int(df['rtcount'][i]), "tweet": df["tweet"][i]}
+    # data = {"1st": {"name": df['name'][0], "username": "@%s" % df['username'][0], "profileimage": df['profileimage'][0].replace('_normal',''), "favorites": int(df['fvcount'][0]), "retweets": df['rtcount'][0], "tweet": int(df["tweet"][0])},
+    #        "2nd": {"name": df['name'][1], "username": "@%s" % df['username'][1], "profileimage": df['profileimage'][1].replace('_normal',''), "favorites": int(df['fvcount'][1]), "retweets": df['rtcount'][1], "tweet": int(df["tweet"][1])},
+    #        "3rd": {"name": df['name'][2], "username": "@%s" % df['username'][2], "profileimage": df['profileimage'][2].replace('_normal',''), "favorites": int(df['fvcount'][2]), "retweets": df['rtcount'][2], "tweet": df["tweet"][2]},
+    #        "4th": {"name": df['name'][3], "username": "@%s" % df['username'][3], "profileimage": df['profileimage'][3].replace('_normal',''), "favorites": int(df['fvcount'][3]), "retweets": df['rtcount'][3], "tweet": df["tweet"][3]},
+    #        "5th": {"name": df['name'][4], "username": "@%s" % df['username'][4], "profileimage": df['profileimage'][4].replace('_normal',''), "favorites": int(df['fvcount'][4]), "retweets": df['rtcount'][4], "tweet": df["tweet"][4]}}
     return data
 
 
@@ -147,8 +155,12 @@ from SMAApp import polarize
 def return_polarity_chartdata(df):
     df['polarity'] = [polarize.polarity(i) for i in df.tweet]
     data = dict(df.polarity.value_counts())
+    # Separates keys and values into their own lists 
+    # ex: xdata = ['positive', 'neutral', 'negative']
+    # ydata = ['124','150','852']
     xdata = [*data]
     ydata = list(data.values())
+    # Convert values into int data type
     ydata = [int(i) for i in ydata]
     # extra_serie = {"tooltip": {"y_start": "", "y_end": ""}}
     # chartdata = {'x': xdata, 'y1': ydata, 'name1':'Tweets', 'extra1': extra_serie
@@ -162,8 +174,8 @@ def return_polarity(df):
     df['polarity'] = [polarize.polarity(i) for i in df.tweet]
     data = dict(df.polarity.value_counts())
     # Parse values from int64 to int
-    # for values in data:
-    #     data[values] = int(data[values])
+    for values in data:
+        data[values] = int(data[values])
     return data
 
     # data = [int(i) for i in list(data.values())]

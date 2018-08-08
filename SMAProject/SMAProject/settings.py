@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 """
 
 import os
+from django.contrib.messages import constants as messages
+from mongoengine import connect
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -40,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_nvd3',
+    'mongoengine.django.mongo_auth',
     'background_task',
     'djangobower',
     'SMAApp',
@@ -54,6 +57,20 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+AUTHENTICATION_BACKENDS = (
+    'mongoengine.django.auth.MongoEngineBackend',
+)
+# AUTH_USER_MODEL = 'mongo_auth.MongoUser'
+# MONGOENGINE_USER_DOCUMENT = 'mongoengine.django.auth.User'
+
+
+MONGO_DATABASE_NAME = 'smadb'
+MONGO_HOST = '127.0.0.1'
+MONGO_PORT = 27017
+connect(MONGO_DATABASE_NAME, host=MONGO_HOST, port=MONGO_PORT)
+
+
 
 ROOT_URLCONF = 'SMAProject.urls'
 
@@ -75,6 +92,7 @@ TEMPLATES = [
     },
 ]
 
+
 WSGI_APPLICATION = 'SMAProject.wsgi.application'
 
 
@@ -84,6 +102,7 @@ WSGI_APPLICATION = 'SMAProject.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
+        # 'ENGINE': 'django.db.backends.dummy',
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
         # 'ENGINE': 'django_mongodb_engine',
         # 'NAME': 'smadb',
@@ -116,6 +135,14 @@ STATICFILES_FINDERS = (
     # 'django.contrib.staticfiles.finders.DefaultStorageFinder',
     'djangobower.finders.BowerFinder',
 )
+
+MESSAGE_TAGS = {
+    messages.DEBUG: 'alert-info',
+    messages.INFO: 'alert-info',
+    messages.SUCCESS: 'alert-success',
+    messages.WARNING: 'alert-warning',
+    messages.ERROR: 'alert-danger',
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.0/topics/i18n/

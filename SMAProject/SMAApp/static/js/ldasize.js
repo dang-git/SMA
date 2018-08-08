@@ -21,7 +21,7 @@ function initldaCss() {
 }
 
 // var newSvgWidth= Math.min(leftPanel.get(0).getBBox().width,rightPanel.get(0).getBBox().width) + 100
-window.addEventListener("resize", resizeLda);
+// window.addEventListener("resize", resizeLda);
 
 // Used to adjust Lda bar chart to go below the scatter chart when window is resized
 function resizeTopicsContainer() {
@@ -61,7 +61,7 @@ function resizeTopicsContainer() {
 
 }
 
-// set min width of width of left panel 
+// set the lda's left panel min width
 function setTopicsBodyMinWidth() {
     $('#topicsBody').css({ "min-width": +"px" });
 }

@@ -68,7 +68,7 @@ def lda_model(data):
             topic.append(j[0])
         all_topics[len(all_topics)+1] = ", ".join(topic)
     p = pyLDAvis.gensim.prepare(lda, corpus, dictionary)
-    # get data as json
+    # return data as json
     lda_data = json.dumps(p.to_dict())
     return lda_data
     # filename = "lda-" + sessionid + ".html"

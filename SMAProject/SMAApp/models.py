@@ -3,7 +3,7 @@ from mongoengine import *
 import datetime
 # Create your models here.
 
-connect('smadb')
+# connect('smadb')
 
 class Snapshot(DynamicDocument):
     _id = ObjectIdField()
@@ -12,12 +12,15 @@ class Snapshot(DynamicDocument):
     # platform = ReferenceField('Ref_platform')
     snapshot_name = StringField()
     extracted_data = ListField()
+    quick_stats = DictField()
+    influencers_data = DictField()
+    influential_data = DictField()
     date_extracted = DateTimeField()
-    chart_data = ListField() # TODO there should be many charts in 1 snapshot
+    chart_data = ListField()
     lda_data = DictField()
+    wordcloud_image = BinaryField() # wordcloud_image = FileField()
     insights = ListField()
-    wordcloud_image = ImageField()
-    owner = StringField() #ReferenceField('User')
+    owner = ObjectIdField() # ReferenceField('User')
     date_created = DateTimeField(default=datetime.datetime.utcnow)
 
 class User(Document):
@@ -29,6 +32,9 @@ class User(Document):
     snapshots = ListField() #ListField(ReferenceField('Snapshot'))
     license_type = StringField()
 
+class WordcloudImage(Document):
+    image = FileField()
+    session_owner = ObjectIdField()
 
 class Organization(Document):
     org_name = StringField()

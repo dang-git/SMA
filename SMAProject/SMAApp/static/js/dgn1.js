@@ -14,17 +14,18 @@ $(document).ready(function(){
     addCommaSeparation();
     
     // retain search box value
-    var searchValue = window.sessionStorage['search_val'];
+    var searchValue = window.sessionStorage['search_keyword'];
     
     $('#searchForm').submit(function(){
-        window.sessionStorage['search_val'] = $("input[name = 'keyword']").val();
+        window.sessionStorage['search_keyword'] = $("input[name = 'keyword']").val();
     });
     
     if(searchValue == ''){
         $('#id_keyword').val('');
     }else{
-        $('#id_keyword').val(window.sessionStorage['search_val']);
+        $('#id_keyword').val(window.sessionStorage['search_keyword']);
     }
+    
     loadInsightValues();
 
    // $('.profile-image').on('error' ,function(){
@@ -34,9 +35,12 @@ $(document).ready(function(){
 
 // display loading screen on search
 $( "#searchButton, #searchAgainButton" ).on( "click", function(event) {
-    $("#loadingPage").css("display","block");
-    $(".load-tweet-text").css("display","block");
-    $("#loadingKeyword").text($("#id_keyword").val());
+    // if searchbox is not empty
+    if ($('#id_keyword').val().length > 0) {
+        $("#loadingPage").css("display","block");
+        $(".load-tweet-text").css("display","block");
+        $("#loadingKeyword").text($("#id_keyword").val());
+    }
     console.log(event.target.id);
     window.sessionStorage.clear();
   });
@@ -56,10 +60,6 @@ function addCommaSeparation(){
     });
 }
 
-
-$('#searchButton').on('click', function(){
-// alert("heyo");
-});
 
 // Checks every input box with "search-insights-input" class
 // and returns their values if they have data saved on session by using inputId
@@ -384,7 +384,6 @@ function csrfSafeMethod(method) {
 function saveSnapshot(){
     var csrftoken = $("[name=csrfmiddlewaretoken]").val();
     // var snapshotName = $('#snapshotName').val();
-    var insights = [];
     var send_data = {
         snapshotName :  $('#snapshotName').val(),
         insights : []
@@ -415,25 +414,164 @@ function saveSnapshot(){
         // contentType: 'application/json',
         dataType: 'json',
         complete: console.log("naipasa na"),
-        success: function (data) {
-            if (data == "Saved") {
-                $(".saving-snapshot-text").css("display", "none");
-                $("#loadingPage").css("display","none");
-                // $("#savingStatus").text(data);
-                $('#saveSnapshotModal').modal('toggle');
-            }
+        success: function(xhr) {
+            // alert("At success")
+            // if (data == "Saved") {
+                if(xhr.status == 200 || xhr.status == 0){
+                    $(".saving-snapshot-text").css("display", "none");
+                    alert("An error occured: " + xhr.status + "," + xhr.statusText);
+                    $("#loadingPage").css("display","none");
+                    // $("#savingStatus").text(data);
+                    $('#saveSnapshotModal').modal('toggle');
+                    location.href = "/diagnostics/";
+                }
+            // }
         },
         error: function(xhr){
-            if(xhr.status == 200){
+            if(xhr.status == 403){
                 $(".saving-snapshot-text").css("display", "none");
                 $("#loadingPage").css("display","none");
-                // $("#savingStatus").text(data);
                 $('#saveSnapshotModal').modal('toggle');
+                $('#snapshotName').append("<p class='save-warning'>Something went wrong, please contact admin.</p>");
+                // location.href = "/diagnostics/";
             }
-            // alert("An error occured: " + xhr.status + "," + xhr.statusText);
-            alert("Saving success!")
+            console.log("An error occured: " + xhr.status + "," + xhr.statusText);
+            location.href = "/diagnostics/";
+            // alert("Saving Failed!");
         }
     });
 }
 
+$('#loginbtn').on('click',function() {
+   if($('#login_email_id').val() && $('#login_password_id').val()){
+       validate_credentials();
+   }
+});
 
+// Submit login form on enter click
+$('#login_password_id').on("keyup", function (event) {
+    event.preventDefault();
+    if (event.keyCode === 13) {
+        $('#loginbtn').click();
+    }
+})
+
+function validate_credentials(){
+    var csrftoken = $("[name=csrfmiddlewaretoken]").val();
+    var user_credentials = {
+        email :  $('#login_email_id').val(),
+        password : $('#login_password_id').val(),
+    }
+
+    $.ajax({
+        beforeSend: function (xhr, settings) {
+            if(!csrfSafeMethod(settings.type) && !this.crossDomain){
+                xhr.setRequestHeader("X-CSRFToken",csrftoken);
+            }
+        },
+        type: 'POST',
+        url: '/ajax/login_user/',
+        data: { 'user_credentials': JSON.stringify(user_credentials)
+         },
+        // contentType: 'application/json',
+        // dataType: 'json',
+        success: function (data) {
+            console.log(data);
+            // $('#loginForm').submit();
+            location.href="/diagnostics/"
+        },
+        error: function(xhr){
+                // Unauthorized
+                if(xhr.status == 401){
+                    if (! $('.login-warning').length > 0) {
+                        $('#loginForm').append("<p class='login-warning'>Invalid Credentials</p>");
+                    }
+                }
+                // alert("An error occured: " + xhr.status + "," + xhr.statusText);
+                // alert("Login Failed!");
+            }
+
+        // complete: console.log("naipasa na"),
+        // success: function (data) {
+        //     if (data == "Saved") {
+        //         $(".saving-snapshot-text").css("display", "none");
+        //         $("#loadingPage").css("display","none");
+        //         // $("#savingStatus").text(data);
+        //         $('#saveSnapshotModal').modal('toggle');
+        //     }
+        // },
+        // error: function(xhr){
+        //     if(xhr.status == 200){
+        //         $(".saving-snapshot-text").css("display", "none");
+        //         $("#loadingPage").css("display","none");
+        //         // $("#savingStatus").text(data);
+        //         $('#saveSnapshotModal').modal('toggle');
+        //         alert("Saving success!");
+        //     }
+        //     // alert("An error occured: " + xhr.status + "," + xhr.statusText);
+        //     alert("Saving Failed!");
+        // }
+    });
+}
+
+$('#logoutBtn').on('click',function() {
+    logout_user();
+});
+
+$('#registeronSnapbtn').on('click', function() {
+   location.href = "/register/"
+});
+
+function logout_user(){
+    sessionStorage.clear();
+    $.ajax({
+        url: '/ajax/logout_user/',
+        success: function (data) {
+            location.href="/"
+        }
+    });
+}
+// Checks if snapshot data to save is complete (checks: lda and image as of now)
+// else save the snapshot
+$('#saveSnapshotBtn').on('click', function () {
+    if (!$('#snapshotName').val().length > 0) {
+        if (!$('.save-warning').length > 0) {
+            $('.modal-body').append("<p class='save-warning'>Please fill up this blank</p>")
+        }
+    } else if (typeof window.sessionStorage['lda_data'] == "undefined" || window.sessionStorage['lda_data'] == null) {
+        if (!$('.save-warning').length > 0) {
+            $('.modal-body').append("<p class='save-warning'>Topic Clustering Data is still being generated, please wait</p>");
+        }
+    } else {
+        saveSnapshot();
+        location.href = "/diagnostics/"
+    }
+    // saveSnapshot();
+    // if(pathname == 'diagnostics'){
+    //     location.reload();
+    // } else {
+    //     location.href="/diagnostics/"
+    // }
+});
+
+// Load Snapshot modal's submit button 
+$('#loadSnapshotBtn').on('click', function() {
+    sessionStorage.clear();
+    $('#loadSnapshotForm').submit();
+});
+
+
+// $('#saveSnapshotModal').on('shown.bs.modal', function(){
+//     if(window.sessionStorage['lda_data'] == null && window.sessionStorage['wc_image'] == null){
+//         $('#saveSnapshotBtn').attr({"disabled":"disabled"});
+//     } else {
+//         $('#saveSnapshotBtn').removeAttr("disabled");
+//     }
+// });
+
+// Remove the warning on save modal when it closes.
+$('#saveSnapshotModal').on('hide.bs.modal', function(){
+    if ($('.save-warning').length > 0) {
+        $('.save-warning').remove();
+    }
+});

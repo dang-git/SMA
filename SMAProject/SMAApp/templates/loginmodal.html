@@ -8,12 +8,12 @@
                 </button>
             </div>
             <div class="modal-body">
-                <input class="form-control" id="username" type="text" placeholder="Username">
-                <input class="form-control" id="username" type="password" placeholder="Password">
+                <form id="loginForm" class="form-wrapper cf" action="{% url 'login_user' %}" method="post">
+                    {% csrf_token %} {{loginform}}
+                </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" onclick="saveSnapshot()">Login</button>
+                <button type="button" id="loginbtn" class="btn btn-primary">Login</button>
             </div>
         </div>
     </div>

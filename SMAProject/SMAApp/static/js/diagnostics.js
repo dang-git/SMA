@@ -1,35 +1,41 @@
 $(document).ready(function () {
-    if(window.sessionStorage['isSnapshot'] == true && snapshotLdadata != null){
-        processldaData(JSON.stringify(snapshotLdadata));
+    // if(typeof window.sessionStorage['bg_started'] != "undefined"){
+    //     isSnapshot
+    // }
+
+    // if (typeof window.sessionStorage['wc_image'] == "undefined" || window.sessionStorage['wc_image'] == null) {
+    //     $('#wordcloudImageContainer').css("display", "none");
+    //     // generateWCImage();
+    // } else {
+    //     $('#imagePlaceholder').css("display", "none");
+    //     $('#wordcloudImage').attr({"src":"data:img/png;base64," + window.sessionStorage['wc_image']})
+    // }
+
+
+    if(window.sessionStorage['lda_data'] == null && window.sessionStorage['isSnapshot'] == 'true'){
+        getSnapshotLdadata();
+        // checkAndProcessLdadata(JSON.stringify(window.sessionStorage['snapshotLdadata']));
+        // generateldaPage();
     }
     // if (window.sessionStorage['bg-started'] != 'Y') {
     //     startBackgroundTasks();
     // }
     //load wordcloud
-    if ((window.sessionStorage['bg_started'] != 'Y' || typeof window.sessionStorage['bg_started'] == "undefined")
-        || window.sessionStorage['bg_done'] != 'Y') {
-        sessionStorage.setItem("bg_started", "Y")
-        // window.sessionStorage['bg_started'] == 'Y';
-        // generateSentiments();
-    }
+    // if ((typeof window.sessionStorage['bg_started'] == "undefined" || window.sessionStorage['bg_started'] != 'Y')
+    //     || window.sessionStorage['bg_done'] != 'Y') {
+    //     sessionStorage.setItem("bg_started", "Y")
+    //     // window.sessionStorage['bg_started'] == 'Y';
+    //     // generateSentiments();
+    // }
 
-    if (window.sessionStorage['lda_deployed'] != 'Y' || typeof window.sessionStorage['bg_started'] == "undefined") {
+    if (window.sessionStorage['isSnapshot'] != 'true' && window.sessionStorage['lda_deployed'] != 'Y') {
         sessionStorage.setItem("lda_deployed", "Y");
-        // startldaDataPull();
+        startldaDataPull();
     }
-
-    if (window.sessionStorage['wc_image'] == null ||
-        typeof window.sessionStorage['wc_image'] == "undefined") {
-        $('#wordcloudImageContainer').css("display", "none");
-        generateWCImage();
-    } else {
-        $('#imagePlaceholder').css("display", "none");
-    }
-
-    // load topic clustering
-    if (window.sessionStorage['lda_data'] == null ||
-        typeof window.sessionStorage['lda_data'] == "undefined") {
-        // generateldaData();
+    else if (window.sessionStorage['isSnapshot'] != 'true' && 
+        (window.sessionStorage['lda_data'] == null ||
+        typeof window.sessionStorage['lda_data'] == "undefined")) {
+        generateldaData();
         // $('#ldaPage').css("display", "none");
     }
     else if ((window.sessionStorage['lda_data'] != null &&
@@ -57,6 +63,7 @@ function generateWCImage() {
             }
             $('#imagePlaceholder').css("display", "none");
             $('#wordcloudImageContainer').css("display", "block");
+            $('#wordcloudImage').attr({"src":"data:img/png;base64," + data})
             //var obj = JSON.parse(data);
             // make a notif its done?
             console.log("image done");
@@ -64,7 +71,7 @@ function generateWCImage() {
     });
 }
 
-
+// Sends go signal to django to trigger generating lda data
 function startldaDataPull() {
     $.ajax({
         url: '/ajax/get_lda_data/',
@@ -72,7 +79,10 @@ function startldaDataPull() {
     });
 }
 
+// This will check lda data on django
+// it also generate "lda page" if lda data already exists
 function generateldaData() {
+    toggleSnackbar(true);
     $.ajax({
         beforeSend: function () {
             if (window.sessionStorage['lda_page'] == null 
@@ -82,18 +92,32 @@ function generateldaData() {
         },
         url: '/ajax/check_lda_status/',
         success: function (data) {
-            processldaData(data);
+            checkAndProcessLdadata(data);
+        }
+    });
+}
+
+// Used when data is loaded from snapshot.
+function getSnapshotLdadata() {
+    $.ajax({
+        url: '/ajax/get_snapshot_lda/',
+        success: function (data) {
+            window.sessionStorage['lda_data'] = JSON.stringify(data);
+            generateldaPage();
         }
     });
 }
 
 // Periodically check data for lda from server every 10 secs.
-function processldaData(data) {
+// calls generateldaData everytime django doesn't give ldadata as result.
+function checkAndProcessLdadata(data) {
     if (data == "False") {
         window.setTimeout(generateldaData, 10000);
         console.log("Getting LDA Again");
     } else {
         window.sessionStorage['lda_data'] = data;
+        $('#snackbar > div > p:eq(0)').text("Finished generating LDA Topic cluster");
+        toggleSnackbar(false);
         generateldaPage();
         console.log("lda data done");
     }
@@ -120,19 +144,31 @@ function generateldaPage() {
     });
 }
 
-function generateSentiments() {
-    console.log("inside sentiments");
-
-    $.ajax({
-        url: '/ajax/get_sentiments/',
-        success: function (data) {
-            if(data == "True"){
-                sessionStorage.setItem("bg_done", "Y");
-                console.log("sentiments done");
-            }
+function toggleSnackbar(visible) {
+    var snackbar = $('#snackbar')
+    if (visible == true) {
+        if (!snackbar.hasClass("show")) {
+            snackbar.addClass("show");
         }
-    });
+    } else {
+        snackbar.removeClass("show");
+        snackbar.addClass("hide");
+    }
 }
+
+// function generateSentiments() {
+//     console.log("inside sentiments");
+
+//     $.ajax({
+//         url: '/ajax/get_sentiments/',
+//         success: function (data) {
+//             if(data == "True"){
+//                 sessionStorage.setItem("bg_done", "Y");
+//                 console.log("sentiments done");
+//             }
+//         }
+//     });
+// }
 
 function startBackgroundTasks() {
     console.log("Starting Background Task");
@@ -156,13 +192,16 @@ function startBackgroundTasks() {
     });
 }
 
-function validate_email(){
-    var form = $('#snapshotForm');
-    var emailTextbox = $('#id_email');
-    console.log("box " + emailTextbox.val());
+function validate_registration_email(){
+    if ($('.save-warning').length > 0) {
+        $('p').remove(".save-warning");
+    }
+    var form = $('#registrationForm');
+    var emailTextbox = $('#reg_email_id');
     // check if textbox has content
     if(emailTextbox.val()){
         $.ajax({
+            // type: 'POST',
             // "data-validate-username-url"
             //  is a custom attribute, you put attributes at html
             url: form.attr("data-validate-email-url"),    
@@ -170,7 +209,11 @@ function validate_email(){
             dataType: 'json',
             success: function (data) {
                 if(data.is_taken){
-                    alert(data.error_message);
+                    if (!$('.save-warning').length > 0) {
+                        $('#reg_email_id').after("<p class='save-warning'>Email has been registered already</p>");
+                    }
+                    
+                    // alert(data.error_message);
                 } else {
                     // alert("not taken")
                 }
@@ -179,9 +222,11 @@ function validate_email(){
     }
 }
 
-$('#id_email').on('keydown',debounce(validate_email,2000,false));
+$('#reg_email_id').on('keydown',debounce(validate_registration_email,2000,false));
 
-
+// $('#registerBtn').on('click', function() {
+//     $('#registrationForm').submit();
+// })
 
 function showSnackbar(message) {
     console.log("show snacku");

@@ -5,22 +5,28 @@ from django.shortcuts import render
 from django.views.generic import TemplateView
 from django.template.loader import render_to_string
 from django.http import HttpResponseRedirect, JsonResponse, HttpResponse
-from django.views.decorators.clickjacking import xframe_options_exempt
+from django.contrib import messages
+from django.contrib.auth.models import User
+from django.contrib.auth import login, logout
+from mongoengine.queryset import DoesNotExist
 from django.conf import settings
-from .forms import SearchForm, SnapshotListForm, RegistrationForm
-from SMAApp import extract, engagements, wordcloudscript, lda, hashtags, tasks, globals, queries, utils
+from django.urls import reverse
+from .forms import SearchForm, SnapshotListForm, RegistrationForm, LoginForm
+from SMAApp import extract, engagements, wordcloudscript, lda, hashtags, tasks, globals, queries, utils, smaapp_constants
 from SMAApp.models import Snapshot, User
 from background_task import background
 from django.core import serializers
-from celery import shared_task
+from celery import shared_task, task
 from celery.result import AsyncResult
-from celery.task.control import revoke
+# from celery.task.control import revoke
 import pandas as pd
 import json
 import uuid
 import os
 import time
 import logging
+import bcrypt
+import numpy as np
 # Create your views here.
 
 tweetCounts = 0
@@ -37,10 +43,13 @@ def get_keyword(request):
 			del request.session['df']
 		if searchform.is_valid():
 			print('extracting')
-			request.session['user_id'] = str(uuid.uuid4())
+			# utils.clear_specific_sessionkeys(request)
+			if request.session.get("lda_data",False):
+				del request.session['lda_data']
+			request.session['user_id'] = request.session.session_key #str(uuid.uuid4())
 			request.session['engagements_data'] = ""
 			#df = extract.searchKeyWord(searchform.cleaned_data['keyword'])[0]
-			pickling = os.path.join(settings.BASE_DIR, "SMAApp\\static\\images\\wordcloud\\SM.pkl")
+			pickling = os.path.join(settings.BASE_DIR, "SMAApp\\static\\images\\wordcloud\\ABSCBN.pkl")
 			#df.to_pickle(pickling)
 			df = pd.read_pickle(pickling)
 
@@ -58,16 +67,18 @@ def get_keyword(request):
 			# user.save()
 			# Append a Snapshot id reference to User
 			# User.objects(id='5b34ed4355d14c2e2c426280').update_one(push__snapshots=snapshot.pk)
-
-			data = engagements.return_engagements(df)
-			formattedData = formatData(data)
 			quick_stats = {}
-			diag_chartdata = {}
+			quick_stats_data = engagements.return_engagements(df)
+			request.session['quick_stats_db'] = quick_stats_data
+			formatted_quick_stats = format_quick_stats_comma(quick_stats_data)
 
-			prepare_chartdata(df)
+			quick_stats = formatted_quick_stats
+			request.session["quick_stats"] = quick_stats
+			diag_chartdata = {}
+			request.session['chartdata'] = prepare_chartdata(df)
 			# for key, value in request.session.items(): print('{}'.format(key))
-			quick_stats["engagements"] = formattedData
-			diag_chartdata = create_diag_chartdata()
+			
+			diag_chartdata = create_diag_chartdata(request.session['chartdata'])
 			# timeline = engagements.return_timeline(df)
 			# globals.chartdata["timeline"] = pd.DataFrame(timeline).to_dict(orient='records')
 				# diag_chartdata["timeline"] = timeline_linechart(globals.chartdata["timeline"])
@@ -77,17 +88,14 @@ def get_keyword(request):
 				# # globals.chartdata["source"] = diag_chartdata["source"]
 				# compositionFormattedData = compositionPiechartConverter(globals.chartdata["composition"])
 				# diag_chartdata["composition"] = compositionFormattedData
-			print("Comp Data", globals.chartdata["composition"])
-			globals.quick_stats = quick_stats
-			globals.diag_chartdata = diag_chartdata
-			# globals.chartdata["composition"] = diag_chartdata["composition"]
-			request.session['engagements_quick_stats'] = quick_stats
-			request.session['engagements_chartdata'] = diag_chartdata
-			globals.snapshot_owner = "Dy"
-			print("here again")
-			globals.SNAPSHOT_LIST = queries.get_snapshot_list()
-			# SAVING TEST
-			print("INIT")
+			
+
+			request.session["diag_chartdata"] = diag_chartdata
+
+			# Prepare data for influencers and influential posts
+			request.session["influencers_data"] = prepare_influencers_data(df)
+			request.session["influential_data"] = prepare_influentialposts_data(df)
+			# globals.SNAPSHOT_LIST = queries.get_snapshot_list()
 			# chartdatalist.append(pd.DataFrame(globals.chartdata).to_json(orient='records'))
 			# snapshot.wordcloud_image = 
 			# snapshot.chart_data = globals.hashtags
@@ -98,133 +106,272 @@ def get_keyword(request):
 
 			
 			# Set list of snapshots to load snapshots dropdown
-			snapshotlistform = SnapshotListForm()
+			snapshotlistform = SnapshotListForm(request=request)
+			loginform = LoginForm()
 			# CHOICE_GENDER = ((1, 'Male'), (2, 'Female'))
 			# globals.snapshotlist = [(snapshotObj.snapshot_name,snapshotObj.snapshot_name) for snapshotObj in Snapshot.objects(owner='Dy')]
 			# snapshotform.fields['snapshotchoices'].choices = CHOICE_GENDER #globals.snapshotlist
-			isSnapshot = 'false'
+			request.session['isSnapshot'] = 'false'
+			request.session['wc_image_str'] = generate_wordcloud_image(request)
+			username = ""
+			if request.session.get('loggedin_username'):
+				username = request.session['loggedin_username']
+			# return HttpResponseRedirect('/diagnostics/')
 			return render(request, 'diagnostics.html',
-                {'isSnapshot':isSnapshot,'quick_stats':quick_stats,
+                {'isSnapshot':request.session['isSnapshot'],'quick_stats':quick_stats,
 				'diag_chartdata':diag_chartdata,
-				'searchform':searchform,'snapshotlistform':snapshotlistform})
+				'searchform':searchform,'snapshotlistform':snapshotlistform,
+				'loginform':loginform,'username':username})
 	else:
-		searchform = SearchForm()
+		if request.session.get('isloggedin'):
+			return HttpResponseRedirect(reverse('diagnostics'))
+		else:
+			searchform = SearchForm()
 	return render(request, 'search.html', {'searchform': searchform})
+
+def login_user(request):
+	authenticated = 'False'
+	if request.method == 'POST':
+		if request.is_ajax():
+			try:
+				print("inside try")
+				user_credentials = json.loads(request.POST.get('user_credentials'))
+				user = User.objects.get(email=user_credentials['email'])
+				# print("usercontents", dict(user.to_mongo()))
+				if bcrypt.checkpw(user_credentials['password'].encode('utf8'),user.password.encode('utf8')):
+					# TODO redundancy
+					# for key, value in request.session.items(): print('{}'.format(key))
+					request.session['loggedin_userid'] = user.id
+					request.session['loggedin_username'] = user.username
+					request.session['isSnapshot'] = 'false'
+					request.session['isloggedin'] = True
+					# searchform = SearchForm()
+					# snapshotlistform = SnapshotListForm()
+					authenticated = 'True'
+					messages.success(request, 'Logged in Successfully')
+					# return HttpResponseRedirect('/diagnostics/')
+					return JsonResponse(authenticated, status=200, safe=False)
+				else:
+					authenticated = 'False'
+					# messages.error(request, 'Wrong credentials')
+					# json = json.dumps({'authenticated': False})
+					return JsonResponse(authenticated, status=401, safe=False)
+			except User.DoesNotExist:
+				authenticated = 'False'
+				return JsonResponse(authenticated, status=401, safe=False)	
+	return JsonResponse(authenticated, status=401, safe=False)
+				# return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+	# Compares the user entered password to hashed password from db
+	# if bcrypt.checkpw(request.POST['password'].encode('utf8'),user.password.encode('utf8')):
+	# 	print("success")	
+	# else:
+	# 	print("unsuccess")
+	# 	return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+	# 	if user.check_password(request.POST['password']):
+	# 		user.backend = 'mongoengine.django.auth.MongoEngineBackend'
+	# 		login(request, user)
+	# 		request.session.set_expiry(60 * 60 * 1) # 1 hour timeout
+	# 		return HttpResponse(user)
+	# 	else:
+	# 		return HttpResponse('login failed')
+	# except DoesNotExist:
+	# 	return HttpResponse('user does not exist')
+	# except Exception:
+	# 	return HttpResponse('unknown error')
+
+def logout_user(request):
+	# request.session.flush()
+	logout(request)
+	return HttpResponseRedirect("/")
+
+# def revoke_started_task():
+# 	# isSnapshots values 'true' and 'false' is string
+# 	# so it will be boolean when passed to js on other functions
+# 	if request.session['isSnapshot'] == 'true' and request.session['lda_data']:
+
 
 
 def open_registration(request):
-	if request.method == 'POST':
-		print("posted")
-		registrationform = RegistrationForm(request.POST)
-		if registrationform.is_valid():
-			print('Registering')
-			isSnapshot = 'false'
-			user = User()
-			user.username = registrationform.cleaned_data.get('username')
-			user.email = registrationform.cleaned_data.get('email')
-			user.password = registrationform.cleaned_data.get('password')
-			user.address = registrationform.cleaned_data.get('address')
-			user.license_type = registrationform.cleaned_data.get('license_type')
-			user.save()
-			globals.loggedin_userid = user.pk
-			print("got search form")
-			searchform = SearchForm()
-			snapshotlistform = SnapshotListForm()	
-			return render(request, 'diagnostics.html',
-				{'isSnapshot':isSnapshot,'quick_stats':globals.quick_stats,
-				'diag_chartdata':globals.diag_chartdata,'searchform':searchform,
-				'snapshotlistform':snapshotlistform})
-				# TODO return an else with error message that states form is invalid
+	loginform = LoginForm()
+	registrationform = RegistrationForm()
+	searchform = SearchForm()
+	if request.session.get('isloggedin'):
+		return HttpResponseRedirect('/diagnostics/')
+	else:
+		if request.method == 'POST':
+			registrationform = RegistrationForm(request.POST)
+			if registrationform.is_valid():
+				print('Registering')
+				request.session['isSnapshot'] = 'false'
+				user = User()
+				user.username = registrationform.cleaned_data.get('username')
+				user.email = registrationform.cleaned_data.get('email')
+				# Hash password before inserting it into db
+				password = registrationform.cleaned_data.get('password')
+				salt = bcrypt.gensalt(smaapp_constants.SALT_WORK_FACTOR)
+				hashed_password = bcrypt.hashpw(password.encode('utf8'),salt)
+				user.password = hashed_password.decode("utf8")
+				user.address = registrationform.cleaned_data.get('address')
+				user.license_type = registrationform.cleaned_data.get('license_type')
+				user.save()
+				request.session['loggedin_userid'] = user.pk
+				request.session['loggedin_username'] = user.username
+				return HttpResponseRedirect('/diagnostics/')
+				# return render(request, 'diagnostics.html',
+				# 	{'isSnapshot':isSnapshot,'quick_stats':globals.quick_stats,
+				# 	'diag_chartdata':globals.diag_chartdata,'searchform':searchform,
+				# 	'snapshotlistform':snapshotlistform})
+					# TODO return an else with error message that states form is invalid
+			else:
+				# if the data has errors, it will default here
+				searchform.fields['keyword'].widget.attrs['placeholder'] = "Search #hashtag"
+				return render(request, 'registration.html',
+				{'searchform':searchform,'registrationform':registrationform,'loginform':loginform})
 		else:
-			# if the data has errors, it will default here
-			searchform = SearchForm()
 			searchform.fields['keyword'].widget.attrs['placeholder'] = "Search #hashtag"
 			return render(request, 'registration.html',
-			{'searchform':searchform,'registrationform':registrationform})
-	else:
-		registrationform = RegistrationForm()
-		searchform = SearchForm()
-		searchform.fields['keyword'].widget.attrs['placeholder'] = "Search #hashtag"
-		print("search dapat")
-		return render(request, 'registration.html',
-		{'searchform':searchform,'registrationform':registrationform})
+			{'searchform':searchform,'registrationform':registrationform, 'loginform':loginform})
 
-
+def get_snapshot_lda(request):
+	if "lda_data" in request.session and request.session["isSnapshot"] == 'true':
+		return JsonResponse(request.session["lda_data"],safe=False)
+	else: 
+		return HttpResponse(False)
 
 #  Called after selecting a snapshot from the load snapshot modal
 def load_snapshot(request):
 	diag_chartdata = {}
+	request.session['isSnapshot'] = 'true'
+	isSnapshot = 'true'
+	searchform = SearchForm()
+	snapshot_lda_data = {}
+	insight = {}
+	insights_fromdb = []
+	username = get_username(request)
 	if request.method == 'POST':
-		snapshotform = SnapshotListForm(request.POST)
-		if snapshotform.is_valid():
-			searchform = SearchForm()
-			snapshot_id = snapshotform.cleaned_data.get('snapshotchoices')
+		print("post only")
+		snapshotlistform = SnapshotListForm(request.POST)
+		print("snap errors", snapshotlistform.errors)
+		if snapshotlistform.is_valid():
+			snapshot_id = request.POST.get('snapshotchoices')
+			# snapshot_id = snapshotlistform.cleaned_data['snapshotchoices']
 			# Set values from loaded snapshot
 			for snapshotObj in Snapshot.objects(_id=snapshot_id):
 				logging.info("Iterating data using snapshot id: %s", snapshot_id)
+				request.session['search_keyword'] = snapshotObj.keyword
 				request.session['df'] = pd.DataFrame(snapshotObj.extracted_data)
-				globals.chartdata['timeline'] = pd.DataFrame(snapshotObj.chart_data[0]['timeline']).to_dict('list')
-				globals.chartdata['source'] = pd.DataFrame(snapshotObj.chart_data[0]['source']).to_dict('list')
-				globals.chartdata['composition'] = pd.DataFrame(snapshotObj.chart_data[0]['composition']).to_dict('list')
-				request.session['engagements_chartdata'] = globals.diag_chartdata
-				request.session["lda_data"] = utils.restoreldakeynames(snapshotObj.lda_data)
-				print("Printable", pd.DataFrame(snapshotObj.chart_data[0]['composition']).to_dict('list'))
-			diag_chartdata = create_diag_chartdata()
-			isSnapshot = 'true'
-			snapshot_lda_data = request.session["lda_data"]
-	# if snapshotlistform.is_valid():
-	return render(request, 'diagnostics.html',
-            {'isSnapshot':isSnapshot,'quick_stats':globals.quick_stats,
+				chartdata = {}
+				chartdata['timeline'] = pd.DataFrame(snapshotObj.chart_data[0]['timeline']).to_dict('list')
+				chartdata['source'] = pd.DataFrame(snapshotObj.chart_data[0]['source']).to_dict('list')
+				chartdata['composition'] = pd.DataFrame(snapshotObj.chart_data[0]['composition']).to_dict('list')
+				chartdata['hashtags'] = snapshotObj.chart_data[0]['hashtags']
+				chartdata['sentiments'] = pd.DataFrame(snapshotObj.chart_data[0]['sentiments']).to_dict('list')
+				chartdata['polarity_table'] = snapshotObj.chart_data[0]['polarity_table'][0] # Access the dict inside the list thats why theres another [0] after the polarity table
+				request.session['chartdata'] = chartdata
+				# globals.chartdata['polarity_table'] = snapshotObj.chart_data[0]['polarity_table']
+				# Returns a list of insights
+				insights_fromdb = snapshotObj.insights
+				# Extract insights from list of insights
+				if insights_fromdb is not None:
+					for idx, insights in enumerate(insights_fromdb):
+						insight[idx] = insights
+
+				# wc_image = snapshotObj.wordcloud_image.read()
+				# wc_image_content_type = snapshotObj.wordcloud_image.content_type
+				quick_stats_data = snapshotObj.quick_stats
+				request.session['quick_stats_db'] = quick_stats_data
+				request.session['influencers_data'] = snapshotObj.influencers_data
+				request.session['influential_data'] = snapshotObj.influential_data
+				request.session['quick_stats'] = format_quick_stats_comma(quick_stats_data)
+				request.session['wc_image_str'] = snapshotObj.wordcloud_image
+				snapshot_lda_data = utils.restore_lda_keynames(snapshotObj.lda_data)
+				request.session["lda_data"] = snapshot_lda_data
+			diag_chartdata = create_diag_chartdata(chartdata)
+			request.session['diag_chartdata'] = diag_chartdata
+			# snapshotlistform = SnapshotListForm(initial={'max_number': '3'})
+			request.session['selected_snapshot'] = snapshot_id
+			snapshotlistform = SnapshotListForm(request=request)
+			# snapshotListFormInstance.fields['snapshotchoices'].initial = [snapshot_id]
+		else:
+			return render(request, 'diagnostics.html',
+			{'isSnapshot':isSnapshot,'quick_stats':request.session['quick_stats'],
 			'diag_chartdata':diag_chartdata,'searchform':searchform,
-			'snapshotform':snapshotform,'snapshotLdadata':snapshot_lda_data})
+			'snapshotlistform':snapshotlistform,'insight':insight,'username':username,
+			'search_keyword':request.session['search_keyword']})
+	else:
+		return HttpResponseRedirect(reverse('diagnostics'))
+	return render(request, 'diagnostics.html',
+            {'isSnapshot':isSnapshot,'quick_stats':request.session['quick_stats'],
+			'diag_chartdata':diag_chartdata,'searchform':searchform,
+			'snapshotlistform':snapshotlistform,'insight':insight,
+			'username':username,'search_keyword':request.session['search_keyword'],
+			'wc_image':request.session['wc_image_str']})
 
 # Sets all data for charts
 def prepare_chartdata(df):
-
+    chartdata = {}
     # Data for timeline linechart (Diagnostics Page)
-    globals.chartdata["timeline"] = engagements.return_timeline(df)
+    chartdata["timeline"] = engagements.return_timeline(df)
 
     # Data for source donut chart (Diagnostics Page)
-    globals.chartdata["source"] = engagements.return_source(df)
-    
+    chartdata["source"] = engagements.return_source(df)
 
     # Data for composition donut chart (Diagnostics Page)
-    globals.chartdata["composition"] = engagements.return_composition(df)
+    chartdata["composition"] = engagements.return_composition(df)
 
     # Data for hashtags barchart (Topics Page)
-    globals.chartdata["hashtags"] = hashtags.hash_(df)
+    chartdata["hashtags"] = hashtags.hash_(df)
 
     # Data for polarity donut chart (Sentiments Page)
-    globals.chartdata["sentiments"] = engagements.return_polarity_chartdata(df)
+    chartdata["sentiments"] = engagements.return_polarity_chartdata(df)
+    chartdata["polarity_table"] = engagements.return_polarity(df)
+
+    return chartdata
+
+def prepare_influencers_data(df):
+	data = {}
+	data['engData'] = engagements.return_influencers(df,'engagements')
+	data['folData'] = engagements.return_influencers(df,'flcount')
+	return data
+
+def prepare_influentialposts_data(df):
+	data = {}
+	data = engagements.return_infl_posts(df)
+	return data
+
+
 
 
 # Creates the charts for diagnostics page
-def create_diag_chartdata():
+def create_diag_chartdata(chartdata):
 	print("Creating Diagnostics chartdata")
 	diag_chartdata = {}
-	diag_chartdata["timeline"] = timeline_linechart(globals.chartdata["timeline"])
-	# sourceData = engagements.return_source(df)
-	sourceFormattedData = sourcePiechartConverter(globals.chartdata["source"])
-	diag_chartdata["source"] = sourceFormattedData
-	# globals.chartdata["source"] = diag_chartdata["source"]
-	compositionFormattedData = compositionPiechartConverter(globals.chartdata["composition"])
-	diag_chartdata["composition"] = compositionFormattedData
+	diag_chartdata["timeline"] = timeline_linechart(chartdata["timeline"])
+	diag_chartdata["source"] = sourcePiechartConverter(chartdata["source"])
+	diag_chartdata["composition"] = compositionPiechartConverter(chartdata["composition"])
 	return diag_chartdata
+
 # Returns lat, lang, user, tweet
 def return_geocode(request):
 	geoCodes = engagements.return_geocode(request.session["df"])
 	return JsonResponse(geoCodes)  
 
 def generate_wordcloud_image(request):
-	imageFilename = "wordcloud-" + request.session["user_id"] + ".png"
-	imagePath = os.path.join(settings.BASE_DIR, "SMAApp\\static\\images\\wordcloud\\" + imageFilename)
-	if not os.path.isfile(imagePath):
+	# image_filename = "wordcloud-" + request.session["user_id"] + ".png"
+	# image_path = os.path.join(settings.BASE_DIR, "SMAApp\\static\\images\\wordcloud\\" + image_filename)
+	if request.session['isSnapshot'] != 'true':
+		# if not os.path.isfile(image_path):
 		print("image not in path")
-		wordcloudscript.return_wordcloud(request.session["df"], request.session["user_id"])
-		return HttpResponse(False)
-	else:
-		return HttpResponse(True)
-
+		img_str = wordcloudscript.return_wordcloud(request.session["df"])
+		print("img is created")
+		return img_str #HttpResponse(img_str)
+		# else:
+		# 	return HttpResponse(True)
+	# else:
+		# return HttpResponse(request.session['wc_image_str'])
+		# wc_image = request.session['wc_image']
+		# wc_image_content_type = request.session['wc_image_content_type']
+		# return HttpResponse(wc_image, mimetype=wc_image_content_type)
 def generate_lda_page(request):
 	#sessionFilename = "lda-" + request.session["user_id"] + ".html"
 	#ldaPath = os.path.join(settings.BASE_DIR, "SMAApp\\templates\\lda\\" + sessionFilename)	
@@ -248,112 +395,150 @@ def generate_lda_page(request):
 	# 	html = render_to_string(ldapath, {'ldajson':request.session["lda_data"]})
 	# 	return HttpResponse(html)
 
-def test_lda(request):
+def start_generate_lda(request):
     df = request.session["df"]
-    lda_data = tasks.generate_lda_data.delay(df.to_json())
-    request.session["lda_data_id"] = lda_data
+    lda_task_id = tasks.generate_lda_data.delay(df.to_json())
+    request.session["lda_task_id"] = lda_task_id
     # if request.session.get("lda_data_id",False):
     #     revoke(str(request.session.get('lda_data_id')),terminate=True,signal='SIGKILL')
     #     print("terminated")
-    request.session["lda_data"] = lda_data.get()
-    # TODO redundancy
-    globals.lda_data = request.session["lda_data"]
-    for key, value in request.session.items(): print('{}'.format(key))
-    request.session.save()
-    for key, value in request.session.items(): print('{}'.format(key))
-    request.session.modified = True
+    # request.session["lda_data"] = lda_task_id.get()
+    # for key, value in request.session.items(): print('{}'.format(key))
     # request.session.modified = True
-    print("LDA should be settled")
-    #return JsonResponse(request.session["lda_data"],safe=False)
+    return HttpResponse(True)
 
 def check_lda_status(request):
+	if "lda_task_id" in request.session and "lda_data" not in request.session:
+		lda_task_id = request.session['lda_task_id']
+		if lda_task_id.ready():
+			request.session["lda_data"] = lda_task_id.get()
+			print("LDA data is ready and sent")
 	# print(request.session.get("lda_data_id",False))
 	if request.session.get("lda_data",False):
+		print("there is lda data")
 		return JsonResponse(request.session["lda_data"],safe=False)
 	else: 
 		return HttpResponse(False)
 
-# @xframe_options_exempt
 def save_snapshot(request):
-	print("Saving start")
 	if request.method == 'POST':
 		if request.is_ajax():
-			dictio = json.loads(request.POST.get('send_data'))
+			snapshot_ajax_data = json.loads(request.POST.get('send_data'))
 						# snapshotname = request.POST['snapshotName']
 			# insights = request.POST.getlist('insight')
-	else:
-		return False
-	snapshot_name = dictio['snapshotName']
-	insights = dictio['insights']
+	snapshot_name = snapshot_ajax_data['snapshotName']
+	insights = snapshot_ajax_data['insights']
 	chartdatalist = []
+	
 	# diagnostics data
 	df = request.session['df']
-	globals.lda_data = request.session["lda_data"]
-	lda_data = utils.removedotsonkey(globals.lda_data) #request.session["lda_data"]
+	lda_data = request.session["lda_data"]
+	lda_data = utils.remove_dots_on_key(lda_data) #request.session["lda_data"]
 
 # # Convert df to dict to save it to db in a Dictfield
 	# # dict_df = 
 	# # diagnostics_data = request.session['engagements_data']
 
-	# Save chart details
-	# chart_data = Chart()
-	# chart_data.chart_container = 
-
-	print("INIT")
-	globals.chartdatafordb["timeline"] = pd.DataFrame(globals.chartdata["timeline"]).to_dict(orient='records')
+	chartdata = {}
+	chartdata = request.session['chartdata']
+	chartdatafordb = {}
+	chartdatafordb["timeline"] = pd.DataFrame(chartdata["timeline"]).to_dict(orient='records')
 
     # Data for source donut chart (Diagnostics Page)
-	globals.chartdatafordb["source"] = pd.DataFrame(globals.chartdata["source"]).to_dict(orient='records')
+	chartdatafordb["source"] = pd.DataFrame(chartdata["source"]).to_dict(orient='records')
 
     # Data for composition donut chart (Diagnostics Page)
-	globals.chartdatafordb["composition"] = pd.DataFrame(globals.chartdata['composition']).to_dict(orient='records')
+	chartdatafordb["composition"] = pd.DataFrame(chartdata['composition']).to_dict(orient='records')
 
-	globals.chartdatafordb["hashtags"] = hashtags.hash_(df)	                            
+	chartdatafordb["hashtags"] = chartdata["hashtags"]
 
 	# Data for polarity donut chart (Sentiments Page)
-	globals.chartdatafordb["sentiments"] = pd.DataFrame(globals.chartdata["sentiments"]).to_dict(orient='records')
+	chartdatafordb["sentiments"] = pd.DataFrame(chartdata["sentiments"]).to_dict(orient='records')
 
-	chartdatalist.append(globals.chartdatafordb)
+	# Set Polarity into a list so it can be saved as an array
+	polarity_table_holder = []
+	polarity_table_holder.append(chartdata["polarity_table"])
+	chartdatafordb["polarity_table"] = polarity_table_holder
+	chartdatalist.append(chartdatafordb)
+
 	# chartdatalist.append(globals.chartdata["timeline"])
 	# chartdatalist.append(pd.DataFrame(globals.chartdata).to_json(orient='records'))
 	# print(chartdatalist)
+
+	# Type Tester
+	# engData = request.session['influencers_data']['engData']
+	# for key in engData:
+	# 	for k in key: 
+	# 		print("key: ", k)
+	# 		for value in engData[key].values():
+	# 			print("engvalue now is ", value, type(value))
+
+	# folData = request.session['influencers_data']['folData']
+	# for key in folData:
+	# 	for value in folData[key].values():
+	# 		print("folvalue now is ", value, type(value))
+			# if isinstance(value,np.int64):
+			# 	engData[key] = int(value)
+			# 	print("freakin type ", engData[key], type(engData[key]))
+
+	# for key, value in request.session.items(): print('{}'.format(key))
 	snapshot = Snapshot()
 	snapshot.keyword = request.session['search_keyword']
 	snapshot.platsearchform = 'twitter'
 	snapshot.snapshot_name = snapshot_name
 	snapshot.insights = insights
 	snapshot.extracted_data = json.loads(df.to_json(orient='records'))
+	snapshot.quick_stats = request.session['quick_stats_db']
+	snapshot.influencers_data = request.session['influencers_data']
+	snapshot.influential_data = request.session['influential_data']
 	snapshot.date_extracted = df['dateextracted'][0]
-	# snapshot.wordcloud_image = 
+	# snapshot.wordcloud_image.put(wc_image,content_type='image/png')
+
+	# Save wc_image as binary. ex: b'iVBOR.....' with the b' infront
+	snapshot.wordcloud_image = request.session['wc_image_str']
 	snapshot.chart_data = chartdatalist #pd.DataFrame(globals.chartdata).to_json(orient='records') #json.loads(chartdatalist)
 	# lda_list = []
 	# lda_list.append(lda_data)
 	snapshot.lda_data = lda_data
-	snapshot.owner = "Dy"
+	snapshot.owner = request.session['loggedin_userid']
 	snapshot.save()
-
-	# Save snapshot id for reference
+	# snapshot.reload()
+	print("Snapshot successfully saved")
 	snapshotObject = {}
-	usersnapshotlist = []
-	snapshotObject["value"] = snapshot.pk
-	snapshotObject["text"] = snapshot_name
-	user = User()
-	user.snapshots = [snapshotObject]
+	if snapshot.pk is not None:
+		# Save snapshot id for reference
+		snapshotObject["value"] = snapshot.pk
+		snapshotObject["text"] = snapshot_name
+		User.objects(_id=request.session['loggedin_userid']).update_one(push__snapshots=snapshotObject)
+		print("Snapshot saved in user object")
+	else:
+		return HttpResponse(status=401)
+	# user = User()
+	# user.snapshots = [snapshotObject]
+	# user.save()
 	# user.snapshots = [snapshot.pk]
-	user.save()
+	
 	# Save to list of snapshots if user already logged in
 	# if(isLoggedIn):
-	User.objects(_id='5b4c58f355d14c1b60591ee6').update_one(push__snapshots=snapshotObject)
-	print("SAVED")
-
+	# dummy_id = '5b570b5b55d14c15804bf846'
+		
+	
+	snapshotListForm = SnapshotListForm(request=request)
 	# Get Snapshot list using user id
 	# usersnapshotlist = []
 	# for userObj in User.objects(_id='5b43845555d14c22b8296ce8'):
 	# 	usersnapshotlist = userObj.snapshots
-	# 	print("POPO")
 	# 	print(usersnapshotlist)
-
-	return HttpResponse("Saved")
+	snapshotListForm.fields['snapshotchoices'].choices = queries.get_snapshot_list(request.session['loggedin_userid'])
+	return HttpResponse(status=200)
+	# return HttpResponseRedirect('/diagnostics/')
+	# return render(request, 'diagnostics.html',
+    #            {'quick_stats':quick_stats,
+	# 		   'diag_chartdata':diag_chartdata,
+	# 		   'searchform':searchform,
+	# 		   'snapshotlistform':snapshotlistform,
+	# 		   'loginform':loginform,
+	# 		   'username':globals.loggedin_username})
 
 def start_background_tasks(request):
 	df = request.session["df"]
@@ -362,7 +547,7 @@ def start_background_tasks(request):
 	request.session.save()
 
 # Checks if email is already taken
-def validate_email(request):
+def validate_registration_email(request):
 	data = {}
 	if request.method == 'GET':
 		if request.is_ajax():
@@ -371,14 +556,10 @@ def validate_email(request):
 				'is_taken': queries.check_if_email_exists(email)
 			}
 	return JsonResponse(data)
-        
-
 
 def get_sentiments(request):
 	df = request.session["df"]
-	print("polarity start")
 	polarity_chartdata = engagements.return_polarity_chartdata(df)
-	print("polarity finish")
 	request.session["polarity_chartdata"] = polarity_chartdata 
 	polarity_table = engagements.return_polarity(df)
 	request.session["polarity_table"] = polarity_table
@@ -395,38 +576,63 @@ def get_sentiments(request):
 #     words = wordcloudscript.return_wordcloud(request.session["df"])
 #     return JsonResponse(words, safe=False)
 
+def get_username(request):
+	username = ""
+	if request.session.get("loggedin_username",False):
+		username = request.session['loggedin_username']
+	return username
+
+
 def open_diagnostics(request):
 	if request.method == 'POST':
 		get_keyword(request)
 	else:
-		df = request.session["df"]
-		quick_stats = request.session['engagements_quick_stats']
-		diag_chartdata = request.session['engagements_chartdata']
+		quick_stats = request.session['quick_stats']
+		diag_chartdata = request.session['diag_chartdata']
 		searchform = SearchForm()
 		searchform.fields['keyword'].widget.attrs['placeholder'] = "Search #hashtag"
-		snapshotform = SnapshotListForm()
+		snapshotlistform = SnapshotListForm(request=request)
+		loginform = LoginForm()
+		username = get_username(request)
 	return render(request, 'diagnostics.html',
-               {'quick_stats':quick_stats,'diag_chartdata':diag_chartdata,'searchform':searchform,'snapshotform':snapshotform})
+               {'quick_stats':quick_stats,
+			   'diag_chartdata':diag_chartdata,
+			   'searchform':searchform,
+			   'snapshotlistform':snapshotlistform,
+			   'loginform':loginform,
+			   'username':username})
 
 def open_influencers(request):
 	if request.method == 'POST':
 		get_keyword(request)
 	else:
-		data = engagements.return_engagements(request.session["df"])
-		data['engData'] = engagements.return_influencers(request.session["df"],'engagements')
-		data['folData'] = engagements.return_influencers(request.session["df"],'flcount')
+		# data = engagements.return_engagements(request.session["df"])
+		data = {}
+		data['engData'] = request.session['influencers_data']['engData']
+		data['folData'] = request.session['influencers_data']['folData']
 		searchform = SearchForm()
 		searchform.fields['keyword'].widget.attrs['placeholder'] = "Search #hashtag"
-	return render(request, 'influencers.html', {'engData':data['engData'],'folData':data['folData'], 'searchform':searchform }) 
+		snapshotlistform = SnapshotListForm(request=request)
+		loginform = LoginForm()
+		username = get_username(request)
+	return render(request, 'influencers.html',
+	 {'engData':data['engData'],'folData':data['folData'],
+	  'searchform':searchform,'snapshotlistform':snapshotlistform,
+	   'loginform':loginform,'username':username}) 
 
 def open_influentialposts(request):
 	if request.method == 'POST':
 		get_keyword(request)
 	else:
-		data = engagements.return_infl_posts(request.session["df"])
+		data = request.session['influential_data']
 		searchform = SearchForm()
 		searchform.fields['keyword'].widget.attrs['placeholder'] = "Search #hashtag"
-	return render(request, 'influentialposts.html',{'influentialPost':data, 'searchform':searchform})
+		snapshotlistform = SnapshotListForm(request=request)
+		loginform = LoginForm()
+		username = get_username(request)
+	return render(request, 'influentialposts.html',
+	{'influentialPost':data, 'searchform':searchform,
+	'snapshotlistform':snapshotlistform,'loginform':loginform,'username':username})
 
 def open_sentiments(request):
 	if request.method == 'POST':
@@ -436,31 +642,36 @@ def open_sentiments(request):
 		# sentiments_id = request.session.get('sentiments_data_id', False)
 		#sentiments = AsyncResult(str(sentiments_id))
 		# Tempo Start
-		if not request.session.get("polarity_chartdata",False) or not request.session.get("polarity_table",False):
-			polarity_chartdata = engagements.return_polarity_chartdata(request.session["df"])
-			request.session["polarity_chartdata"] = polarity_chartdata 
-			polarity_table = engagements.return_polarity(request.session["df"])
-			request.session["polarity_table"] = polarity_table
+		# if not request.session.get("polarity_chartdata",False) or not request.session.get("polarity_table",False):
+		# 	polarity_chartdata = engagements.return_polarity_chartdata(request.session["df"])
+		# 	request.session["polarity_chartdata"] = polarity_chartdata 
+		# 	polarity_table = engagements.return_polarity(request.session["df"])
+		# 	request.session["polarity_table"] = polarity_table
 		# Tempo End
 		# for key, value in request.session.items(): print('{}'.format(key))
-		chartdata = globals.chartdata["sentiments"] #request.session.get('polarity_chartdata', False)
+		#request.session.get('polarity_chartdata', False)
 		
 		#engagements.return_polarity_chartdata(request.session["df"])
 		data = {}
-		data['polarityTable'] = engagements.return_polarity(request.session["df"])
+		data['polarityTable'] = request.session['chartdata']['polarity_table']#engagements.return_polarity(request.session["df"])
 		# data['polarityTable'] = request.session.get('polarity_table', False)
 		#engagements.return_polarity(request.session["df"])
-		data['polar'] = polarity_donutchart(chartdata)
+		data['polar'] = polarity_donutchart(request.session['chartdata']["sentiments"])
 		searchform = SearchForm()
 		searchform.fields['keyword'].widget.attrs['placeholder'] = "Search #hashtag"
-	return render(request, 'sentiments.html', {'sentiments':data,'searchform':searchform})
+		snapshotlistform = SnapshotListForm(request=request)
+		loginform = LoginForm()
+		username = get_username(request)
+	return render(request, 'sentiments.html', 
+	{'sentiments':data,'searchform':searchform,
+	'snapshotlistform':snapshotlistform,'loginform':loginform,'username':username})
 
 def open_topics(request):
 	if request.method == 'POST':
 		get_keyword(request)
 	else:
 		data = {}
-		data["barchart"] = globals.chartdata["hashtags"]
+		data["barchart"] = request.session["chartdata"]["hashtags"]
 		# data["barchart"] = demo_horizontalBarChart(chartdata)
          
 		sessionid = request.session["user_id"]
@@ -472,14 +683,20 @@ def open_topics(request):
 		# 	return HttpResponse(False)
 			# wordcloudscript.return_wordcloud(request.session["df"], request.session["user_id"])
 			# lda.lda_model(request.session["df"], request.session["user_id"])
-		snapshot_lda_data = request.session["lda_data"]
+			
+		# snapshot_lda_data = request.session["lda_data"]
+		# 'snapshotLdadata':json.dumps(snapshot_lda_data)
 		searchform = SearchForm()
 		searchform.fields['keyword'].widget.attrs['placeholder'] = "Search #hashtag"
+		snapshotlistform = SnapshotListForm(request=request)
+		loginform = LoginForm()
+		username = get_username(request)
 	return render(request, 'topics.html',
 	{'tophashtagsdata':data["barchart"], 'sessionid':sessionid,
-	'searchform':searchform,'snapshotLdadata':json.dumps(snapshot_lda_data)})
+	'searchform':searchform,'snapshotlistform':snapshotlistform,
+	'loginform':loginform,'username':username,'wc_image':request.session['wc_image_str'].decode('utf-8')})
 
-def formatData(data):
+def format_quick_stats_comma(data):
  	return	{'users': "{:,}".format(data['users']),
                   'tweets': "{:,}".format(data['tweets']),
                   'engagements': "{:,}".format(data['engagements']),

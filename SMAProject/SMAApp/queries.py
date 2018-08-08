@@ -1,21 +1,19 @@
 from SMAApp.models import Snapshot, User
-from SMAApp import globals
 
 # Returns a snapshot list containing tuples with snapshot id and its text
 # in this format [(id1,text1),(id2,text2)]
-def get_snapshot_list():
+def get_snapshot_list(userid):
     snapshot_list = []
     snap = ()
-    snapshot_count = Snapshot.objects.count()
-    i = 0
-    print("get_snap ", snapshot_list)
-    print("snapcount ", snapshot_count)
-    while i < snapshot_count:
-        for user in User.objects(_id='5b4c58f355d14c1b60591ee6'): #TODO replace with globals.user_id
-            print("get_snap inside", snapshot_list,i)
-            snap = (user.snapshots[i]['value'],user.snapshots[i]['text']) 
+    # Used aggregate to get the number of snaphots a user has.
+    # Particularly this:  'snapshotCount': {'$size': '$snapshots'}
+    pipeline = { '$project':{'snapshots': 1, 'snapshotCount': {'$size': '$snapshots'}}}        
+    # dummy_id = '5b570b5b55d14c15804bf846'
+    for user in User.objects(_id=userid).aggregate(pipeline):
+        for snapshot in user['snapshots']:
+            snap = (snapshot['value'],snapshot['text']) 
             snapshot_list.append(snap)
-        i += 1
+
     # snapshot_list = [(snapshotObj._id,snapshotObj.snapshot_name) for snapshotObj in Snapshot.objects(owner=globals.snapshot_owner)]
     return snapshot_list
 

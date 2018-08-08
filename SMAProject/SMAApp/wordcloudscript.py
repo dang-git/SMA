@@ -5,7 +5,8 @@ Created on Tue Jun 20 14:06:20 2017
 @author: user
 """
 
-import re
+import re, base64
+from io import BytesIO
 import pandas as pd
 from wordcloud import WordCloud
 from wordcloud import ImageColorGenerator
@@ -56,7 +57,7 @@ def count_word(message):
     return list_
 
 
-def return_wordcloud(data, sessionid):
+def return_wordcloud(data):
     message = ''
     for i in list(range(0, len(data))):
         speech = re.sub(r'@\w+', ' ', data['tweet'][int(i)])
@@ -139,8 +140,16 @@ def return_wordcloud(data, sessionid):
     wc.generate(message)
     wc.recolor(color_func = image_colors)
     #saves wordcloud as png files
-    filename = "wordcloud-" + sessionid + ".png"
-    imagePath = os.path.join(settings.BASE_DIR, "SMAApp\static\images\wordcloud\\" + filename)
-    if not os.path.isfile(imagePath):
-        # wc.to_image()
-        wc.to_file(str(imagePath))
+    # filename = "wordcloud-" + sessionid + ".png"
+    # imagePath = os.path.join(settings.BASE_DIR, "SMAApp\static\images\wordcloud\\" + filename)
+    # if not os.path.isfile(imagePath):
+    wc_img = wc.to_image()
+    # wc.to_file(str(imagePath))
+    buffered = BytesIO()
+    wc_img.save(buffered,format="PNG")
+    img_str = base64.b64encode(buffered.getvalue())
+    outfile = open("basic1.txt", "a")
+    outfile.write("\n")
+    outfile.write(str(img_str))
+    outfile.close()
+    return img_str

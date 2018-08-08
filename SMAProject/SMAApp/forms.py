@@ -7,16 +7,27 @@ class SearchForm(forms.Form):
  #[(snapshotObj._id,snapshotObj.snapshot_name) for snapshotObj in Snapshot.objects(owner='Dy')]
 
 class SnapshotListForm(forms.Form):
-	snapshotchoices = forms.ChoiceField()
 	# Override init method to set dropdown values on every form load
 	def __init__(self, *args, **kwargs):
+		request = kwargs.pop("request",None)
 		super(SnapshotListForm, self).__init__(*args, **kwargs)
-		self.fields['snapshotchoices'].choices = queries.get_snapshot_list() #forms.ChoiceField(choices=globals.SNAPSHOT_LIST)
+		if request is not None:
+			if request.session.get('loggedin_userid'):
+				self.fields['snapshotchoices'] = forms.ChoiceField()
+				self.fields['snapshotchoices'].widget.attrs = {'class':'snapshot-choices'}
+				self.fields['snapshotchoices'].choices =  queries.get_snapshot_list(request.session['loggedin_userid']) #forms.ChoiceField(choices=globals.SNAPSHOT_LIST)		
+			if request.session.get('selected_snapshot'):
+				self.fields['snapshotchoices'].initial = [request.session['selected_snapshot']]
+				# self.fields['snapshotchoices'].widget.choices = queries.get_snapshot_list(request.session['loggedin_userid']) #forms.ChoiceField(choices=globals.SNAPSHOT_LIST)		
 		# self.fields['snapshotchoices'] = forms.ModelChoiceField(queryset=Snapshot.objects.all(),empty_label="")
 
 class RegistrationForm(forms.Form):
-	username = forms.CharField(label='', widget=forms.TextInput(attrs={'placeholder': 'Username','id': 'id_username'}))
-	email = forms.EmailField(label='', widget=forms.TextInput(attrs={'placeholder': 'Email','id': 'id_email'}))
-	password = forms.CharField(widget=forms.PasswordInput())
-	address = forms.CharField(label='', widget=forms.TextInput(attrs={'placeholder': 'Address','id': 'id_address'}))
+	username = forms.CharField(label='', widget=forms.TextInput(attrs={'class': 'registration-input','id': 'reg_username_id'}))
+	email = forms.EmailField(label='', widget=forms.EmailInput(attrs={'class': 'registration-input','id': 'reg_email_id'}))
+	password = forms.CharField(label= '', widget=forms.PasswordInput(attrs={'class': 'registration-input','id': 'reg_password_id'}))
+	address = forms.CharField(label='', widget=forms.TextInput(attrs={'class': 'registration-input','id': 'reg_address_id'}))
 	license_type = forms.ChoiceField(choices=smaapp_constants.LICENSE_TYPES)
+
+class LoginForm(forms.Form):
+	email = forms.EmailField(label='', widget=forms.TextInput(attrs={'placeholder': 'Email','id': 'login_email_id'}))
+	password = forms.CharField(label='', widget=forms.PasswordInput(attrs={'placeholder': 'Password','id': 'login_password_id'}))
