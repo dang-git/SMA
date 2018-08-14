@@ -28,6 +28,13 @@ $(document).ready(function(){
     
     loadInsightValues();
 
+    // Hide bootstrap alert after 2 seconds if present.
+    if($('div.alert').length > 0) {
+        $("div.alert").fadeTo(2000, 500).slideUp(500, function () {
+            $("div.alert").slideUp(500);
+        });
+    }
+
    // $('.profile-image').on('error' ,function(){
    //     $(this).attr('src', 'https://vignette.wikia.nocookie.net/citrus/images/6/60/No_Image_Available.png/revision/latest?cb=20170129011325')
    // });
@@ -412,14 +419,16 @@ function saveSnapshot(){
                // insight : insights
          },
         // contentType: 'application/json',
+        async: false,
         dataType: 'json',
         complete: console.log("naipasa na"),
         success: function(xhr) {
             // alert("At success")
             // if (data == "Saved") {
+                // alert("An success occured: " + xhr.status + "," + xhr.statusText + ","+ xhr.readyState);
                 if(xhr.status == 200 || xhr.status == 0){
                     $(".saving-snapshot-text").css("display", "none");
-                    alert("An error occured: " + xhr.status + "," + xhr.statusText);
+                    alert("An success inside occured: " + xhr.status + "," + xhr.statusText + ","+ xhr.readyState);
                     $("#loadingPage").css("display","none");
                     // $("#savingStatus").text(data);
                     $('#saveSnapshotModal').modal('toggle');
@@ -428,15 +437,16 @@ function saveSnapshot(){
             // }
         },
         error: function(xhr){
+            // alert("An error occured: " + xhr.status + "," + xhr.statusText + ","+ xhr.readyState);
             if(xhr.status == 403){
                 $(".saving-snapshot-text").css("display", "none");
                 $("#loadingPage").css("display","none");
                 $('#saveSnapshotModal').modal('toggle');
                 $('#snapshotName').append("<p class='save-warning'>Something went wrong, please contact admin.</p>");
-                // location.href = "/diagnostics/";
+                location.href = "/diagnostics/";
             }
-            console.log("An error occured: " + xhr.status + "," + xhr.statusText);
-            location.href = "/diagnostics/";
+            // alert("An error after occured: " + xhr.status + "," + xhr.statusText + ","+ xhr.readyState);
+            // location.href = "/diagnostics/";
             // alert("Saving Failed!");
         }
     });
@@ -490,27 +500,6 @@ function validate_credentials(){
                 // alert("An error occured: " + xhr.status + "," + xhr.statusText);
                 // alert("Login Failed!");
             }
-
-        // complete: console.log("naipasa na"),
-        // success: function (data) {
-        //     if (data == "Saved") {
-        //         $(".saving-snapshot-text").css("display", "none");
-        //         $("#loadingPage").css("display","none");
-        //         // $("#savingStatus").text(data);
-        //         $('#saveSnapshotModal').modal('toggle');
-        //     }
-        // },
-        // error: function(xhr){
-        //     if(xhr.status == 200){
-        //         $(".saving-snapshot-text").css("display", "none");
-        //         $("#loadingPage").css("display","none");
-        //         // $("#savingStatus").text(data);
-        //         $('#saveSnapshotModal').modal('toggle');
-        //         alert("Saving success!");
-        //     }
-        //     // alert("An error occured: " + xhr.status + "," + xhr.statusText);
-        //     alert("Saving Failed!");
-        // }
     });
 }
 
@@ -533,7 +522,8 @@ function logout_user(){
 }
 // Checks if snapshot data to save is complete (checks: lda and image as of now)
 // else save the snapshot
-$('#saveSnapshotBtn').on('click', function () {
+$('#saveSnapshotBtn').on('click', function (event) {
+    event.preventDefault();
     if (!$('#snapshotName').val().length > 0) {
         if (!$('.save-warning').length > 0) {
             $('.modal-body').append("<p class='save-warning'>Please fill up this blank</p>")
@@ -573,5 +563,14 @@ $('#loadSnapshotBtn').on('click', function() {
 $('#saveSnapshotModal').on('hide.bs.modal', function(){
     if ($('.save-warning').length > 0) {
         $('.save-warning').remove();
+    }
+});
+
+// Disable snapshot loading when there are no snapshots available
+$('#loadSnapshotModal').on('shown.bs.modal', function () {
+    if (!$('#id_snapshotchoices').has('option').length > 0) {
+        $('#loadSnapshotBtn').prop("disabled", true);
+    } else {
+        $('#loadSnapshotBtn').prop("disabled", false);
     }
 });

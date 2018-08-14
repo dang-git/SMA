@@ -1,5 +1,6 @@
 
 body {
+    overflow: hidden;
 	background-color: #ffffff;
 	margin: 0;
 }
@@ -166,16 +167,16 @@ svg.nvd3-svg{
     display: inline-block;
     overflow-y: auto;
     overflow-x: hidden;
-    height: 82.5vh;
+    height: 76.5vh; /*82.5vh;*/
     /* padding-right: 10px; */
    
 }
 
 #footerSection{
     width: 100%; 
-    height: auto;
+    /* height: auto; */
     bottom: 0;
-    position: relative;
+    position: fixed;
 }
 
 #pointwestContainer{

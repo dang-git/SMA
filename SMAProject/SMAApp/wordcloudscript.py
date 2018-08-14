@@ -6,7 +6,6 @@ Created on Tue Jun 20 14:06:20 2017
 """
 
 import re, base64
-from io import BytesIO
 import pandas as pd
 from wordcloud import WordCloud
 from wordcloud import ImageColorGenerator
@@ -145,11 +144,8 @@ def return_wordcloud(data):
     # if not os.path.isfile(imagePath):
     wc_img = wc.to_image()
     # wc.to_file(str(imagePath))
-    buffered = BytesIO()
-    wc_img.save(buffered,format="PNG")
-    img_str = base64.b64encode(buffered.getvalue())
-    outfile = open("basic1.txt", "a")
-    outfile.write("\n")
-    outfile.write(str(img_str))
-    outfile.close()
-    return img_str
+    # outfile = open("basic1.txt", "a")
+    # outfile.write("\n")
+    # outfile.write(str(b64_img_str))
+    # outfile.close()
+    return wc_img 

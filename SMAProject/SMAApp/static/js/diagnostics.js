@@ -28,15 +28,16 @@ $(document).ready(function () {
     //     // generateSentiments();
     // }
 
-    if (window.sessionStorage['isSnapshot'] != 'true' && window.sessionStorage['lda_deployed'] != 'Y') {
-        sessionStorage.setItem("lda_deployed", "Y");
-        startldaDataPull();
-    }
-    else if (window.sessionStorage['isSnapshot'] != 'true' && 
-        (window.sessionStorage['lda_data'] == null ||
-        typeof window.sessionStorage['lda_data'] == "undefined")) {
-        generateldaData();
-        // $('#ldaPage').css("display", "none");
+    if(window.sessionStorage['isSnapshot'] != 'true'){
+        if (window.sessionStorage['lda_deployed'] != 'Y') {
+            sessionStorage.setItem("lda_deployed", "Y");
+            startldaDataPull();
+        }
+        else if (window.sessionStorage['lda_data'] == null ||
+            typeof window.sessionStorage['lda_data'] == "undefined") {
+            generateldaData();
+            // $('#ldaPage').css("display", "none");
+        }
     }
     else if ((window.sessionStorage['lda_data'] != null &&
         (window.sessionStorage['lda_page'] == null ||
@@ -126,7 +127,6 @@ function checkAndProcessLdadata(data) {
 
 
 function generateldaPage() {
-    console.log("inside lda page");
     $.ajax({
         url: '/ajax/get_lda_page/',
         success: function (data) {
@@ -155,20 +155,6 @@ function toggleSnackbar(visible) {
         snackbar.addClass("hide");
     }
 }
-
-// function generateSentiments() {
-//     console.log("inside sentiments");
-
-//     $.ajax({
-//         url: '/ajax/get_sentiments/',
-//         success: function (data) {
-//             if(data == "True"){
-//                 sessionStorage.setItem("bg_done", "Y");
-//                 console.log("sentiments done");
-//             }
-//         }
-//     });
-// }
 
 function startBackgroundTasks() {
     console.log("Starting Background Task");

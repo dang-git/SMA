@@ -1,5 +1,5 @@
 from django.db import models
-from mongoengine import *
+from mongoengine import DynamicDocument,Document, BinaryField, DictField, ObjectIdField, StringField, ListField, DateTimeField, FileField, ImageField, ReferenceField
 import datetime
 # Create your models here.
 
@@ -18,7 +18,7 @@ class Snapshot(DynamicDocument):
     date_extracted = DateTimeField()
     chart_data = ListField()
     lda_data = DictField()
-    wordcloud_image = BinaryField() # wordcloud_image = FileField()
+    wordcloud_image = ImageField() # wordcloud_image = FileField()
     insights = ListField()
     owner = ObjectIdField() # ReferenceField('User')
     date_created = DateTimeField(default=datetime.datetime.utcnow)
@@ -51,9 +51,3 @@ class Chart(Document):
 
 class Chart_point(Document):
     chart_point_id = ObjectIdField()
-
-    
-
-
-
-
