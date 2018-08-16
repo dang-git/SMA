@@ -15,7 +15,7 @@ class SnapshotListForm(forms.Form):
 			if request.session.get('loggedin_userid'):
 				self.fields['snapshotchoices'] = forms.ChoiceField()
 				self.fields['snapshotchoices'].widget.attrs = {'class':'snapshot-choices'}
-				self.fields['snapshotchoices'].choices = request.session['snapshot_list'] #queries.get_snapshot_list(request.session['loggedin_userid']) #forms.ChoiceField(choices=globals.SNAPSHOT_LIST)		
+				self.fields['snapshotchoices'].choices = request.session['snapshot_list'] if request.session.get('snapshot_list') else [] #queries.get_snapshot_list(request.session['loggedin_userid']) #forms.ChoiceField(choices=globals.SNAPSHOT_LIST)		
 			if request.session.get('selected_snapshot'):
 				self.fields['snapshotchoices'].initial = [request.session['selected_snapshot']]
 				# self.fields['snapshotchoices'].widget.choices = queries.get_snapshot_list(request.session['loggedin_userid']) #forms.ChoiceField(choices=globals.SNAPSHOT_LIST)		

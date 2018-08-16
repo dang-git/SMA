@@ -28,16 +28,15 @@ $(document).ready(function () {
     //     // generateSentiments();
     // }
 
-    if(window.sessionStorage['isSnapshot'] != 'true'){
-        if (window.sessionStorage['lda_deployed'] != 'Y') {
-            sessionStorage.setItem("lda_deployed", "Y");
-            startldaDataPull();
-        }
-        else if (window.sessionStorage['lda_data'] == null ||
-            typeof window.sessionStorage['lda_data'] == "undefined") {
-            generateldaData();
-            // $('#ldaPage').css("display", "none");
-        }
+    if (window.sessionStorage['isSnapshot'] != 'true' && window.sessionStorage['lda_deployed'] != 'Y') {
+        sessionStorage.setItem("lda_deployed", "Y");
+        startldaDataPull();
+    }
+    else if (window.sessionStorage['isSnapshot'] != 'true' && 
+        (window.sessionStorage['lda_data'] == null ||
+        typeof window.sessionStorage['lda_data'] == "undefined")) {
+        generateldaData();
+        // $('#ldaPage').css("display", "none");
     }
     else if ((window.sessionStorage['lda_data'] != null &&
         (window.sessionStorage['lda_page'] == null ||
@@ -72,7 +71,7 @@ function generateWCImage() {
     });
 }
 
-// Sends go signal to django to trigger generating lda data
+// Sends go signal to backend to trigger generating lda data
 function startldaDataPull() {
     $.ajax({
         url: '/ajax/get_lda_data/',
@@ -80,7 +79,7 @@ function startldaDataPull() {
     });
 }
 
-// This will check lda data on django
+// This will check lda data on backend
 // it also generate "lda page" if lda data already exists
 function generateldaData() {
     toggleSnackbar(true);
@@ -109,15 +108,15 @@ function getSnapshotLdadata() {
     });
 }
 
-// Periodically check data for lda from server every 10 secs.
-// calls generateldaData everytime django doesn't give ldadata as result.
+// Periodically check data for lda from backend every 10 secs.
+// calls generateldaData everytime backend doesn't give ldadata as result.
 function checkAndProcessLdadata(data) {
     if (data == "False") {
         window.setTimeout(generateldaData, 10000);
         console.log("Getting LDA Again");
     } else {
         window.sessionStorage['lda_data'] = data;
-        $('#snackbar > div > p:eq(0)').text("Finished generating LDA Topic cluster");
+        $('#snackbar.show').text("Finished generating LDA Topic cluster");
         toggleSnackbar(false);
         generateldaPage();
         console.log("lda data done");
@@ -151,8 +150,11 @@ function toggleSnackbar(visible) {
             snackbar.addClass("show");
         }
     } else {
-        snackbar.removeClass("show");
-        snackbar.addClass("hide");
+        $("#snackbar.show").fadeTo(3000, 500).slideUp(500, function () {
+            $("#snackbar.show").slideUp(500);
+        });
+        // snackbar.removeClass("show");
+        // snackbar.addClass("hide");
     }
 }
 
@@ -198,7 +200,6 @@ function validate_registration_email(){
                     if (!$('.save-warning').length > 0) {
                         $('#reg_email_id').after("<p class='save-warning'>Email has been registered already</p>");
                     }
-                    
                     // alert(data.error_message);
                 } else {
                     // alert("not taken")
@@ -213,7 +214,3 @@ $('#reg_email_id').on('keydown',debounce(validate_registration_email,2000,false)
 // $('#registerBtn').on('click', function() {
 //     $('#registrationForm').submit();
 // })
-
-function showSnackbar(message) {
-    console.log("show snacku");
-}

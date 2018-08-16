@@ -99,7 +99,7 @@ def get_keyword(request):
 				'searchform':searchform,'snapshotlistform':snapshotlistform,
 				'loginform':loginform,'username':username})
 	else:
-		if request.session.get('isloggedin'):
+		if 'isloggedin' in request.session or 'search_keyword' in request.session:
 			return HttpResponseRedirect(reverse('diagnostics'))
 		else:
 			searchform = SearchForm()
@@ -145,7 +145,7 @@ def login_user(request):
 					# searchform = SearchForm()
 					# snapshotlistform = SnapshotListForm()
 					authenticated = 'True'
-					messages.success(request, 'Logged in Successfully')
+					messages.success(request, smaapp_constants.LOGIN_SUCCESS)
 					# return HttpResponseRedirect('/diagnostics/')
 					request.session['snapshot_list'] = queries.get_snapshot_list(user.id)
 					return JsonResponse(authenticated, status=200, safe=False)
@@ -212,6 +212,9 @@ def open_registration(request):
 				user.save()
 				request.session['loggedin_userid'] = user.pk
 				request.session['loggedin_username'] = user.username
+
+				# Create a snapshot_list key so we won't get KeyError
+				request.session['snapshot_list'] = []
 				return HttpResponseRedirect('/diagnostics/')
 				# return render(request, 'diagnostics.html',
 				# 	{'isSnapshot':isSnapshot,'quick_stats':globals.quick_stats,
@@ -295,6 +298,7 @@ def load_snapshot(request):
 				request.session['selected_snapshot'] = snapshot_id
 				snapshotlistform = SnapshotListForm(request=request)
 				# snapshotListFormInstance.fields['snapshotchoices'].initial = [snapshot_id]
+				messages.success(request,smaapp_constants.LOADING_SNAPSHOT_SUCCESS)
 			else:
 				messages.error(request,"Blank snapshot not loaded.")
 				return HttpResponseRedirect(reverse('diagnostics'))
@@ -485,12 +489,14 @@ def save_snapshot(request):
 				# user.snapshots = [snapshot.pk]
 					
 				# Update dropdown's snapshot list
+				# if request.session.get('snapshot_list',[]):
 				snapshot_list = request.session['snapshot_list']
 				snapshot_list.append((snapshotObject['value'],snapshotObject['text']))
 				request.session['snapshot_list'] = snapshot_list
+				print("snapshot list has been set", request.session['snapshot_list'])
 				snapshotListForm = SnapshotListForm(request=request)
 				snapshotListForm.fields['snapshotchoices'].choices = request.session['snapshot_list'] #queries.get_snapshot_list(request.session['loggedin_userid'])
-
+				messages.success(request,smaapp_constants.SAVING_SUCCESS)
 				return HttpResponse(status=200)
 			else:
 				return HttpResponse(status=401)

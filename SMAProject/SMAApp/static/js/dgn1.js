@@ -506,11 +506,6 @@ function validate_credentials(){
 $('#logoutBtn').on('click',function() {
     logout_user();
 });
-
-$('#registeronSnapbtn').on('click', function() {
-   location.href = "/register/"
-});
-
 function logout_user(){
     sessionStorage.clear();
     $.ajax({
@@ -527,10 +522,12 @@ $('#saveSnapshotBtn').on('click', function (event) {
     if (!$('#snapshotName').val().length > 0) {
         if (!$('.save-warning').length > 0) {
             $('.modal-body').append("<p class='save-warning'>Please fill up this blank</p>")
+            // $(".save-warning").fadeOut(3000);
         }
     } else if (typeof window.sessionStorage['lda_data'] == "undefined" || window.sessionStorage['lda_data'] == null) {
         if (!$('.save-warning').length > 0) {
             $('.modal-body').append("<p class='save-warning'>Topic Clustering Data is still being generated, please wait</p>");
+            // $(".save-warning").fadeOut(3000);
         }
     } else {
         saveSnapshot();
@@ -546,10 +543,20 @@ $('#saveSnapshotBtn').on('click', function (event) {
 
 // Load Snapshot modal's submit button 
 $('#loadSnapshotBtn').on('click', function() {
-    sessionStorage.clear();
-    $('#loadSnapshotForm').submit();
+    if (!$('#id_snapshotchoices').has('option').length > 0) {
+        if (!$('.load-warning').length > 0) {
+            $('#id_snapshotchoices').after("<p class='load-warning'>Please save a snapshot first</p>");
+            // $(".load-warning").fadeOut(3000);
+        }
+    } else {
+        sessionStorage.clear();
+        $('#loadSnapshotForm').submit();
+    }
 });
 
+function set(params) {
+    
+}
 
 // $('#saveSnapshotModal').on('shown.bs.modal', function(){
 //     if(window.sessionStorage['lda_data'] == null && window.sessionStorage['wc_image'] == null){

@@ -630,7 +630,7 @@ left: 0;
     width: auto !important;
 }
 
-.save-warning{
+.save-warning, .load-warning{
     color: #ff0000;
 }
 

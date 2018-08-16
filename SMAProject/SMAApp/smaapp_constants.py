@@ -10,3 +10,8 @@ LICENSE_TYPES = (('free','Free'),('premium','Premium'))
 
 # Set how many iterations bcrypt encrypts the password
 SALT_WORK_FACTOR = 10
+
+# Success Messages
+LOGIN_SUCCESS = "Logged in Successfully"
+SAVING_SUCCESS = "Snapshot has been successfully saved"
+LOADING_SNAPSHOT_SUCCESS = "Loading snapshot complete"
