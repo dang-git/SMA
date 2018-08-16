@@ -28,6 +28,7 @@ import time
 import logging
 import bcrypt
 import numpy as np
+import sys
 # Create your views here.
 
 tweetCounts = 0
@@ -89,8 +90,7 @@ def get_keyword(request):
 			request.session['pil_image_str'] = generate_wordcloud_image(request)
 			# Base64 form of image (Binary)
 			request.session['wc_image_str'] = utils.convert_to_base64(request.session['pil_image_str'])
-
-			username = ""
+			# username = ""
 			if request.session.get('loggedin_username'):
 				username = request.session['loggedin_username']
 			return render(request, 'diagnostics.html',
@@ -419,7 +419,7 @@ def save_snapshot(request):
 			lda_data = request.session["lda_data"]
 			lda_data = utils.remove_dots_on_key(lda_data) #request.session["lda_data"]
 
-		# # Convert df to dict to save it to db in a Dictfield
+			# # Convert df to dict to save it to db in a Dictfield
 			# # dict_df = 
 			# # diagnostics_data = request.session['engagements_data']
 
@@ -472,6 +472,7 @@ def save_snapshot(request):
 			try:
 				snapshot.save()
 			except ValidationError as e:
+				messages.error(request,smaapp_constants.SAVING_ERROR)
 				return HttpResponse(status=403)
 
 			# snapshot.reload()
@@ -493,13 +494,13 @@ def save_snapshot(request):
 				snapshot_list = request.session['snapshot_list']
 				snapshot_list.append((snapshotObject['value'],snapshotObject['text']))
 				request.session['snapshot_list'] = snapshot_list
-				print("snapshot list has been set", request.session['snapshot_list'])
 				snapshotListForm = SnapshotListForm(request=request)
 				snapshotListForm.fields['snapshotchoices'].choices = request.session['snapshot_list'] #queries.get_snapshot_list(request.session['loggedin_userid'])
 				messages.success(request,smaapp_constants.SAVING_SUCCESS)
 				return HttpResponse(status=200)
-			else:
-				return HttpResponse(status=401)
+		else:
+			messages.error(request,smaapp_constants.SAVING_ERROR)
+			return HttpResponse(status=401)
 	
 	# return HttpResponseRedirect('/diagnostics/')
 	# return render(request, 'diagnostics.html',
