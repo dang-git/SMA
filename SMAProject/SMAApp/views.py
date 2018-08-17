@@ -13,6 +13,7 @@ from mongoengine import ValidationError
 from django.conf import settings
 from django.urls import reverse
 from .forms import SearchForm, SnapshotListForm, RegistrationForm, LoginForm
+from .chartdata import ChartData
 from SMAApp import extract, engagements, wordcloudscript, lda, hashtags, tasks, globals, queries, utils, smaapp_constants
 from SMAApp.models import Snapshot, User
 from background_task import background
@@ -29,6 +30,7 @@ import logging
 import bcrypt
 import numpy as np
 import sys
+from bson import errors
 # Create your views here.
 
 tweetCounts = 0
@@ -73,6 +75,7 @@ def get_keyword(request):
 			request.session["quick_stats"] = quick_stats
 			diag_chartdata = {}
 			request.session['chartdata'] = prepare_chartdata(df)
+			print("chart data size: ", sys.getsizeof(request.session['chartdata']))
 			diag_chartdata = create_diag_chartdata(request.session['chartdata'])
 
 			request.session["diag_chartdata"] = diag_chartdata
@@ -90,7 +93,7 @@ def get_keyword(request):
 			request.session['pil_image_str'] = generate_wordcloud_image(request)
 			# Base64 form of image (Binary)
 			request.session['wc_image_str'] = utils.convert_to_base64(request.session['pil_image_str'])
-			# username = ""
+			username = ""
 			if request.session.get('loggedin_username'):
 				username = request.session['loggedin_username']
 			return render(request, 'diagnostics.html',
@@ -107,24 +110,31 @@ def get_keyword(request):
 
 # Sets all data for charts
 def prepare_chartdata(df):
-    chartdata = {}
+    # chartdata = {}
+	chartdata = ChartData()
     # Data for timeline linechart (Diagnostics Page)
-    chartdata["timeline"] = engagements.return_timeline(df)
+	chartdata.timeline = engagements.return_timeline(df)
+    # chartdata["timeline"] = engagements.return_timeline(df)
 
     # Data for source donut chart (Diagnostics Page)
-    chartdata["source"] = engagements.return_source(df)
+	chartdata.source =  engagements.return_source(df)
+    # chartdata["source"] = engagements.return_source(df)
 
     # Data for composition donut chart (Diagnostics Page)
-    chartdata["composition"] = engagements.return_composition(df)
+	chartdata.composition = engagements.return_composition(df)
+    # chartdata["composition"] = engagements.return_composition(df)
 
     # Data for hashtags barchart (Topics Page)
-    chartdata["hashtags"] = hashtags.hash_(df)
+	chartdata.hashtags = hashtags.hash_(df)
+    # chartdata["hashtags"] = hashtags.hash_(df)
 
     # Data for polarity donut chart (Sentiments Page)
-    chartdata["sentiments"] = engagements.return_polarity_chartdata(df)
-    chartdata["polarity_table"] = engagements.return_polarity(df)
+	chartdata.sentiments = engagements.return_polarity_chartdata(df)
+    # chartdata["sentiments"] = engagements.return_polarity_chartdata(df)
+	chartdata.polarity_table = engagements.return_polarity(df)
+    # chartdata["polarity_table"] = engagements.return_polarity(df)
 
-    return chartdata
+	return chartdata
 
 def login_user(request):
 	authenticated = 'False'
@@ -259,13 +269,20 @@ def load_snapshot(request):
 					logging.info("Iterating data using snapshot id: %s", snapshot_id)
 					request.session['search_keyword'] = snapshotObj.keyword
 					request.session['df'] = pd.DataFrame(snapshotObj.extracted_data)
-					chartdata = {}
-					chartdata['timeline'] = pd.DataFrame(snapshotObj.chart_data[0]['timeline']).to_dict('list')
-					chartdata['source'] = pd.DataFrame(snapshotObj.chart_data[0]['source']).to_dict('list')
-					chartdata['composition'] = pd.DataFrame(snapshotObj.chart_data[0]['composition']).to_dict('list')
-					chartdata['hashtags'] = snapshotObj.chart_data[0]['hashtags']
-					chartdata['sentiments'] = pd.DataFrame(snapshotObj.chart_data[0]['sentiments']).to_dict('list')
-					chartdata['polarity_table'] = snapshotObj.chart_data[0]['polarity_table'][0] # Access the dict inside the list thats why theres another [0] after the polarity table
+					# chartdata = {}
+					chartdata = ChartData()
+					chartdata.timeline = pd.DataFrame(snapshotObj.chart_data[0]['timeline']).to_dict('list')
+					chartdata.source = pd.DataFrame(snapshotObj.chart_data[0]['source']).to_dict('list')
+					chartdata.composition = pd.DataFrame(snapshotObj.chart_data[0]['composition']).to_dict('list')
+					chartdata.hashtags = snapshotObj.chart_data[0]['hashtags']
+					chartdata.sentiments = pd.DataFrame(snapshotObj.chart_data[0]['sentiments']).to_dict('list')
+					chartdata.polarity_table = snapshotObj.chart_data[0]['polarity_table'][0] # Access the dict inside the list thats why theres another [0] after the polarity table
+					# chartdata['timeline'] = pd.DataFrame(snapshotObj.chart_data[0]['timeline']).to_dict('list')
+					# chartdata['source'] = pd.DataFrame(snapshotObj.chart_data[0]['source']).to_dict('list')
+					# chartdata['composition'] = pd.DataFrame(snapshotObj.chart_data[0]['composition']).to_dict('list')
+					# chartdata['hashtags'] = snapshotObj.chart_data[0]['hashtags']
+					# chartdata['sentiments'] = pd.DataFrame(snapshotObj.chart_data[0]['sentiments']).to_dict('list')
+					# chartdata['polarity_table'] = snapshotObj.chart_data[0]['polarity_table'][0] # Access the dict inside the list thats why theres another [0] after the polarity table
 					request.session['chartdata'] = chartdata
 					diag_chartdata = create_diag_chartdata(chartdata)
 					request.session['diag_chartdata'] = diag_chartdata
@@ -331,10 +348,14 @@ def prepare_influentialposts_data(df):
 # Creates the charts for diagnostics page
 def create_diag_chartdata(chartdata):
 	print("Creating Diagnostics chartdata")
-	diag_chartdata = {}
-	diag_chartdata["timeline"] = timeline_linechart(chartdata["timeline"])
-	diag_chartdata["source"] = sourcePiechartConverter(chartdata["source"])
-	diag_chartdata["composition"] = compositionPiechartConverter(chartdata["composition"])
+	# diag_chartdata = {}
+	diag_chartdata = ChartData()
+	diag_chartdata.timeline = timeline_linechart(chartdata.timeline)
+	diag_chartdata.source = sourcePiechartConverter(chartdata.source)
+	diag_chartdata.composition = compositionPiechartConverter(chartdata.composition)
+	# diag_chartdata["timeline"] = timeline_linechart(chartdata.timeline)
+	# diag_chartdata["source"] = sourcePiechartConverter(chartdata.source)
+	# diag_chartdata["composition"] = compositionPiechartConverter(chartdata.composition)
 	return diag_chartdata
 
 # Returns lat, lang, user, tweet
@@ -423,26 +444,27 @@ def save_snapshot(request):
 			# # dict_df = 
 			# # diagnostics_data = request.session['engagements_data']
 
-			chartdata = {}
+			# chartdata = {}
+			chartdata = ChartData()
 			chartdata = request.session['chartdata']
 			chartdatafordb = {}
-			chartdatafordb["timeline"] = pd.DataFrame(chartdata["timeline"]).to_dict(orient='records')
+			chartdatafordb["timeline"] = pd.DataFrame(chartdata.timeline).to_dict(orient='records')
 
 			# Data for source donut chart (Diagnostics Page)
-			chartdatafordb["source"] = pd.DataFrame(chartdata["source"]).to_dict(orient='records')
+			chartdatafordb['source'] = pd.DataFrame(chartdata.source).to_dict(orient='records')
 
 			# Data for composition donut chart (Diagnostics Page)
-			chartdatafordb["composition"] = pd.DataFrame(chartdata['composition']).to_dict(orient='records')
+			chartdatafordb['composition'] = pd.DataFrame(chartdata.composition).to_dict(orient='records')
 
-			chartdatafordb["hashtags"] = chartdata["hashtags"]
+			chartdatafordb['hashtags'] = chartdata.hashtags
 
 			# Data for polarity donut chart (Sentiments Page)
-			chartdatafordb["sentiments"] = pd.DataFrame(chartdata["sentiments"]).to_dict(orient='records')
+			chartdatafordb['sentiments'] = pd.DataFrame(chartdata.sentiments).to_dict(orient='records')
 
 			# Set Polarity into a list so it can be saved as an array
 			polarity_table_holder = []
-			polarity_table_holder.append(chartdata["polarity_table"])
-			chartdatafordb["polarity_table"] = polarity_table_holder
+			polarity_table_holder.append(chartdata.polarity_table)
+			chartdatafordb['polarity_table'] = polarity_table_holder
 			chartdatalist.append(chartdatafordb)
 
 			# for key, value in request.session.items(): print('{}'.format(key))
@@ -594,8 +616,10 @@ def open_sentiments(request):
 		get_keyword(request)
 	else:
 		data = {}
-		data['polarityTable'] = request.session['chartdata']['polarity_table']
-		data['polar'] = polarity_donutchart(request.session['chartdata']["sentiments"])
+		chartdata = request.session['chartdata']
+		# data['polarityTable'] = request.session['chartdata']['polarity_table']
+		data['polarityTable'] = chartdata.polarity_table
+		data['polar'] = polarity_donutchart(chartdata.sentiments)
 		searchform = SearchForm()
 		searchform.fields['keyword'].widget.attrs['placeholder'] = "Search #hashtag"
 		snapshotlistform = SnapshotListForm(request=request)
@@ -610,7 +634,9 @@ def open_topics(request):
 		get_keyword(request)
 	else:
 		data = {}
-		data["barchart"] = request.session["chartdata"]["hashtags"]
+		# data["barchart"] = request.session["chartdata"]["hashtags"]
+		chartdata = request.session['chartdata']
+		data["barchart"] = chartdata.hashtags
 		# data["barchart"] = demo_horizontalBarChart(chartdata)
          
 		sessionid = request.session["user_id"]

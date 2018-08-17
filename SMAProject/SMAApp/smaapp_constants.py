@@ -15,3 +15,6 @@ SALT_WORK_FACTOR = 10
 LOGIN_SUCCESS = "Logged in Successfully"
 SAVING_SUCCESS = "Snapshot has been successfully saved"
 LOADING_SNAPSHOT_SUCCESS = "Loading snapshot complete"
+
+# Error Messages
+SAVING_ERROR = "An error has occured when saving the snapshot"
