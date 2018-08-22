@@ -18,3 +18,4 @@ LOADING_SNAPSHOT_SUCCESS = "Loading snapshot complete"
 
 # Error Messages
 SAVING_ERROR = "An error has occured when saving the snapshot"
+USER_DOES_NOT_EXIST = "Password or email is incorrect"

@@ -8,7 +8,7 @@
                 </button>
             </div>
             <div class="modal-body">
-                <form id="loginForm" class="form-wrapper cf" action="{% url 'login_user' %}" method="post">
+                <form id="loginForm" class="form-wrapper cf" action="{% url 'ajax_login_user' %}" method="post">
                     {% csrf_token %} {{loginform}}
                 </form>
             </div>

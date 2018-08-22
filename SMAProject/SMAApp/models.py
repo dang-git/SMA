@@ -31,6 +31,8 @@ class User(Document):
     address = StringField()
     snapshots = ListField() #ListField(ReferenceField('Snapshot'))
     license_type = StringField()
+    ## USERNAME_FIELD = 'email'
+    ## REQUIRED_FIELDS = ['username','address','license_type']
 
 class WordcloudImage(Document):
     image = FileField()

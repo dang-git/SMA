@@ -12,12 +12,12 @@ urlpatterns = [
     url(r'^topics/$', views.open_topics, name='topics'),
     url(r'^sentiments/$', views.open_sentiments, name='sentiments'),
     url(r'^register/$', views.open_registration, name='register'),
-    
+    url(r'^login_user/$', views.login_user, name='login_user'),
 
     # Snapshots
     url(r'^loadsnapshot/$', views.load_snapshot, name='loadsnapshot'),
     
-    url(r'^ajax/login_user/$', views.login_user, name='login_user'),
+    url(r'^ajax/login_user/$', views.ajax_login_user, name='ajax_login_user'),
     url(r'^ajax/logout_user/$', views.logout_user, name='logout_user'),
 
     # Ajax Response

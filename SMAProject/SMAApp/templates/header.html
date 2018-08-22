@@ -19,14 +19,7 @@
                     <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#loadSnapshotModal">
                             Load a snapshot
                     </button>
-                {% else %}
-                <a href="{% url 'register' %}" class="item-link">Register</a>
-                <!-- if username is present, there is a loggedin user -->
-                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#loginModal">
-                        Login
-                    </button>
-                {% endif %}
-                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#saveSnapshotModal">
+                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#saveSnapshotModal">
                         Save as snaphot
                 </button>
                         <form id="searchForm" class="form-wrapper cf" action="/" method="post">
@@ -38,6 +31,13 @@
                             <button type="submit" id="searchAgainButton">Search</button>
                         </div>
                         </form>
+                {% else %}
+                <a href="{% url 'register' %}" class="item-link">Register</a>
+                <!-- if username is present, there is a loggedin user -->
+                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#loginModal">
+                        Login
+                    </button>
+                {% endif %}
                     </div>
             </div>
         </div>

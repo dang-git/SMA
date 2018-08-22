@@ -15,7 +15,7 @@ body {
     src: url('Raleway-Bold.ttf');
 }
 
-#fly {
+#flyLogo {
 	margin-top: 2vw;
 	margin-left: 1.5vw;
 	height: 4vw;
@@ -204,4 +204,10 @@ body {
     right: 0;
     display: block;
     background-color: #ffffff;
+}
+
+#logoutBtn{
+    /* margin-top: 2vw; */
+    margin-left: 1.5vw;
+    /* height: 4vw; */
 }

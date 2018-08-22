@@ -637,3 +637,11 @@ left: 0;
 .snapshot-choices{
     width: 10em;
 }
+
+.alerts{
+    position: absolute;
+    top: 10px;
+    left: 20px;
+    right: 20px;
+    z-index: 9999;
+}

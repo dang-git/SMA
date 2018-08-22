@@ -5,6 +5,7 @@ from io import BytesIO, StringIO
 from tempfile import NamedTemporaryFile
 from shutil import copyfileobj
 from PIL import Image
+from django.urls import reverse
 # This removes a dot from keys
 # because mongodb doesnt allow keys with dots or $
 def remove_dots_on_key(dictionary):
@@ -64,11 +65,14 @@ def create_temp_img_file(pil_image):
 # Note: make sure you import this by placing: "from .utils import login_required" on the file that this will be used
 def login_required(view_func):
     @functools.wraps(view_func)
-    def wrapper(request, *args, **kwargs):
-        if request.session.get('isloggedin'):
-            return django.http.HttpResponseRedirect('/diagnostics/')
-
-        return django.http.JsonResponse('Unauthorized', status=401,safe=False)
+    def wrapper(request, *args, **kwargs):              
+        # if request.session.get('isloggedin'):
+        if 'isloggedin' in request.session and 'search_keyword' in request.session:
+            return view_func(request, *args, **kwargs)  
+            # return django.http.HttpResponseRedirect(reverse('diagnostics'))
+        else:
+            return django.http.HttpResponseRedirect(reverse('login_user'))
+        # return django.http.JsonResponse('Unauthorized', status=401,safe=False)
     return wrapper
 
 # Prevents users from accessing any pages when they have not conducted a search yet.

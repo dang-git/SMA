@@ -12,14 +12,19 @@ from mongoengine.queryset import DoesNotExist
 from mongoengine import ValidationError
 from django.conf import settings
 from django.urls import reverse
+# from django.contrib.auth.decorators import login_required
+from .utils import login_required
 from .forms import SearchForm, SnapshotListForm, RegistrationForm, LoginForm
 from .chartdata import ChartData
-from SMAApp import extract, engagements, wordcloudscript, lda, hashtags, tasks, globals, queries, utils, smaapp_constants
+from SMAApp import extract, engagements, wordcloudscript, lda, hashtags, tasks, globals, queries, utils
+from SMAApp import smaapp_constants as constants
 from SMAApp.models import Snapshot, User
 from background_task import background
 from django.core import serializers
 from celery import shared_task, task
 from celery.result import AsyncResult
+from django.contrib.auth import authenticate
+
 # from celery.task.control import revoke
 import pandas as pd
 import json
@@ -36,9 +41,13 @@ from bson import errors
 tweetCounts = 0
 
 def home(request):
-	return get_keyword(request)
+	if 'isloggedin' in request.session:
+		return get_keyword(request)
+	else:
+		return login_user(request)
 
 def get_keyword(request):
+	print("get keyword")
 	if request.method == 'POST':
 		searchform = SearchForm(request.POST)
 		if 'user_id' in request.session:
@@ -102,7 +111,7 @@ def get_keyword(request):
 				'searchform':searchform,'snapshotlistform':snapshotlistform,
 				'loginform':loginform,'username':username})
 	else:
-		if 'isloggedin' in request.session or 'search_keyword' in request.session:
+		if 'isloggedin' in request.session and 'search_keyword' in request.session:
 			return HttpResponseRedirect(reverse('diagnostics'))
 		else:
 			searchform = SearchForm()
@@ -137,6 +146,44 @@ def prepare_chartdata(df):
 	return chartdata
 
 def login_user(request):
+	if request.method == 'POST':
+		loginform = LoginForm(request.POST)
+		if loginform.is_valid():
+
+			email =  loginform.cleaned_data.get('email')
+			password = loginform.cleaned_data.get('password')
+			user1 = authenticate(email=email,password=password)
+			try:
+				user = User.objects.get(email=email)
+			except DoesNotExist:
+				messages.error(request, constants.USER_DOES_NOT_EXIST)
+				return render(request, 'loginpage.html', {'loginform': loginform})
+			if bcrypt.checkpw(password.encode('utf8'),user.password.encode('utf8')):
+				# TODO redundancy
+				# for key, value in request.session.items(): print('{}'.format(key))
+				request.session['loggedin_userid'] = user.id
+				request.session['loggedin_username'] = user.username
+				request.session['isSnapshot'] = 'false'
+				request.session['isloggedin'] = True
+				searchform = SearchForm()
+				authenticated = 'True'
+				messages.success(request, constants.LOGIN_SUCCESS)
+				request.session['snapshot_list'] = queries.get_snapshot_list(user.id)
+				return render(request, 'search.html', {'searchform': searchform})
+			else:
+				authenticated = 'False'
+				messages.error(request, 'Wrong credentials')
+				return render(request, 'loginpage.html', {'loginform': loginform})
+	else:
+		if 'isloggedin' in request.session:
+			searchform = SearchForm()
+			return render(request, 'search.html', {'searchform': searchform})
+		else:
+			loginform = LoginForm()
+	return render(request, 'loginpage.html', {'loginform': loginform})
+
+
+def ajax_login_user(request):
 	authenticated = 'False'
 	if request.method == 'POST':
 		if request.is_ajax():
@@ -155,7 +202,7 @@ def login_user(request):
 					# searchform = SearchForm()
 					# snapshotlistform = SnapshotListForm()
 					authenticated = 'True'
-					messages.success(request, smaapp_constants.LOGIN_SUCCESS)
+					messages.success(request, constants.LOGIN_SUCCESS)
 					# return HttpResponseRedirect('/diagnostics/')
 					request.session['snapshot_list'] = queries.get_snapshot_list(user.id)
 					return JsonResponse(authenticated, status=200, safe=False)
@@ -214,7 +261,7 @@ def open_registration(request):
 				user.email = registrationform.cleaned_data.get('email')
 				# Hash password before inserting it into db
 				password = registrationform.cleaned_data.get('password')
-				salt = bcrypt.gensalt(smaapp_constants.SALT_WORK_FACTOR)
+				salt = bcrypt.gensalt(constants.SALT_WORK_FACTOR)
 				hashed_password = bcrypt.hashpw(password.encode('utf8'),salt)
 				user.password = hashed_password.decode("utf8")
 				user.address = registrationform.cleaned_data.get('address')
@@ -315,7 +362,7 @@ def load_snapshot(request):
 				request.session['selected_snapshot'] = snapshot_id
 				snapshotlistform = SnapshotListForm(request=request)
 				# snapshotListFormInstance.fields['snapshotchoices'].initial = [snapshot_id]
-				messages.success(request,smaapp_constants.LOADING_SNAPSHOT_SUCCESS)
+				messages.success(request,constants.LOADING_SNAPSHOT_SUCCESS)
 			else:
 				messages.error(request,"Blank snapshot not loaded.")
 				return HttpResponseRedirect(reverse('diagnostics'))
@@ -494,7 +541,7 @@ def save_snapshot(request):
 			try:
 				snapshot.save()
 			except ValidationError as e:
-				messages.error(request,smaapp_constants.SAVING_ERROR)
+				messages.error(request,constants.SAVING_ERROR)
 				return HttpResponse(status=403)
 
 			# snapshot.reload()
@@ -518,10 +565,10 @@ def save_snapshot(request):
 				request.session['snapshot_list'] = snapshot_list
 				snapshotListForm = SnapshotListForm(request=request)
 				snapshotListForm.fields['snapshotchoices'].choices = request.session['snapshot_list'] #queries.get_snapshot_list(request.session['loggedin_userid'])
-				messages.success(request,smaapp_constants.SAVING_SUCCESS)
+				messages.success(request,constants.SAVING_SUCCESS)
 				return HttpResponse(status=200)
 		else:
-			messages.error(request,smaapp_constants.SAVING_ERROR)
+			messages.error(request,constants.SAVING_ERROR)
 			return HttpResponse(status=401)
 	
 	# return HttpResponseRedirect('/diagnostics/')
@@ -560,7 +607,7 @@ def get_username(request):
 		username = request.session['loggedin_username']
 	return username
 
-
+@login_required
 def open_diagnostics(request):
 	if request.method == 'POST':
 		get_keyword(request)
@@ -580,6 +627,7 @@ def open_diagnostics(request):
 			   'loginform':loginform,
 			   'username':username})
 
+@login_required
 def open_influencers(request):
 	if request.method == 'POST':
 		get_keyword(request)
@@ -597,6 +645,7 @@ def open_influencers(request):
 	  'searchform':searchform,'snapshotlistform':snapshotlistform,
 	   'loginform':loginform,'username':username}) 
 
+@login_required
 def open_influentialposts(request):
 	if request.method == 'POST':
 		get_keyword(request)
@@ -611,6 +660,7 @@ def open_influentialposts(request):
 	{'influentialPost':data, 'searchform':searchform,
 	'snapshotlistform':snapshotlistform,'loginform':loginform,'username':username})
 
+@login_required
 def open_sentiments(request):
 	if request.method == 'POST':
 		get_keyword(request)
@@ -629,6 +679,7 @@ def open_sentiments(request):
 	{'sentiments':data,'searchform':searchform,
 	'snapshotlistform':snapshotlistform,'loginform':loginform,'username':username})
 
+@login_required
 def open_topics(request):
 	if request.method == 'POST':
 		get_keyword(request)

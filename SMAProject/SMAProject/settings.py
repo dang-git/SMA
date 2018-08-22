@@ -60,9 +60,10 @@ MIDDLEWARE = [
 
 AUTHENTICATION_BACKENDS = (
     'mongoengine.django.auth.MongoEngineBackend',
+##    'mongo_auth.backends.LazyUserBackend',
 )
-# AUTH_USER_MODEL = 'mongo_auth.MongoUser'
-# MONGOENGINE_USER_DOCUMENT = 'mongoengine.django.auth.User'
+## AUTH_USER_MODEL = 'mongo_auth.MongoUser'
+## MONGOENGINE_USER_DOCUMENT = 'SMAApp.models.User'
 
 
 MONGO_DATABASE_NAME = 'smadb'

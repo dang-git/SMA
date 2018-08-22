@@ -12,7 +12,7 @@ $(document).ready(function () {
     // }
 
 
-    if(window.sessionStorage['lda_data'] == null && window.sessionStorage['isSnapshot'] == 'true'){
+    if (window.sessionStorage['lda_data'] == null && window.sessionStorage['isSnapshot'] == 'true') {
         getSnapshotLdadata();
         // checkAndProcessLdadata(JSON.stringify(window.sessionStorage['snapshotLdadata']));
         // generateldaPage();
@@ -27,25 +27,26 @@ $(document).ready(function () {
     //     // window.sessionStorage['bg_started'] == 'Y';
     //     // generateSentiments();
     // }
-
-    if (window.sessionStorage['isSnapshot'] != 'true' && window.sessionStorage['lda_deployed'] != 'Y') {
-        sessionStorage.setItem("lda_deployed", "Y");
-        startldaDataPull();
-    }
-    else if (window.sessionStorage['isSnapshot'] != 'true' && 
-        (window.sessionStorage['lda_data'] == null ||
-        typeof window.sessionStorage['lda_data'] == "undefined")) {
-        generateldaData();
-        // $('#ldaPage').css("display", "none");
-    }
-    else if ((window.sessionStorage['lda_data'] != null &&
-        (window.sessionStorage['lda_page'] == null ||
-            typeof window.sessionStorage['lda_page'] == "undefined"))) {
-        generateldaPage();
-    }
-    else {
-        $('#ldaPlaceholder').css("display", "none");
-        $('#ldaPage').html(window.sessionStorage['lda_page']);
+    if (typeof window.sessionStorage['search_keyword'] != "undefined") {
+        if (window.sessionStorage['isSnapshot'] != 'true' && window.sessionStorage['lda_deployed'] != 'Y') {
+            sessionStorage.setItem("lda_deployed", "Y");
+            startldaDataPull();
+        }
+        else if (window.sessionStorage['isSnapshot'] != 'true' &&
+            (window.sessionStorage['lda_data'] == null ||
+                typeof window.sessionStorage['lda_data'] == "undefined")) {
+            generateldaData();
+            // $('#ldaPage').css("display", "none");
+        }
+        else if ((window.sessionStorage['lda_data'] != null &&
+            (window.sessionStorage['lda_page'] == null ||
+                typeof window.sessionStorage['lda_page'] == "undefined"))) {
+            generateldaPage();
+        }
+        else {
+            $('#ldaPlaceholder').css("display", "none");
+            $('#ldaPage').html(window.sessionStorage['lda_page']);
+        }
     }
 });
 
@@ -198,7 +199,7 @@ function validate_registration_email(){
             success: function (data) {
                 if(data.is_taken){
                     if (!$('.save-warning').length > 0) {
-                        $('#reg_email_id').after("<p class='save-warning'>Email has been registered already</p>");
+                        $('#reg_email_id').after("<p class='save-warning'>Email has been taken already</p>");
                     }
                     // alert(data.error_message);
                 } else {
