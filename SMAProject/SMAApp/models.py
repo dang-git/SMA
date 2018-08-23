@@ -23,6 +23,8 @@ class Snapshot(DynamicDocument):
     owner = ObjectIdField() # ReferenceField('User')
     date_created = DateTimeField(default=datetime.datetime.utcnow)
 
+    meta = {'db_alias': 'smadb'}
+
 class User(Document):
     _id = ObjectIdField()
     username = StringField()
@@ -33,6 +35,7 @@ class User(Document):
     license_type = StringField()
     ## USERNAME_FIELD = 'email'
     ## REQUIRED_FIELDS = ['username','address','license_type']
+    meta = {'db_alias': 'smadb'}
 
 class WordcloudImage(Document):
     image = FileField()
@@ -53,3 +56,11 @@ class Chart(Document):
 
 class Chart_point(Document):
     chart_point_id = ObjectIdField()
+
+
+""" SMA Words """
+
+class List_Name(Document):
+    name = ListField()
+
+    meta = {'db_alias': 'smawords'}
