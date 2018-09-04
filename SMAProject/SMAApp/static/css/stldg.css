@@ -645,3 +645,7 @@ left: 0;
     right: 20px;
     z-index: 9999;
 }
+
+body > #footerSection{
+    max-width: 100%;
+}

@@ -15,17 +15,20 @@ import math
 import os
 import string
 import pandas as pd
+from SMAApp import queries
 
 dir_path = os.path.dirname(os.path.realpath("polarize.py"))
 bf = pd.read_csv(dir_path + "\\SMAApp\\base_forms.csv", header=None)
 base_forms = {} 
-for i in list(range(0,len(bf))):
-    base_forms[bf[0][i].lower()] = bf[1][i].lower()
+# for i in list(range(0,len(bf))):
+#     base_forms[bf[0][i].lower()] = bf[1][i].lower()
 
-v = pd.read_csv(dir_path + "\\SMAApp\\verbs.csv", header=None)
-for i in list(range(0,len(v))):
-    base_forms[v[0][i].lower()] = v[1][i].lower()
-        
+# v = pd.read_csv(dir_path + "\\SMAApp\\verbs.csv", header=None)
+# for i in list(range(0,len(v))):
+#     base_forms[v[0][i].lower()] = v[1][i].lower()
+
+# queries.insert_baseforms(base_forms)
+base_forms = queries.get_baseforms()
 emojis = {
 u'\U0001f600': ' emjaaa ',
 u'\U0001f601': ' emjaab ',
@@ -137,6 +140,9 @@ u'\U0001f389': ' emjaec ',
 u'\U0001f38a': ' emjaed '
 }
 
+# queries.insert_emojis(emojis)
+emojis = queries.get_emojis()
+
 def make_emojis_string(input_sentence):
     text = input_sentence
     for i in emojis.keys():
@@ -171,55 +177,59 @@ PUNC_LIST = [".", "!", "?", ",", ";", ":", "-", "'", "\"",
              "!!", "!!!", "!!!!", "??", "???", "?!?", "!?!", "?!?!", "!?!?"]
 
 # Negating terms: the following list contains known negating terms
-NEGATE = \
-["aint", "arent", "cannot", "cant", "couldnt", "darent", "didnt", "doesnt",
- "ain't", "aren't", "can't", "couldn't", "daren't", "didn't", "doesn't",
- "dont", "hadnt", "hasnt", "havent", "isnt", "mightnt", "mustnt", "neither",
- "don't", "hadn't", "hasn't", "haven't", "isn't", "mightn't", "mustn't",
- "neednt", "needn't", "never", "none", "nope", "nor", "not", "nothing",
- "nowhere", "oughtnt", "shant", "shouldnt", "uhuh", "wasnt", "werent",
- "oughtn't", "shan't", "shouldn't", "uh-uh", "wasn't", "weren't",
- "without", "wont", "wouldnt", "won't", "wouldn't", "rarely", "seldom",
- "despite", "nobody", "noone", "no"]
+NEGATE = queries.get_negates()
+# \
+# ["aint", "arent", "cannot", "cant", "couldnt", "darent", "didnt", "doesnt",
+#  "ain't", "aren't", "can't", "couldn't", "daren't", "didn't", "doesn't",
+#  "dont", "hadnt", "hasnt", "havent", "isnt", "mightnt", "mustnt", "neither",
+#  "don't", "hadn't", "hasn't", "haven't", "isn't", "mightn't", "mustn't",
+#  "neednt", "needn't", "never", "none", "nope", "nor", "not", "nothing",
+#  "nowhere", "oughtnt", "shant", "shouldnt", "uhuh", "wasnt", "werent",
+#  "oughtn't", "shan't", "shouldn't", "uh-uh", "wasn't", "weren't",
+#  "without", "wont", "wouldnt", "won't", "wouldn't", "rarely", "seldom",
+#  "despite", "nobody", "noone", "no"]
  
 neutr = ["should", "shall"]
 
 # The following list contains booster/dampener 'intensifiers' or
 # 'degree adverbs'
 # These are from http://en.wiktionary.org/wiki/Category:English_degree_adverbs
-BOOSTER_DICT = \
-{"absolutely": B_INCR, "amazingly": B_INCR, "awfully": B_INCR,
- "completely": B_INCR, "considerably": B_INCR, "decidedly": B_INCR,
- "deeply": B_INCR, "effing": B_INCR, "enormously": B_INCR,
- "entirely": B_INCR, "especially": B_INCR, "exceptionally": B_INCR,
- "extremely": B_INCR, "fabulously": B_INCR, "flipping": B_INCR,
- "flippin": B_INCR, "fricking": B_INCR, "frickin": B_INCR,
- "frigging": B_INCR, "friggin": B_INCR, "fully": B_INCR, "fucking": B_INCR,
- "greatly": B_INCR, "hella": B_INCR, "highly": B_INCR, "hugely": B_INCR,
- "incredibly": B_INCR, "intensely": B_INCR, "majorly": B_INCR, "more": B_INCR,
- "most": B_INCR, "particularly": B_INCR, "purely": B_INCR, "quite": B_INCR,
- "really": B_INCR, "remarkably": B_INCR, "so": B_INCR, "substantially": B_INCR,
- "thoroughly": B_INCR, "totally": B_INCR, "tremendously": B_INCR,
- "uber": B_INCR, "unbelievably": B_INCR, "unusually": B_INCR,
- "utterly": B_INCR, "very": B_INCR, "super": B_INCR, "almost": B_DECR,
- "barely": B_DECR, "hardly": B_DECR, "just enough": B_DECR, "kind of": B_DECR,
- "kinda": B_DECR, "kindof": B_DECR, "kind-of": B_DECR, "less": B_DECR,
- "little": B_DECR, "marginally": B_DECR, "occasionally": B_DECR,
- "partly": B_DECR, "scarcely": B_DECR, "slightly": B_DECR, "somewhat": B_DECR,
- "sort of": B_DECR, "sorta": B_DECR, "sortof": B_DECR, "sort-of": B_DECR}
+BOOSTER_DICT = queries.get_boosters()
+
+# \
+# {"absolutely": B_INCR, "amazingly": B_INCR, "awfully": B_INCR,
+#  "completely": B_INCR, "considerably": B_INCR, "decidedly": B_INCR,
+#  "deeply": B_INCR, "effing": B_INCR, "enormously": B_INCR,
+#  "entirely": B_INCR, "especially": B_INCR, "exceptionally": B_INCR,
+#  "extremely": B_INCR, "fabulously": B_INCR, "flipping": B_INCR,
+#  "flippin": B_INCR, "fricking": B_INCR, "frickin": B_INCR,
+#  "frigging": B_INCR, "friggin": B_INCR, "fully": B_INCR, "fucking": B_INCR,
+#  "greatly": B_INCR, "hella": B_INCR, "highly": B_INCR, "hugely": B_INCR,
+#  "incredibly": B_INCR, "intensely": B_INCR, "majorly": B_INCR, "more": B_INCR,
+#  "most": B_INCR, "particularly": B_INCR, "purely": B_INCR, "quite": B_INCR,
+#  "really": B_INCR, "remarkably": B_INCR, "so": B_INCR, "substantially": B_INCR,
+#  "thoroughly": B_INCR, "totally": B_INCR, "tremendously": B_INCR,
+#  "uber": B_INCR, "unbelievably": B_INCR, "unusually": B_INCR,
+#  "utterly": B_INCR, "very": B_INCR, "super": B_INCR, "almost": B_DECR,
+#  "barely": B_DECR, "hardly": B_DECR, "just enough": B_DECR, "kind of": B_DECR,
+#  "kinda": B_DECR, "kindof": B_DECR, "kind-of": B_DECR, "less": B_DECR,
+#  "little": B_DECR, "marginally": B_DECR, "occasionally": B_DECR,
+#  "partly": B_DECR, "scarcely": B_DECR, "slightly": B_DECR, "somewhat": B_DECR,
+#  "sort of": B_DECR, "sorta": B_DECR, "sortof": B_DECR, "sort-of": B_DECR}
 
  # Check for special case idioms using a sentiment-laden keyword known to SAGE
-SPECIAL_CASE_IDIOMS = \
-{"the shit": 3, "the bomb": 3, "bad ass": 1.5, "yeah right": -2,
- "cut the mustard": 2, "kiss of death": -1.5, "hand to mouth": -2,
- "$ hungry": -3, "money hungry": -3, "dollar hungry": -3, "ok fine": -1,
- "no response": -2, "can't book": -2, "don't book": -3, "give refund": -3,
- "no refund": -2, "@delta next time": 1, "see you @delta": 1,
- "pilot didn't show": -3, "not apologize": -2, "you suck": -3,
- "thank for nothing": -2, "can't check in": -2, "cant check in": -2,
- "website isn't work": -2, "send me expired": -2,
- "pilots haven't arrive": -2, "not well": -1, "not okay": -1,
- "hard time": -1, "thank you": 1, "thank u": 1, "share in metrobank plunged": -1}
+SPECIAL_CASE_IDIOMS = queries.get_idioms()
+# \
+# {"the shit": 3, "the bomb": 3, "bad ass": 1.5, "yeah right": -2,
+#  "cut the mustard": 2, "kiss of death": -1.5, "hand to mouth": -2,
+#  "$ hungry": -3, "money hungry": -3, "dollar hungry": -3, "ok fine": -1,
+#  "no response": -2, "can't book": -2, "don't book": -3, "give refund": -3,
+#  "no refund": -2, "@delta next time": 1, "see you @delta": 1,
+#  "pilot didn't show": -3, "not apologize": -2, "you suck": -3,
+#  "thank for nothing": -2, "can't check in": -2, "cant check in": -2,
+#  "website isn't work": -2, "send me expired": -2,
+#  "pilots haven't arrive": -2, "not well": -1, "not okay": -1,
+#  "hard time": -1, "thank you": 1, "thank u": 1, "share in metrobank plunged": -1}
 
 
 ##===========================================================================##
@@ -346,12 +356,14 @@ class SentimentIntensityAnalyzer(object):
     # Convert lexicon file to dictionary
     def make_lex_dict(self):
         lex_dict = {}
-        with open(self.lexicon_file) as infile:
-            readCSV = csv.reader(infile, delimiter=',')
-            for row in readCSV:
-                (word, measure) = (row[0], row[1])
-                lex_dict[word] = float(measure)
-            return lex_dict
+        # with open(self.lexicon_file) as infile:
+        #     readCSV = csv.reader(infile, delimiter=',')
+        #     for row in readCSV:
+        #         (word, measure) = (row[0], row[1])
+        #         lex_dict[word] = float(measure)
+        lex_dict = queries.get_lexicons()
+        # queries.insert_lexicon(lex_dict)
+        return lex_dict
     
     # Return a float for sentiment strength based on the input text.
     # Positive values are positive valence, negative values are negative
