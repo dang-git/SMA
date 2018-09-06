@@ -581,3 +581,48 @@ $('#loadSnapshotModal').on('shown.bs.modal', function () {
         $('#loadSnapshotBtn').prop("disabled", false);
     }
 });
+
+$('#uploadwcMaskButton').on('click', function(){
+    console.log("clicked");
+    uploadWordcloudMask();
+});
+
+
+// Replaces the wordcloud's mask on File submission.
+$('#uploadwcMaskForm').on('submit', function (e) {
+    // stops page from refreshing after submitting form.
+    e.preventDefault();
+    var formData = new FormData(this);
+    // in case of errors, previous image will hold the value of original image.
+    var previousImage;
+    // var file = jQuery('#uploadwcMask').files[0];
+    // formdata.append("image", file);
+    $.ajax({
+        beforeSend: function (xhr, settings) {
+            $('#imagePlaceholder').css("display", "block");
+            $('#wordcloudImage').css("display", "none");
+            previousImage = $('#wordcloudImage').attr('src')
+        },
+        url: "/upload/wordcloud_mask/",
+        type: "POST",
+        data: formData,
+        processData: false, // Don't process the files
+        contentType: false, // Set content type to false as jQuery will tell the server its a query string request
+        success: function (data) {
+            if (pathname == "topics") {
+                $('#imagePlaceholder').css("display", "none");
+                $('#wordcloudImage').css("display", "block");
+                $('#wordcloudImage').attr({ "src": "data:img/png;base64," + data });
+
+                // Reset the form.
+                $('#uploadwcMaskForm').each(function () {
+                    this.reset();
+                });
+            }
+            console.log("image swapped");
+        },
+        error: function () {
+            $('#wordcloudImage').attr('src') = previousImage;
+        }
+    });
+});

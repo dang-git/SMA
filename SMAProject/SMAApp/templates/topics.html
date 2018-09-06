@@ -1,7 +1,7 @@
 {% load staticfiles %}  {% load nvd3_tags %}
 <!DOCTYPE html>
 <html>
-<title>TWITTER SEARCH</title>
+<title>Topics - TWITTER SEARCH</title>
 
 <head>
 	<link rel="stylesheet" type="text/css" href="{% static 'bootstrap/css/bootstrap.css' %}">
@@ -34,60 +34,58 @@
 		{% include 'sidebar.html'%}
 		{% include 'messages.html'%}
 		<div class="row">
-				<div id="content" class="col-lg-12 col-xs-12">
-					<div class="main">
-							<div class="topic-main-container cloud-topic-container">
-									<div class="topic-title">WORDCLOUD</div>
-										<!-- <p id="imagePlaceholder">Loading Wordcloud Image <img id="miniLoading" src="{% static 'images/mini-loading.gif' %}" height="25"></p> -->
-									<div id="wordcloudImageContainer">
-										<!-- <img id="wordcloudImage" class="wordcloud-image"/> -->
-										<img src="data:img/png;base64,{{wc_image}}" id="wordcloudImage" class="wordcloud-image"/>
-											{# with 'images/wordcloud/wordcloud-'|add:sessionid|add:'.png' as wordcloud_image #}
-											<!-- <img src="{% static wordcloud_image %}" class="wordcloud-image"/> -->
-											{# endwith #}
-						<div id="uploadImageContainer">
-							<!-- 						<label class="image-file-upload">
-										<input type="file" accept="image/*"/>
-										Upload image
-									</label> -->
-							<input type="file" name="uploadImageFileBtn" id="uploadImageFileBtn" accept="image/x-png,image/gif,image/jpeg" />
-						</div>
-						<div class="search-insight-container">
-							<input type="text" id="wordcloudInsight" placeholder="Type insights here" class="search-insights-input">
-						</div>
-						<!-- <div id='wordcloud'></div>
-						<script>
-						d3.wordcloud()
-							.size([800, 400])
-							.selector('#wordcloud')
-							.words([{text: 'word', size: 5}, {text: 'cloud', size: 15}])
-							.start();
-						</script> -->
+			<div id="content" class="col-lg-12 col-xs-12">
+				<div class="main">
+					<div class="topic-main-container cloud-topic-container">
+						<div class="topic-title">WORDCLOUD</div>
+						<div id="wordcloudImageContainer">
+							<!-- <img id="wordcloudImage" class="wordcloud-image"/> -->
+							<p id="imagePlaceholder">Loading Wordcloud Image <img id="miniLoading" src="{% static 'images/mini-loading.gif' %}" height="25"></p>
+							<img src="data:img/png;base64,{{wc_image}}" id="wordcloudImage" class="wordcloud-image" /> 
+							{# with 'images/wordcloud/wordcloud-'|add:sessionid|add:'.png' as wordcloud_image #}
+							<!-- <img src="{% static wordcloud_image %}" class="wordcloud-image"/> -->
+							{# endwith #}
+							<div id="uploadImageContainer">
+								<form id="uploadwcMaskForm">
+									{% csrf_token %}
+									<input type="file" name="wc_mask" id="uploadwcMask" accept="image/x-png,image/gif,image/jpeg" />
+									<input type="submit" id="uploadwcMaskButton" name="uploadwcMaskButton" />
+								</form>
 							</div>
-							<div class="top-hashtag-container">
-								<div class="topic-title">TOP HASHTAGS</div>
-								<svg id="hashtagChart"></svg>
-								<div class="search-insight-container">
-									<input type="text" id="topHastagsInsight" placeholder="Type insights here" class="search-insights-input">
-								</div>
+							<div class="search-insight-container">
+								<input type="text" id="wordcloudInsight" placeholder="Type insights here" class="search-insights-input">
+							</div>
+							<!-- <div id='wordcloud'></div>
+								<script>
+								d3.wordcloud()
+									.size([800, 400])
+									.selector('#wordcloud')
+									.words([{text: 'word', size: 5}, {text: 'cloud', size: 15}])
+									.start();
+								</script> -->
 						</div>
-				
-						
+						<div class="top-hashtag-container">
+							<div class="topic-title">TOP HASHTAGS</div>
+							<svg id="hashtagChart"></svg>
+							<div class="search-insight-container">
+								<input type="text" id="topHastagsInsight" placeholder="Type insights here" class="search-insights-input">
+							</div>
+						</div>
+		
+		
 					</div>
 					<div class="lda">
 						<div class="topic-title">TOPICS</div>
 						<div id="ldaContainer">
 							<!-- to test lda.html, only remove the 3 lines and replace with {# include 'lda/lda.html' #}  -->
 							<div id="ldaPlaceholder">
-								<p>Loading Topic Clusters 
-								<img id="miniLoading" src="{% static 'images/mini-loading.gif' %}" height="25">
+								<p>Loading Topic Clusters
+									<img id="miniLoading" src="{% static 'images/mini-loading.gif' %}" height="25">
 								</p>
 							</div>
 							<div id="ldaPage"></div>
-							{# include 'lda.html' #}
-								{# with 'lda-'|add:sessionid|add:'.html' as lda_page #}
-								{# include 'lda/'|add:lda_page #}
-								{# endwith #}
+							{# include 'lda.html' #} {# with 'lda-'|add:sessionid|add:'.html' as lda_page #} {# include 'lda/'|add:lda_page #} {# endwith
+							#}
 							<div class="search-insight-container">
 								<input type="text" id="topic1Insight" placeholder="Type insights here for topic 1" class="search-insights-input">
 							</div>
