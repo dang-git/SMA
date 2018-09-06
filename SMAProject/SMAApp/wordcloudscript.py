@@ -83,51 +83,51 @@ def return_wordcloud(data):
     words = [w for w in words if not w in stops]
     words = [w for w in words if not w in names]
     words = list(filter(None, words))
-    for i in range(0, len(words)):
-        if "bwas" in words[i]: 
-            words[i] = "bawas"
-        if "bawas" in words[i]: 
-            words[i] = "bawas"
-        if "withdraw" in words[i]: 
-            words[i] = "withdraw"
-        if words[i] in ['nawidraw', 'winidraw', 'wothdraw', 'widrawal', 'widrawals', 'winithdraw', 'wedrawhin', 'nagwidraw', 'witdrawals', 'winiwidraw', 'withraw', 'widraw', 'wedraw', 'mawdraw', 'mgwdraw', 'witdrawan', 'wiwiwdraw', 'wiwidrwhn', 'widroha']: 
-            words[i] = "withdraw"
-        if "balik" in words[i]: 
-            words[i] = "balik"
-        if "inconven" in words[i]: 
-            words[i] = "inconvenient"
-        if "service" in words[i]: 
-            words[i] = "service"
-        if "system" in words[i]: 
-            words[i] = "system"
-        if "tagal" in words[i]: 
-            words[i] = "tagal"
-        if "tiwala" in words[i]: 
-            words[i] = "tiwala"
-        if "twala" == words[i]: 
-            words[i] = "tiwala"
-        if "transfer" in words[i]: 
-            words[i] = "transfer"
-        if "trust" in words[i]: 
-            words[i] = "trust"
-        if "secur" in words[i]: 
-            words[i] = "security"
-        if "hacked" in words[i]: 
-            words[i] = "hack"
-        if  words[i] in ['banks', 'banko']: 
-            words[i] = "bank"
-        if "problem" in words[i]: 
-            words[i] = "problema"
-        if "errors" == words[i]: 
-            words[i] = "error"
-        if words[i] in ['ty', 'tnx', 'thx', 'thnx', 'thank']: 
-            words[i] = "thanks"
-        if words[i] in ['nawalang', 'mawawala', 'nawawala', 'wlng', 'nawawalan', 'nawalan', 'walang', 'mawala', 'nawala', 'wla', 'nawawalang', 'wlang', 'nwala', 'mawalan']: 
-            words[i] = "wala"
-        if words[i] in ['nakawan', 'ninakawan', 'nanakawan']: 
-            words[i] = "nakaw"
-        if words[i] in ['fufund', 'fund', 'funds']: 
-            words[i] = "fund"
+    # for i in range(0, len(words)):
+    #     if "bwas" in words[i]: 
+    #         words[i] = "bawas"
+    #     if "bawas" in words[i]: 
+    #         words[i] = "bawas"
+    #     if "withdraw" in words[i]: 
+    #         words[i] = "withdraw"
+    #     if words[i] in ['nawidraw', 'winidraw', 'wothdraw', 'widrawal', 'widrawals', 'winithdraw', 'wedrawhin', 'nagwidraw', 'witdrawals', 'winiwidraw', 'withraw', 'widraw', 'wedraw', 'mawdraw', 'mgwdraw', 'witdrawan', 'wiwiwdraw', 'wiwidrwhn', 'widroha']: 
+    #         words[i] = "withdraw"
+    #     if "balik" in words[i]: 
+    #         words[i] = "balik"
+    #     if "inconven" in words[i]: 
+    #         words[i] = "inconvenient"
+    #     if "service" in words[i]: 
+    #         words[i] = "service"
+    #     if "system" in words[i]: 
+    #         words[i] = "system"
+    #     if "tagal" in words[i]: 
+    #         words[i] = "tagal"
+    #     if "tiwala" in words[i]: 
+    #         words[i] = "tiwala"
+    #     if "twala" == words[i]: 
+    #         words[i] = "tiwala"
+    #     if "transfer" in words[i]: 
+    #         words[i] = "transfer"
+    #     if "trust" in words[i]: 
+    #         words[i] = "trust"
+    #     if "secur" in words[i]: 
+    #         words[i] = "security"
+    #     if "hacked" in words[i]: 
+    #         words[i] = "hack"
+    #     if  words[i] in ['banks', 'banko']: 
+    #         words[i] = "bank"
+    #     if "problem" in words[i]: 
+    #         words[i] = "problema"
+    #     if "errors" == words[i]: 
+    #         words[i] = "error"
+    #     if words[i] in ['ty', 'tnx', 'thx', 'thnx', 'thank']: 
+    #         words[i] = "thanks"
+    #     if words[i] in ['nawalang', 'mawawala', 'nawawala', 'wlng', 'nawawalan', 'nawalan', 'walang', 'mawala', 'nawala', 'wla', 'nawawalang', 'wlang', 'nwala', 'mawalan']: 
+    #         words[i] = "wala"
+    #     if words[i] in ['nakawan', 'ninakawan', 'nanakawan']: 
+    #         words[i] = "nakaw"
+    #     if words[i] in ['fufund', 'fund', 'funds']: 
+    #         words[i] = "fund"
     message = ''
     for i in range(0, len(words)):
         message = message + ' ' + words[i]
