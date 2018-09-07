@@ -1,6 +1,8 @@
 from django.urls import path, include
 from SMAApp import views
 from django.conf.urls import url
+from django.conf import settings
+from django.conf.urls.static import static
 
 # handler404 = 'SMAApp.views.view_404'
 urlpatterns = [
@@ -40,4 +42,9 @@ urlpatterns = [
     
     # Username exists checker
     url(r'^ajax/validate_registration_email/', views.validate_registration_email, name='validate_registration_email'),
+
+    # Wordcloud Mask Upload
+    url(r'^upload/wordcloud_mask/', views.upload_wordcloud_mask, name='upload_wordcloud_mask'),
 ]
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -57,7 +57,7 @@ def count_word(message):
     return list_
 
 
-def return_wordcloud(data):
+def return_wordcloud(request, data):
     message = ''
     for i in list(range(0, len(data))):
         speech = re.sub(r'@\w+', ' ', data['tweet'][int(i)])
@@ -133,11 +133,16 @@ def return_wordcloud(data):
         message = message + ' ' + words[i]
     # return count_word(message)
     #wordcloud background picture
-    img = Image.open(os.path.join(settings.BASE_DIR, 'SMAApp\\bg2.jpg'))
+    # mask_url = request.FILES.get('wc_mask')
+    if 'wcmask_url' in request.session:
+        mask_url = 'SMAApp\\' + request.session['wcmask_url']
+    else:
+        mask_url = 'SMAApp\\bg2.jpg'
+    img = Image.open(os.path.join(settings.BASE_DIR, mask_url)).convert('RGB')
     img = img.resize((900,550), Image.ANTIALIAS)
     hcmask = np.array(img)
     image_colors = ImageColorGenerator(hcmask)
-    wc = WordCloud(background_color = '#ffffff', max_words = 300, mask = hcmask, stopwords = stops)
+    wc = WordCloud(background_color = '#ffffff', max_words = 300, mask = hcmask, stopwords = stops) #for lines: contour_width=1, contour_color='black'
     wc.generate(message)
     wc.recolor(color_func = image_colors)
     #saves wordcloud as png files
