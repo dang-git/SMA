@@ -77,15 +77,23 @@
 					<div class="lda">
 						<div class="topic-title">TOPICS</div>
 						<div id="ldaContainer">
+							<!-- <div class="lda-topic-count">
+								<label for="ldavis_el84844464070221763284634421-topic-count" style="font-family: sans-serif; font-size: 14px">
+									Topic Count:
+									span id="ldavis_el84844464070221763284634421-topic-value">
+									</span
+								</label>
+								<input style="width: 50px" type="text" min="0" max="4" step="1" id="ldavisTopicCount">
+								<button id="submitTopicCount" style="margin-left: 5px"> Set Topic </button>
+							</div> -->
 							<!-- to test lda.html, only remove the 3 lines and replace with {# include 'lda/lda.html' #}  -->
 							<div id="ldaPlaceholder">
-								<p>Loading Topic Clusters
+								<p>Loading Topic Clusters Please wait...
 									<img id="miniLoading" src="{% static 'images/mini-loading.gif' %}" height="25">
 								</p>
 							</div>
 							<div id="ldaPage"></div>
-							{# include 'lda.html' #} {# with 'lda-'|add:sessionid|add:'.html' as lda_page #} {# include 'lda/'|add:lda_page #} {# endwith
-							#}
+							{# include 'lda.html' #} {# with 'lda-'|add:sessionid|add:'.html' as lda_page #} {# include 'lda/'|add:lda_page #} {# endwith #}
 							<div class="search-insight-container">
 								<input type="text" id="topic1Insight" placeholder="Type insights here for topic 1" class="search-insights-input">
 							</div>

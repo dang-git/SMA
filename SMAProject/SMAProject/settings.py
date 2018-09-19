@@ -70,7 +70,7 @@ SMADB_MONGO_DATABASE_NAME = 'smadb'
 SMAWORDS_MONGO_DATABASE_NAME = 'smawords'
 MONGO_HOST = '127.0.0.1'
 MONGO_PORT = 27017
-connect(SMADB_MONGO_DATABASE_NAME, alias='smadb', host=MONGO_HOST, port=MONGO_PORT)
+connect(SMADB_MONGO_DATABASE_NAME, alias='default', host=MONGO_HOST, port=MONGO_PORT)
 connect(SMAWORDS_MONGO_DATABASE_NAME, alias='smawords', host=MONGO_HOST, port=MONGO_PORT)
 
 
@@ -91,6 +91,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'django.template.context_processors.media',
             ],
         },
     },
@@ -179,6 +180,9 @@ BOWER_INSTALLED_APPS = (
     'd3#3.3.13',
     'nvd3#1.7.1',
 )
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'SMAApp\\media')
 
 
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'

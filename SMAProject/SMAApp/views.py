@@ -18,12 +18,13 @@ from .forms import SearchForm, SnapshotListForm, RegistrationForm, LoginForm
 from .chartdata import ChartData
 from SMAApp import extract, engagements, wordcloudscript, lda, hashtags, tasks, globals, queries, utils
 from SMAApp import smaapp_constants as constants
-from SMAApp.models import Snapshot, User, Names
+from SMAApp.models import Snapshot, User, Names, WordCloudImageMask
 from background_task import background
 from django.core import serializers
 from celery import shared_task, task
 from celery.result import AsyncResult
 from django.contrib.auth import authenticate
+from django.core.files.storage import FileSystemStorage
 
 # from celery.task.control import revoke
 import pandas as pd
@@ -43,16 +44,6 @@ def home(request):
 		return get_keyword(request)
 	else:
 		return login_user(request)
-
-def insert_names():
-	names = ['camacho', 'jason', 'ron', 'alcantara-banaybanay', 'rob', 'cynthia', 'sonja', 'roy', 'gahon', 'mejia', 'rosales', 'tuba', 'maquilan', 'galvez', 'abdurahman', 'jerome', 'jessie', 'rutor', 'pedro', 'keith', 'sabalburo', 'marissa', 'santosghel', 'april', 'anjannette', 'riza', 'salido', 'rg', 'tj', 'balderama', 'estanislao', 'oliveros', 'tvpatrol', 'scarlett', 'icasiano-ruiz', 'dela', 'secondez,ly', 'labong', 'ayyie', 'augusto', 'hannah', 'aurora', 'gerodias', 'evardome', 'jacq', 'vera', 'bugna', 'lhenyet', 'sol', 'besinal', 'ivanong', 'hya', 'joed', 'ofrin', 'erlinda', 'esperanza', 'dumaguing', 'philippines', 'solatorio', 'michael', 'dia', 'ryan', 'ri', 'p', 'harry', 'elah', 'venus', 'caryl', 'orzo', 'louie', 'zabarte', 'inot', 'zhav', 'tel', 'osinsao', 'musñgi', 'teo', 'jerelyn', 'abarquez', 'falcis', 'jc', 'galay', 'mangaliman', 'marilyn', 'arnold', 'rodmar', 'elise', 'redrose', 'belleza', 'capalad', 'rosauro', 'celestino', 'jochelle', 'cely', 'vitorillo', 'kris', 'canales', 'barrientos', 'lising', 'laurence', 'haze', 'binabay', 't', 'joycie', 'net', 'roann', 'jayson', 'phoebe', 'christian', 'dahl', 'laborre', 'therese', 'henry', 'jasmine', 'avigail', 'leo', 'ching', 'simon', 'janessa', 'jhunski', 'josol', 'odero', 'pacis', 'relly', 'terrence', 'bemon', 'calter', 'marionne', 'heracleo', 'louise', 'nodalo', 'alyssa', 'raffytulfo', 'aki', 'ramos', 'lizette', 'cindy', 'dasco', 'cathy', 'janice', 'rlndblnsg', 'dre', 'agustin', 'jann', 'robillos', 'sirc', 'mendozadel', 'apple', 'apyang', 'julie', 'boqx', 'bro', 'rhonn', 'austria', 'alinsod', 'aimee', 'kristina', 'elizaga', 'baltazar', 'gagalang', 'ishibashi', 'trinidad', 'angelo', 'cha', 'tels', 'jayme', 'andaya', 'barrios', 'mendoza', 'nava', 'charie', 'aya', 'ambid', 'elleyn', 'rodriguez', 'salash', 'presquito', 'bonilla', 'chu', 'galguerra', 'morc', 'jonathan', 'seguerra', 'baba', 'escalona', 'miayo', 'sarmiento', 'baliuag', 'aiza', 'israel', 'yvaine', 'casey', 'barcellano', 'dios', 'tesalona', 'zamora', 'chastine', 'secuya', 'conje', 'esquivel', 'te', 'ma', 'caguiat', 'rayson', 'gabriel', 'mo', 'krizza', 'albon', 'jude', 'mj', 'nina', 'arches', 'archer', 'del', 'era', 'flo', 'julliane', 'bojo', 'ernest', 'olivar', 'dee', 'zafe', 'heart', 'gerly', 'rappler', 'shara', 'milagrosa', 'amalia', 'dato-on', 'honey', 'naome', 'allauigan', 'daiserie', 'malig-on', 'nobleza', 'tan', 'agena', 'angielyn', 'sis', 'mendoza-del', 'reyespia', 'silos', 'russelloto', 'roderos', 'lorisse', 'cabrillos', 'ava', 'camille', 'brian', 'sia', 'mayores', 'gallart', 'mari', 'reyes', 'enz', 'fortaliza', 'divo', 'masujer', 'mar', 'dadia', 'elizabeth', 'gmanews', 'ayala', 'may', 'alojado', 'hong', 'alegre', 'ronald', 'levi', 'margret', 'actiontv', 'rosanna', 'mai', 'alindada', 'avengers', 'malena', 'a', 'abe', 'beltran', 'azzupary', 'pamparo-castrillo', 'rosalinda', 'arciento', 'q', 'umagang', 'claire', 'riezel', 'martina', 'pangilinan-po', 'gerard', 'buge', 'paz', 'castillejos',
-         'sd', 'shiela', 'voluntarioso', 'navarroanj', 'johnell', 'josephine', 'quiño', 'orana', 'yvonne', 'emmanuel', 'caudilla', 'modesto', 'mabel', 'dagaraga', 'mallari', 'glen', 'jian', 'josie', 'runas', 'zepeda', 'amaloveina', 'yucai', 'lu', 'dolly', 'romarico', 'santelices', 'taylo', 'esem', 'rara', 'jady', 'balungcas', 'barbosa', 'dacumos', 'vhie', 'notario', 'diko', 'jvr', 'dan', 'jadloc', 'tanzie', 'flordeliza', 'caampued', 'cendy', 'baillo', 'alojchristine', 'dalusong', 'adri', 'odee', 'son', 'rhym', 'bryan', 'vidal', 'ruby', 'usman', 'jenina', 'james', 'tere', 'fhei', 'l', 'alexis', 'nerecena', 'cammille', 'wong', 'jefferson', 'mead', 'lheyann', 'bong', 'alice', 'deguzman', 'em', 'guinto', 'jenn', 'rachelle', 'cecille', 'rojas', 'alojadoacatherine', 'katrina', 'sardeniola', 'guilangue', 'macabanti-geronimo', 'marcos', 'girl', 'nanit', 'aldrin', 'marius', 'angulo', 'rey', 'ibarra', 'ernie', 'garcia', 'gonzales', 'robert', 'pajiji', 'kenn', 'keno', 'lagumbay', 'mandz', 'zanchez', 'charlyne', 'daniel', 'ren', 'dominguiano', 'gutierrez', ',buan', 'generoso', 'dahleng', 'lorgene', 'ella', 'rj', 'benjamin', 'torres', 'harold', 'clarence', 'alban', 'lawrence', 'ganzon', 'caronan', 'perucho', 'fred', 'mikhail', 'jhenni', 'jill', 'yuri', 'carl', 'ramoy', 'asi', 'romualdo', 'ariane', 'princess', 'esteves', 'asmaira', 'marla', 'yara', 'dorlyn', 'ate', 'watisdis', 'g', 'cañeda', 'cadiz', 'barbara', 'helen', 'gelyn', 'marlo', 'david', 'katniss', 'nalzaro', 'mae', 'isa', 'quinto', 'tyntine', 'legaspi', 'nebrida', 'cangas', 'paclibar', 'albarido', 'pangilinan', 'dione', 'justine', 'ong', 'famor', 'jesus', 'bernadette', 'pamparo-castrillolouise', 'mel', 'jazz', 'pablo', 'rona', 'jerizza', 'scent', 'mervyn', 'lazala', 'reinier', 'combate', 'ian', 'castaneda', 'castillo', 'imelda', 'perado', 'isadel', 'pilarca', 'magcawas', 'ramssel', 'aldwin', 'patiño', 'mayvelle', 'gilbert', 'john', 'jen', 'genesis', 'rosario', 'cabral', 'vargasmaglalang', 'padrinao-villanueva', 'acogido', 'taylo-', 'villanueva', 'silang', 'carmi', 'valencia', 'grace', 'valdz', 'rollie', 'king', 'vienne', 'man-on', 'jayjay', 'treb', 'maricel', 'manlapaz', 'capili', 'cristobal', 'abs-cbn', 'genson', 'salazar', 'lourdes', 'sophia', 'and', 'ver-dee', 'jinky', 'aquino', 'ana', 'lhene', 'ann', 'ram', 'francial', 'dungog-romagos', 'canlapan', 'mararac', 'quilinguing', 'herlene', 'kevin', 'ray', 'poblete', 'sotelo', 'ybanez', 'lamsen', 'maximo', 'mia', 'lim', 'ecalnir', '-', 'oh', 'roehl', 'aisha', 'chiong', 'fajilan', 'rowen', 'arazas', 'jhen', 'fayot', 'emalyn', 'mamhie', 'santiago', 'mariz', 'abella', 'manette', 'alcantara', 'unang', 'hazel', 'maris', 'jeph', 'jazziel', 'kelly', 'caponpon', 'sapo', 'charm', 'villafuerte', 'bh3', 'marie', 'fria', 'maria', 'don', 'besas', 'ofiana', 'flor', 'ylime', 'm', 'paru', 'saguinsin', 'lujera', 'bulan', 'charmaeine', 'brey', 'renier', 'gabaleo', 'ramososhasha', 'daluz', 'arjaybaluyot', 'zacarias', 'ralph', 
-         'charles', 'niel', 'jarder', 'troy', 'merin', 'perlas', 'sarenbeniga', 'cabeliza', 'sangalang', 'florentino', 'kale', 'figueroa', 'cyril', 'leigh', 'cherryl', 'jay', 'jabee', 'locsin', 'ayen', 'mitzi', 'tanya', 'aldo', 'botabara', 'alocha', 'jam', 'gideon', 'aby', 'vierneza', 'caroline', 'sieg', 'ruiz', 'rica', 'boris', 'angieline', 'adviento', 'couz', 'jomar', 'criste', 'de', 'dc', 'b', 'cora', 'dy', 'uy', 'kayganda', 'gen', 'rondez', 'alexander', 'buan', 'dianne', 'casabuena', 'joanne', 'emm', 'corvin', 'lala', 'remata', 'charleane', 'felipe', 'jaime', 'roger', 'aris', 'jeosh', 'allito', 'dagtaagta', 'leynes', 'bam', 'jovie', 'khristine', 'rfl', 'carrillo', 'eiram', 'nixx', 'agulto', 'cao', 'buscagan', 'isabel', 'roque', 'ablen', 'leslie', 'rmg', 'ricyet', 'bautista', 'troilus', 'nimfa', 'angie', 'corro', 'caster', 'cheska', 'dexter', 'jennyrose', 'mitch', 'gayjow', 'apol', 'arlyn', 'mamayay', 'verbo', 'rito', 'aranza', 'isha', 'morales', 'marvin', 'zabala', 'palogan', 'jasmin', 'baltar', 'tania', 'dhianne', 'rimas', 'jov', 'domo', 'joy', 'herrera', 'valerie', 'antoniano', 'jr', 'hirit', 'javierariane', 'nikka', 'manalili', 'yba', 'selene', 'news', 'ravela', 'lopez', 'loudine', 'manabat', 'c', 'javier', 'almonguera', 'jm', 'jocelyn', 'edgar', 'vincharl', 'shankanecai', 'soriano', 'tolentino', 'milo', 'jonas', 's', 'com', 'eto', 'con', 'ayeeh', 'oswa', 'mangilit', 'co', 'jeff', 'toni', 'cinth', 'durante', 'cla', 'guzman', 'karen', 'rae', 'esbra', 'kev', 'baccay', 'magbanua', 'sherwin', 'san', 'carpio', 'rrvee', 'kinjan', 'karlo', 'lanymay', 'odey', 'karla', 'elmer', 'teus', 'kasten', 'mark', 'olave', 'raffy', 'mikee', 'yan', 'noel', 'razzie', 'pj', 'quintong', 'zobel', 'mary', 'caloi', 'hernandez', 'roselyn', 'mike', 'cecile', 'dhey', 'chua', 'gemma', 'mahusay', 'dhes', 'andrew', 'gan', 'fritz', 'andrei', 'dote', 'taboadabas', 'mhee', 'quilapio', 'aileen', 'kerstin', 'judee', 'remy', 'deden', 'cepriano', 'calderonukaren', 'castro', 'n', 'dacanay', 'capinpin', 'aldie', 'margie', 'maravilla-casacop', 'vicky', 'jerald', 'drewan', 'archie', 'veronica', 'parugrug', 'bustarde', 'portugal', 'susana', 'cabangon', 'veras', 'shamy', 'yam', 'ii', 'rio', 'oquindo', 'majano', 'perez', 'jingco', 'zandro', 'boom', 'zaldy', 'ayuban', 'ignacio', 'santos', 'guzman-francisco', 'cascabel', 'pau', 'aldana', 'belle', 'edwin', 'macalalad', 'bella', 'leoniño', 'rules', 'ocampo', 'jepher', 'naces', 'claridad', 'miya', 'pam', 'paoner', 'brigente', 'calacday', 'raymond', 'leonie', 'condes', 'talaban', 'kit', 'palabrica', 'cudiamat', 'kim', 'dayan', 'villegas', 'vargas', 'gaspay', 'villa', 'arra', 'albesa', 'blanco', 'meazel', 'antonio', 'portillo', 'jessica', 'toy', 'espiritu', 'llanto', 'jayvee', 'legera', 'denjie', 'burgos', 'alvin', 'bonecille', 'jexter', 'rhoen', 'hervas', 'celzo', 'bes', 'jaul', 'oxford', 'jonard', 'ethel', 'patsy', 'laurel', 'paul', 'montañez', 'riachelle', 'rochelle', 'trins', 'bry', 'rose', 'gma', 
-         'gorme', 'tin', 'balubar', 'rubio', 'bobis', 'samuel', 'tuway', 'viansuaverdez', 'ada', 'bagacina', 'yopo', 'panara-ag', 'alcala', 'venzon', 'jake', 'clirkz', 'sunico', 'vanessa', 'granados', 'sabdaniaira', 'cruz', 'recy', 'malubay', 'tolentino-miano', 'alida', 'lanie', 'enriquez', 'mariah', 'margiemel', 'popoy', 'rozend', 'christine', 'verner', 'paradagomez', 'salinas', 'edjen', 'cayabyab', 'arthur', 'gumana', 'rhodora', 'talosig', 'martin', 'ivan', 'mamagat', 'chico', 'love', 'salih', 'dimapilis', 'manaay', 'lazarte', 'macario', 'shen', 'chrissele', 'tulod', 'denice', 'nagal', 'donald', 'francisco', 'rhazel', 'gracia', 'dimaano', 'cebrero', 'bagtas', 'alfaize', 'marzan', 'caredz', 'manahan', 'isagan', 'cavada', 'masaybeng', 'irma', 'rmarie', 'bagos', 'jelka', 'mhendie', 'oblanca', 'cnn', 'anne', 'dizon', 'marit', 'anna', 'arnel', 'mante', 'sarah', 'abanes', 'emms', 'gmax', 'briones', 'bogie', 'reza', 'palisoc', 'marquez', 'rosal', 'oliver', 'pascual', 'yolly', 'ross', 'francis', 'diosa', 'russell', 'shine', 'conrad', 'cerafica', 'justin', 'adzwiya', 'linsangan', 'jay-ar', 'o', 'hilarion', 'wolf', 'kpn', 'tomo', 'segovia', 'maurin', 'hazey', 'dulay', 'reycie', 'carolyn', 'costumbrado', 'obrero', 'miranda', 'catherine', 'retchie', 'gleng', 'yap', 'martinez', 'lacerna', 'paches', 'magbitang', 'mauie', 'diala', 'joyce', 'arvin', 'gomez', 'cajeta', 'joemar', 'jing', 'qadriyyah', 'delos', 'ortiz', 'neser', 'pauline', 'loo', 'ponce', 'imperial', 'joseph', 'daniell', 'shella', 'dioso', 'jayron', 'jane', 'pilares', 'labaco', 'gil', 'dutchque', 'vicente', 'pauyon', 'bobadilla', 'gulmatico', 'vasquez', 'arceta', 'kristian', 'jun', 'mc', 'marge', 'concepcion', 'mercado', 'funda', 'lans', 'pepperminty', 'khim', 'jumawid', 'ladines', 'alvero', 'kiitt', 'erick', 'paires', 'salome', 'angcao', 'maglalang', 'merilyn', 'manuel', 'taguibao', 'madz', 'bermas', 'krizzie', 'molato', 'kathy', 'ae', 'chad', 'ghaneza', 'sarsola', 'russelle', 'draculan', 'al', 'añonuevo', 'au', 'lher', 'aristotle', 'kho', 'abarilla', 'grafil', 'lyn', 'claudine', 'eric', 'fajie', 'ronil', 'tita', 'polangco', 'guarin', 'evilla', 'sumampong', 'quinjacob', 'abigail', 'lendy', 'nick', 'jona', 'feliciano', 'nico', 'oscar', 'rosalita', 'njie', 'rigonan', 'riam', 'garcera', 'tess', 'cyrmyn', 'jestoni', 'cabrera', 'chavez', 'ku', 'iza', 'janella', 'papa', 'acosta', 'medina', 'regalario', 'margaret', 'maureen', 'macallop', 'lacaba', 'abanes-escalona', 'terry', 'sai-rex', 'cabuang', 'valderama', 'urbano', 'jones', 'miles', 'sayson', 'news5', 'geraldine', 'hadap', 'dumalag', 'krystyn', 'aiko', 'elizalde', 'dinia']
-
-	names_db = Names()
-	names_db.name_list = names
-	names_db.save()
 
 def get_keyword(request):
 	if request.method == 'POST':
@@ -91,7 +82,6 @@ def get_keyword(request):
 			request.session["quick_stats"] = quick_stats
 			diag_chartdata = {}
 			request.session['chartdata'] = prepare_chartdata(df)
-			print("chart data size: ", sys.getsizeof(request.session['chartdata']))
 			diag_chartdata = create_diag_chartdata(request.session['chartdata'])
 
 			request.session["diag_chartdata"] = diag_chartdata
@@ -194,7 +184,6 @@ def ajax_login_user(request):
 	if request.method == 'POST':
 		if request.is_ajax():
 			try:
-				print("inside try")
 				user_credentials = json.loads(request.POST.get('user_credentials'))
 				user = User.objects.get(email=user_credentials['email'])
 				# print("usercontents", dict(user.to_mongo()))
@@ -318,54 +307,55 @@ def load_snapshot(request):
 			if snapshot_id is not None:
 				# snapshot_id = snapshotlistform.cleaned_data['snapshotchoices']
 				# Set values from loaded snapshot
-				for snapshotObj in Snapshot.objects(_id=snapshot_id):
+				for snapshot_obj in Snapshot.objects(_id=snapshot_id):
 					logging.info("Iterating data using snapshot id: %s", snapshot_id)
-					request.session['search_keyword'] = snapshotObj.keyword
-					request.session['df'] = pd.DataFrame(snapshotObj.extracted_data)
+					request.session['search_keyword'] = snapshot_obj.keyword
+					request.session['df'] = pd.DataFrame(snapshot_obj.extracted_data)
 					# chartdata = {}
 					chartdata = ChartData()
-					chartdata.timeline = pd.DataFrame(snapshotObj.chart_data[0]['timeline']).to_dict('list')
-					chartdata.source = pd.DataFrame(snapshotObj.chart_data[0]['source']).to_dict('list')
-					chartdata.composition = pd.DataFrame(snapshotObj.chart_data[0]['composition']).to_dict('list')
-					chartdata.hashtags = snapshotObj.chart_data[0]['hashtags']
-					chartdata.sentiments = pd.DataFrame(snapshotObj.chart_data[0]['sentiments']).to_dict('list')
-					chartdata.polarity_table = snapshotObj.chart_data[0]['polarity_table'][0] # Access the dict inside the list thats why theres another [0] after the polarity table
-					# chartdata['timeline'] = pd.DataFrame(snapshotObj.chart_data[0]['timeline']).to_dict('list')
-					# chartdata['source'] = pd.DataFrame(snapshotObj.chart_data[0]['source']).to_dict('list')
-					# chartdata['composition'] = pd.DataFrame(snapshotObj.chart_data[0]['composition']).to_dict('list')
-					# chartdata['hashtags'] = snapshotObj.chart_data[0]['hashtags']
-					# chartdata['sentiments'] = pd.DataFrame(snapshotObj.chart_data[0]['sentiments']).to_dict('list')
-					# chartdata['polarity_table'] = snapshotObj.chart_data[0]['polarity_table'][0] # Access the dict inside the list thats why theres another [0] after the polarity table
+					chartdata.timeline = pd.DataFrame(snapshot_obj.chart_data[0]['timeline']).to_dict('list')
+					chartdata.source = pd.DataFrame(snapshot_obj.chart_data[0]['source']).to_dict('list')
+					chartdata.composition = pd.DataFrame(snapshot_obj.chart_data[0]['composition']).to_dict('list')
+					chartdata.hashtags = snapshot_obj.chart_data[0]['hashtags']
+					chartdata.sentiments = pd.DataFrame(snapshot_obj.chart_data[0]['sentiments']).to_dict('list')
+					chartdata.polarity_table = snapshot_obj.chart_data[0]['polarity_table'][0] # Access the dict inside the list thats why theres another [0] after the polarity table
+					# chartdata['timeline'] = pd.DataFrame(snapshot_obj.chart_data[0]['timeline']).to_dict('list')
+					# chartdata['source'] = pd.DataFrame(snapshot_obj.chart_data[0]['source']).to_dict('list')
+					# chartdata['composition'] = pd.DataFrame(snapshot_obj.chart_data[0]['composition']).to_dict('list')
+					# chartdata['hashtags'] = snapshot_obj.chart_data[0]['hashtags']
+					# chartdata['sentiments'] = pd.DataFrame(snapshot_obj.chart_data[0]['sentiments']).to_dict('list')
+					# chartdata['polarity_table'] = snapshot_obj.chart_data[0]['polarity_table'][0] # Access the dict inside the list thats why theres another [0] after the polarity table
 					request.session['chartdata'] = chartdata
 					diag_chartdata = create_diag_chartdata(chartdata)
 					request.session['diag_chartdata'] = diag_chartdata
 
 					# Returns a list of insights
-					insights_fromdb = snapshotObj.insights
+					insights_fromdb = snapshot_obj.insights
 					# Extract insights from list of insights
 					if insights_fromdb is not None:
 						for idx, insights in enumerate(insights_fromdb):
 							insight[idx] = insights
 
-					# wc_image = snapshotObj.wordcloud_image.read()
-					# wc_image_content_type = snapshotObj.wordcloud_image.content_type
-					quick_stats_data = snapshotObj.quick_stats
+					# wc_image = snapshot_obj.wordcloud_image.read()
+					# wc_image_content_type = snapshot_obj.wordcloud_image.content_type
+					quick_stats_data = snapshot_obj.quick_stats
 					request.session['quick_stats_db'] = quick_stats_data
-					request.session['influencers_data'] = snapshotObj.influencers_data
-					request.session['influential_data'] = snapshotObj.influential_data
+					request.session['influencers_data'] = snapshot_obj.influencers_data
+					request.session['influential_data'] = snapshot_obj.influential_data
 					request.session['quick_stats'] = format_quick_stats_comma(quick_stats_data)
 					
 					# PIL Image way 
-					# print("snapshotObj.wordcloud_image", snapshotObj.wordcloud_image.width)
-					request.session['wc_image_str'] = utils.convert_to_base64(snapshotObj.wordcloud_image.read())
-					# request.session['wc_image_str'] = utils.convert_to_base64(snapshotObj.wordcloud_image)
+					# print("snapshot_obj.wordcloud_image", snapshot_obj.wordcloud_image.width)
+					request.session['wc_image_str'] = utils.convert_to_base64(snapshot_obj.wordcloud_image.read())
+					# request.session['wc_image_str'] = utils.convert_to_base64(snapshot_obj.wordcloud_image)
 					# Base64 way
-					# request.session['wc_image_str'] = snapshotObj.wordcloud_image
-					snapshot_lda_data = utils.restore_lda_keynames(snapshotObj.lda_data)
+					# request.session['wc_image_str'] = snapshot_obj.wordcloud_image
+					snapshot_lda_data = utils.restore_lda_keynames(snapshot_obj.lda_data)
 					request.session["lda_data"] = snapshot_lda_data
 				
 				# snapshotlistform = SnapshotListForm(initial={'max_number': '3'})
 				request.session['selected_snapshot'] = snapshot_id
+				request.session['current_snapshot'] = snapshot_id
 				snapshotlistform = SnapshotListForm(request=request)
 				# snapshotListFormInstance.fields['snapshotchoices'].initial = [snapshot_id]
 				messages.success(request,constants.LOADING_SNAPSHOT_SUCCESS)
@@ -419,12 +409,15 @@ def return_geocode(request):
 def generate_wordcloud_image(request):
 	# image_filename = "wordcloud-" + request.session["user_id"] + ".png"
 	# image_path = os.path.join(settings.BASE_DIR, "SMAApp\\static\\images\\wordcloud\\" + image_filename)
-	if request.session['isSnapshot'] != 'true':
+	# if request.session['isSnapshot'] != 'true':
 		# if not os.path.isfile(image_path):
-		print("image not in path")
-		pil_img_str = wordcloudscript.return_wordcloud(request.session["df"])
-		print("img is created")
-		return pil_img_str #HttpResponse(img_str)
+	print("Creating img")
+	wcmask_url = None
+	if 'wcmask_url' in request.session:
+		wcmask_url = request.session['wcmask_url']
+	pil_img_str = wordcloudscript.return_wordcloud(wcmask_url, request.session["df"])
+	print("img is created")
+	return pil_img_str #HttpResponse(img_str)
 		# else:
 		# 	return HttpResponse(True)
 	# else:
@@ -454,16 +447,20 @@ def generate_lda_page(request):
 	# 	return HttpResponse(html)
 
 def start_generate_lda(request):
-    df = request.session["df"]
-    lda_task_id = tasks.generate_lda_data.delay(df.to_json())
-    request.session["lda_task_id"] = lda_task_id
+	# if request.method == 'POST':
+	# 	if request.is_ajax():
+	# 		num_topics = request.POST.get('num_topics')
+	df = request.session["df"]
+	num_topics = 4
+	lda_task_id = tasks.generate_lda_data.delay(num_topics, df.to_json())
+	request.session["lda_task_id"] = lda_task_id
     # if request.session.get("lda_data_id",False):
     #     revoke(str(request.session.get('lda_data_id')),terminate=True,signal='SIGKILL')
     #     print("terminated")
     # request.session["lda_data"] = lda_task_id.get()
     # for key, value in request.session.items(): print('{}'.format(key))
     # request.session.modified = True
-    return HttpResponse(True)
+	return HttpResponse(True)
 
 def check_lda_status(request):
 	if "lda_task_id" in request.session and "lda_data" not in request.session:
@@ -486,93 +483,101 @@ def save_snapshot(request):
 			# insights = request.POST.getlist('insight')
 			snapshot_name = snapshot_ajax_data['snapshotName']
 			insights = snapshot_ajax_data['insights']
-			chartdatalist = []
-			
-			# diagnostics data
-			df = request.session['df']
-			lda_data = request.session["lda_data"]
-			lda_data = utils.remove_dots_on_key(lda_data) #request.session["lda_data"]
 
-			# # Convert df to dict to save it to db in a Dictfield
-			# # dict_df = 
-			# # diagnostics_data = request.session['engagements_data']
+			if 'current_snapshot' in request.session:
+				updated = Snapshot.objects.filter(id=request.session['current_snapshot']).update(insights=insights)
+				if updated == 1:
+					messages.success(request, constants.INSIGHTS_UPDATE_SUCCESS)
+					return HttpResponse(status=200)
+			else:
+				chartdatalist = []
+				
+				# diagnostics data
+				df = request.session['df']
+				lda_data = request.session["lda_data"]
+				lda_data = utils.remove_dots_on_key(lda_data) #request.session["lda_data"]
 
-			# chartdata = {}
-			chartdata = ChartData()
-			chartdata = request.session['chartdata']
-			chartdatafordb = {}
-			chartdatafordb["timeline"] = pd.DataFrame(chartdata.timeline).to_dict(orient='records')
+				# # Convert df to dict to save it to db in a Dictfield
+				# # dict_df = 
+				# # diagnostics_data = request.session['engagements_data']
 
-			# Data for source donut chart (Diagnostics Page)
-			chartdatafordb['source'] = pd.DataFrame(chartdata.source).to_dict(orient='records')
+				# chartdata = {}
+				chartdata = ChartData()
+				chartdata = request.session['chartdata']
+				chartdatafordb = {}
+				chartdatafordb["timeline"] = pd.DataFrame(chartdata.timeline).to_dict(orient='records')
 
-			# Data for composition donut chart (Diagnostics Page)
-			chartdatafordb['composition'] = pd.DataFrame(chartdata.composition).to_dict(orient='records')
+				# Data for source donut chart (Diagnostics Page)
+				chartdatafordb['source'] = pd.DataFrame(chartdata.source).to_dict(orient='records')
 
-			chartdatafordb['hashtags'] = chartdata.hashtags
+				# Data for composition donut chart (Diagnostics Page)
+				chartdatafordb['composition'] = pd.DataFrame(chartdata.composition).to_dict(orient='records')
 
-			# Data for polarity donut chart (Sentiments Page)
-			chartdatafordb['sentiments'] = pd.DataFrame(chartdata.sentiments).to_dict(orient='records')
+				chartdatafordb['hashtags'] = chartdata.hashtags
 
-			# Set Polarity into a list so it can be saved as an array
-			polarity_table_holder = []
-			polarity_table_holder.append(chartdata.polarity_table)
-			chartdatafordb['polarity_table'] = polarity_table_holder
-			chartdatalist.append(chartdatafordb)
+				# Data for polarity donut chart (Sentiments Page)
+				chartdatafordb['sentiments'] = pd.DataFrame(chartdata.sentiments).to_dict(orient='records')
 
-			# for key, value in request.session.items(): print('{}'.format(key))
-			snapshot = Snapshot()
-			snapshot.keyword = request.session['search_keyword']
-			snapshot.platform = 'twitter'
-			snapshot.snapshot_name = snapshot_name
-			snapshot.insights = insights
-			snapshot.extracted_data = json.loads(df.to_json(orient='records'))
-			snapshot.quick_stats = request.session['quick_stats_db']
-			snapshot.influencers_data = request.session['influencers_data']
-			snapshot.influential_data = request.session['influential_data']
-			snapshot.date_extracted = df['dateextracted'][0]
+				# Set Polarity into a list so it can be saved as an array
+				polarity_table_holder = []
+				polarity_table_holder.append(chartdata.polarity_table)
+				chartdatafordb['polarity_table'] = polarity_table_holder
+				chartdatalist.append(chartdatafordb)
 
-			# Temporary Image way
-			# Get image as temp
-			tempImgObj = utils.create_temp_img_file(request.session['pil_image_str'])
-			snapshot.wordcloud_image.put(tempImgObj, content_type='image/png')
+				# for key, value in request.session.items(): print('{}'.format(key))
+				snapshot = Snapshot()
+				snapshot.keyword = request.session['search_keyword']
+				snapshot.platform = 'twitter'
+				snapshot.snapshot_name = snapshot_name
+				snapshot.insights = insights
+				snapshot.extracted_data = json.loads(df.to_json(orient='records'))
+				snapshot.quick_stats = request.session['quick_stats_db']
+				snapshot.influencers_data = request.session['influencers_data']
+				snapshot.influential_data = request.session['influential_data']
+				snapshot.date_extracted = df['dateextracted'][0]
 
-			# Save wc_image as binary. ex: b'iVBOR.....' with the b' infront
-			# snapshot.wordcloud_image = request.session['wc_image_str']
-			snapshot.chart_data = chartdatalist #pd.DataFrame(globals.chartdata).to_json(orient='records') #json.loads(chartdatalist)
-			# lda_list = []
-			# lda_list.append(lda_data)
-			snapshot.lda_data = lda_data
-			snapshot.owner = request.session['loggedin_userid']
-			try:
-				snapshot.save()
-			except ValidationError as e:
-				messages.error(request,constants.SAVING_ERROR)
-				return HttpResponse(status=403)
+				# Temporary Image way
+				# Get image as temp
+				tempImg_obj = utils.create_temp_img_file(request.session['pil_image_str'])
+				snapshot.wordcloud_image.put(tempImg_obj, content_type='image/png')
 
-			# snapshot.reload()
-			print("Snapshot successfully saved")
-			snapshotObject = {}
-			if snapshot.pk is not None:
-				# Save snapshot id for reference
-				snapshotObject["value"] = snapshot.pk
-				snapshotObject["text"] = snapshot_name
-				User.objects(_id=request.session['loggedin_userid']).update_one(push__snapshots=snapshotObject)
-				print("Snapshot saved in user object")
-				# user = User()
-				# user.snapshots = [snapshotObject]
-				# user.save()
-				# user.snapshots = [snapshot.pk]
-					
-				# Update dropdown's snapshot list
-				# if request.session.get('snapshot_list',[]):
-				snapshot_list = request.session['snapshot_list']
-				snapshot_list.append((snapshotObject['value'],snapshotObject['text']))
-				request.session['snapshot_list'] = snapshot_list
-				snapshotListForm = SnapshotListForm(request=request)
-				snapshotListForm.fields['snapshotchoices'].choices = request.session['snapshot_list'] #queries.get_snapshot_list(request.session['loggedin_userid'])
-				messages.success(request,constants.SAVING_SUCCESS)
-				return HttpResponse(status=200)
+				# Save wc_image as binary. ex: b'iVBOR.....' with the b' infront
+				# snapshot.wordcloud_image = request.session['wc_image_str']
+				snapshot.chart_data = chartdatalist #pd.DataFrame(globals.chartdata).to_json(orient='records') #json.loads(chartdatalist)
+				# lda_list = []
+				# lda_list.append(lda_data)
+				snapshot.lda_data = lda_data
+				snapshot.owner = request.session['loggedin_userid']
+				try:
+					snapshot.save()
+				except ValidationError as e:
+					messages.error(request,constants.SAVING_ERROR)
+					return HttpResponse(status=403)
+
+				# snapshot.reload()
+				print("Snapshot successfully saved")
+				snapshotObject = {}
+				if snapshot.pk is not None:
+					request.session['current_snapshot'] = snapshot.id
+					# Save snapshot id for reference
+					snapshotObject["value"] = snapshot.pk
+					snapshotObject["text"] = snapshot_name
+					User.objects(_id=request.session['loggedin_userid']).update_one(push__snapshots=snapshotObject)
+					print("Snapshot saved in user object")
+					# user = User()
+					# user.snapshots = [snapshotObject]
+					# user.save()
+					# user.snapshots = [snapshot.pk]
+						
+					# Update dropdown's snapshot list
+					# if request.session.get('snapshot_list',[]):
+					snapshot_list = request.session['snapshot_list']
+					snapshot_list.append((snapshotObject['value'],snapshotObject['text']))
+					request.session['snapshot_list'] = snapshot_list
+					snapshotListForm = SnapshotListForm(request=request)
+					snapshotListForm.fields['snapshotchoices'].choices = request.session['snapshot_list'] #queries.get_snapshot_list(request.session['loggedin_userid'])
+					messages.success(request,constants.SAVING_SUCCESS)
+					return HttpResponse(status=200)
 		else:
 			messages.error(request,constants.SAVING_ERROR)
 			return HttpResponse(status=401)
@@ -687,6 +692,8 @@ def open_sentiments(request):
 
 @login_required
 def open_topics(request):
+	# if request.method == 'POST' and 'uploadwcMaskButton' in request.POST:
+	# 	upload_wordcloud_mask(request)
 	if request.method == 'POST':
 		get_keyword(request)
 	else:
@@ -697,8 +704,6 @@ def open_topics(request):
 		# data["barchart"] = demo_horizontalBarChart(chartdata)
          
 		sessionid = request.session["user_id"]
-				#path = "C:/Users/christian.dy/Documents/GitHub/SMALab/SMAProject/SMAApp/templates/lda/"
-		#imagePath = "C:/Users/christian.dy/Documents/GitHub/SMALab/SMAProject/SMAApp/static/images/wordcloud/"
 		
 		# Checks if lda.html or wordcloud image has not yet been been created
 		# if not os.path.isfile(imagePath) or not os.path.isfile(ldaPath):
@@ -717,6 +722,23 @@ def open_topics(request):
 	{'tophashtagsdata':data["barchart"], 'sessionid':sessionid,
 	'searchform':searchform,'snapshotlistform':snapshotlistform,
 	'loginform':loginform,'username':username,'wc_image':request.session['wc_image_str'].decode('utf-8')})
+
+# FileSystemStorage already appends a string to the uploaded filename
+# so that it won't be overwritten if another file with the same filename has been uploaded
+def upload_wordcloud_mask(request):
+	if request.is_ajax():
+		if request.method == 'POST': # and request.FILES['wc_mask']:
+			wc_mask = request.FILES['wc_mask']
+			fs = FileSystemStorage()
+			filename = fs.save(wc_mask.name,wc_mask)
+			uploaded_file_url = fs.url(filename)
+			request.session['wcmask_url'] = uploaded_file_url
+			#  Recreate image and set it to session.
+			request.session['pil_image_str'] = generate_wordcloud_image(request)
+			request.session['wc_image_str'] = utils.convert_to_base64(request.session['pil_image_str'])
+			path = settings.MEDIA_ROOT + "\\" + filename
+			os.remove(path)
+			return HttpResponse(request.session['wc_image_str'])
 
 def format_quick_stats_comma(data):
  	return	{'users': "{:,}".format(data['users']),

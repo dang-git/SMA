@@ -649,3 +649,15 @@ left: 0;
 body > #footerSection{
     max-width: 100%;
 }
+
+#imagePlaceholder {
+    display: none;
+}
+
+.lda-topic-count{
+    background: #e8e8e8;
+}
+
+/* #ldaPlaceholder{
+    display: none;
+} */

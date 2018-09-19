@@ -23,7 +23,7 @@ class Snapshot(DynamicDocument):
     owner = ObjectIdField() # ReferenceField('User')
     date_created = DateTimeField(default=datetime.datetime.utcnow)
 
-    meta = {'db_alias': 'smadb'}
+    meta = {'db_alias': 'default'}
 
 class User(Document):
     _id = ObjectIdField()
@@ -36,12 +36,13 @@ class User(Document):
     ## USERNAME_FIELD = 'email'
     ## REQUIRED_FIELDS = ['username','address','license_type']
     
-    meta = {'db_alias': 'smadb'}
+    meta = {'db_alias': 'default'}
 
 #UNUSED
-class WordcloudImage(Document):
-    image = FileField()
-    session_owner = ObjectIdField()
+class WordCloudImageMask(Document):
+    image = ImageField()
+    owner = StringField()
+    uploaded_at = DateTimeField(default=datetime.datetime.utcnow)
 
 #UNUSED
 class Organization(Document):

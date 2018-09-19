@@ -4,10 +4,10 @@ from SMAApp import lda, engagements, hashtags, wordcloudscript
 import pandas as pd
 
 @task
-def generate_lda_data(df):
+def generate_lda_data(num_topics, df):
     print("lda started")
     data = pd.read_json(df)
-    lda_data = lda.lda_model(data)
+    lda_data = lda.lda_model(num_topics,data)
     return lda_data
 
 @task
@@ -19,12 +19,11 @@ def generate_sentiments_data(df):
     print("polar end")
     return sentiments #int(polarityTable)
 
-@task
-def generate_wordcloud_image(df):
-    print("Image creation started")
-    img_str = wordcloudscript.return_wordcloud(df)
-    return img_str
-
+# @task
+# def generate_wordcloud_image(df):
+#     print("Image creation started")
+#     img_str = wordcloudscript.return_wordcloud(df)
+#     return img_str
 @task
 def prepareChartData(df):
     print("preparing chart data")

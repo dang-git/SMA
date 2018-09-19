@@ -43,8 +43,12 @@ urlpatterns = [
     # Username exists checker
     url(r'^ajax/validate_registration_email/', views.validate_registration_email, name='validate_registration_email'),
 
+    # Set Number of Topics
+    # url(r'^ajax/set_topics_count/', views.start_generate_lda, name='set_topics_count'),
+    
     # Wordcloud Mask Upload
     url(r'^upload/wordcloud_mask/', views.upload_wordcloud_mask, name='upload_wordcloud_mask'),
+    
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

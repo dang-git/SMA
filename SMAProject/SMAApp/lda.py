@@ -16,6 +16,8 @@ from django.conf import settings
 import pyLDAvis
 import pyLDAvis.gensim
 import os.path
+from .EpochLogger import EpochLogger
+# from gensim.models.callbacks import PerplexityMetric
 
 stopwords = nltk.corpus.stopwords.words('english')
 stopwords.extend(["rt", "n't", "'s", "ve", "amp"])
@@ -56,10 +58,12 @@ def further_process(sentences):
     corpus = [dictionary.doc2bow(text) for text in texts]
     return corpus, dictionary
 
-def lda_model(data):
+def lda_model(num_topics,data):
     corpus, dictionary = further_process(data.tweet)
-    lda = models.LdaModel(corpus, num_topics=4, id2word=dictionary, update_every=5,
-                          chunksize=10000, passes=100)
+    epoch_logger = EpochLogger()
+    # perplexity_logger = PerplexityMetric(corpus=corpus, logger='shell')
+    lda = models.LdaModel(corpus, num_topics=num_topics, id2word=dictionary, update_every=5,
+                          chunksize=10000, passes=100, callbacks=[epoch_logger])
     topics_matrix = lda.show_topics(formatted=False, num_words=20)
     all_topics = {}
     for i in topics_matrix:

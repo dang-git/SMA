@@ -36,7 +36,6 @@ $(document).ready(function () {
             (window.sessionStorage['lda_data'] == null ||
                 typeof window.sessionStorage['lda_data'] == "undefined")) {
             generateldaData();
-            // $('#ldaPage').css("display", "none");
         }
         else if ((window.sessionStorage['lda_data'] != null &&
             (window.sessionStorage['lda_page'] == null ||
@@ -212,6 +211,19 @@ function validate_registration_email(){
 
 $('#reg_email_id').on('keydown',debounce(validate_registration_email,2000,false));
 
-// $('#registerBtn').on('click', function() {
-//     $('#registrationForm').submit();
-// })
+$('#registerBtn').on('click', function() {
+    $('#registrationForm').submit();
+})
+
+// Unused
+// Enable Setting the number of topics
+function appendAddNumberofTopics() {
+    var addTopicsDiv = ['<label for="ldavis_el84844464070221763284634421-topic-count" style="font-family: sans-serif; font-size: 14px">',
+        'Topic Count:',
+        '<span id="ldavis_el84844464070221763284634421-topic-value">',
+        '</span>',
+        '</label>',
+        '<input style="width: 50px" type="text" min="0" max="4" step="1" id="ldavis_el84844464070221763284634421-topic-count">',
+        '<button id="execute-topic-count" style="margin-left: 5px"> Set Topic </button>']
+    $('#ldavis_el84844464070221763284634421-top').prepend(addTopicsDiv);
+}

@@ -597,32 +597,55 @@ $('#uploadwcMaskForm').on('submit', function (e) {
     var previousImage;
     // var file = jQuery('#uploadwcMask').files[0];
     // formdata.append("image", file);
-    $.ajax({
-        beforeSend: function (xhr, settings) {
-            $('#imagePlaceholder').css("display", "block");
-            $('#wordcloudImage').css("display", "none");
-            previousImage = $('#wordcloudImage').attr('src')
-        },
-        url: "/upload/wordcloud_mask/",
-        type: "POST",
-        data: formData,
-        processData: false, // Don't process the files
-        contentType: false, // Set content type to false as jQuery will tell the server its a query string request
-        success: function (data) {
-            if (pathname == "topics") {
-                $('#imagePlaceholder').css("display", "none");
-                $('#wordcloudImage').css("display", "block");
-                $('#wordcloudImage').attr({ "src": "data:img/png;base64," + data });
+    if (!$('#uploadwcMask')[0].files.length == 0) {
+        $.ajax({
+            beforeSend: function (xhr, settings) {
+                $('#imagePlaceholder').css("display", "block");
+                $('#wordcloudImage').css("display", "none");
+                previousImage = $('#wordcloudImage').attr('src')
+            },
+            url: "/upload/wordcloud_mask/",
+            type: "POST",
+            data: formData,
+            processData: false, // Don't process the files
+            contentType: false, // Set content type to false as jQuery will tell the server its a query string request
+            success: function (data) {
+                if (pathname == "topics") {
+                    $('#imagePlaceholder').css("display", "none");
+                    $('#wordcloudImage').css("display", "block");
+                    $('#wordcloudImage').attr({ "src": "data:img/png;base64," + data });
 
-                // Reset the form.
-                $('#uploadwcMaskForm').each(function () {
-                    this.reset();
-                });
+                    // Reset the form.
+                    $('#uploadwcMaskForm').each(function () {
+                        this.reset();
+                    });
+                }
+                console.log("image swapped");
+            },
+            error: function () {
+                $('#wordcloudImage').attr('src') = previousImage;
             }
-            console.log("image swapped");
+        });
+    }
+});
+
+$('#submitTopicCount').on('click', function () {
+    var num_topics = $('#ldavisTopicCount').val()
+    var csrftoken = $("[name=csrfmiddlewaretoken]").val();
+    $.ajax({
+        beforeSend: function(xhr, settings) {
+            if(!csrfSafeMethod(settings.type) && !this.crossDomain){
+                xhr.setRequestHeader("X-CSRFToken",csrftoken); 
+            }
         },
-        error: function () {
-            $('#wordcloudImage').attr('src') = previousImage;
+        type: 'POST',
+        // "data-validate-username-url"
+        //  is a custom attribute, you put attributes at html
+        url: '/ajax/get_lda_data/',
+        data: {'num_topics':num_topics},
+        // dataType: 'json',
+        complete: function (data) {
+            $('#ldaPlaceholder').css("display", "block");
         }
     });
 });

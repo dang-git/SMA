@@ -239,8 +239,85 @@ def get_boosters():
 
     """ BASE FORMS """
 
-def insert_baseforms(base_forms):
+def insert_baseforms():
     print("BASE_FORMS")
+
+    words = ["bwas","bawas","withdraw",'nawidraw', 'winidraw', 'wothdraw', 'widrawal', 'widrawals', 'winithdraw', \
+    'wedrawhin', 'nagwidraw', 'witdrawals', 'winiwidraw', 'withraw', 'widraw', 'wedraw', 'mawdraw', 'mgwdraw', \
+    'witdrawan', 'wiwiwdraw', 'wiwidrwhn', 'widroha','balik',"inconven","service","system","tagal","twala",\
+    "transfer","trust","secur","hacked",'banks', 'banko',"problem","errors",'ty', 'tnx', 'thx', 'thnx', 'thank'\
+    'nawalang', 'mawawala', 'nawawala', 'wlng', 'nawawalan', 'nawalan', 'walang', 'mawala', 'nawala', 'wla', 'nawawalang', 'wlang', 'nwala', 'mawalan',\
+    'nakawan', 'ninakawan', 'nanakawan','fufund', 'fund', 'funds']
+
+    base_forms = {}
+
+    for i in range(0, len(words)):
+        if "bwas" in words[i]: 
+            base_forms[words[i]] = "bawas"
+            # words[i] = "bawas"
+        if "bawas" in words[i]: 
+            base_forms[words[i]] = "bawas"
+            # words[i] = "bawas"
+        if "withdraw" in words[i]: 
+            base_forms[words[i]] = "withdraw"
+            words[i] = "withdraw"
+        if words[i] in ['nawidraw', 'winidraw', 'wothdraw', 'widrawal', 'widrawals', 'winithdraw', 'wedrawhin', 'nagwidraw', 'witdrawals', 'winiwidraw', 'withraw', 'widraw', 'wedraw', 'mawdraw', 'mgwdraw', 'witdrawan', 'wiwiwdraw', 'wiwidrwhn', 'widroha']: 
+            base_forms[words[i]] = "withdraw"
+            # words[i] = "withdraw"
+        if "balik" in words[i]: 
+            base_forms[words[i]] = "balik"
+            # words[i] = "balik"
+        if "inconven" in words[i]: 
+            base_forms[words[i]] = "inconvenient"
+            # words[i] = "inconvenient"
+        if "service" in words[i]: 
+            base_forms[words[i]] = "service"
+            # words[i] = "service"
+        if "system" in words[i]: 
+            base_forms[words[i]] = "system"
+            # words[i] = "system"
+        if "tagal" in words[i]: 
+            base_forms[words[i]] = "tagal"
+            # words[i] = "tagal"
+        if "tiwala" in words[i]: 
+            base_forms[words[i]] = "tiwala"
+            # words[i] = "tiwala"
+        if "twala" == words[i]: 
+            base_forms[words[i]] = "tiwala"
+            # words[i] = "tiwala"
+        if "transfer" in words[i]: 
+            base_forms[words[i]] = "transfer"
+            # words[i] = "transfer"
+        if "trust" in words[i]: 
+            base_forms[words[i]] = "trust"
+            # words[i] = "trust"
+        if "secur" in words[i]: 
+            base_forms[words[i]] = "security"
+            # words[i] = "security"
+        if "hacked" in words[i]: 
+            base_forms[words[i]] = "hack"
+            # words[i] = "hack"
+        if  words[i] in ['banks', 'banko']: 
+            base_forms[words[i]] = "bank"
+            # words[i] = "bank"
+        if "problem" in words[i]: 
+            base_forms[words[i]] = "problema"
+            # words[i] = "problema"
+        if "errors" == words[i]: 
+            base_forms[words[i]] = "error"
+            # words[i] = "error"
+        if words[i] in ['ty', 'tnx', 'thx', 'thnx', 'thank']: 
+            base_forms[words[i]] = "thanks"
+            # words[i] = "thanks"
+        if words[i] in ['nawalang', 'mawawala', 'nawawala', 'wlng', 'nawawalan', 'nawalan', 'walang', 'mawala', 'nawala', 'wla', 'nawawalang', 'wlang', 'nwala', 'mawalan']: 
+            base_forms[words[i]] = "wala"
+            # words[i] = "wala"
+        if words[i] in ['nakawan', 'ninakawan', 'nanakawan']: 
+            base_forms[words[i]] = "nakaw"
+            # words[i] = "nakaw"
+        if words[i] in ['fufund', 'fund', 'funds']: 
+            base_forms[words[i]] = "Fund"
+            # words[i] = "fund"
     # base_forms = {}
     # base_forms = {'asker':'4','aski':'askar','ask':'leava'}
 

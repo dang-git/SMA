@@ -57,7 +57,7 @@ def count_word(message):
     return list_
 
 
-def return_wordcloud(request, data):
+def return_wordcloud(wcmask_url, data):
     message = ''
     for i in list(range(0, len(data))):
         speech = re.sub(r'@\w+', ' ', data['tweet'][int(i)])
@@ -134,8 +134,8 @@ def return_wordcloud(request, data):
     # return count_word(message)
     #wordcloud background picture
     # mask_url = request.FILES.get('wc_mask')
-    if 'wcmask_url' in request.session:
-        mask_url = 'SMAApp\\' + request.session['wcmask_url']
+    if wcmask_url is not None:
+        mask_url = 'SMAApp\\' + wcmask_url
     else:
         mask_url = 'SMAApp\\bg2.jpg'
     img = Image.open(os.path.join(settings.BASE_DIR, mask_url)).convert('RGB')

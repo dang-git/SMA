@@ -14,6 +14,7 @@ SALT_WORK_FACTOR = 10
 # Success Messages
 LOGIN_SUCCESS = "Logged in Successfully"
 SAVING_SUCCESS = "Snapshot has been successfully saved"
+INSIGHTS_UPDATE_SUCCESS = "Insights have been updated successfully"
 LOADING_SNAPSHOT_SUCCESS = "Loading snapshot complete"
 
 # Error Messages
