@@ -31,8 +31,6 @@ urlpatterns = [
     # Checks the lda status everytime.
     url(r'^ajax/check_lda_status/$', views.check_lda_status, name='check_lda_status'),
 
-    url(r'^ajax/start_background_tasks/$', views.start_background_tasks, name='start_background_tasks'),
-
     #url(r'^ajax/get_wordcloud/$', views.return_wordcloud, name='get_wordcloud'),
     # Save snapshot
     url(r'^ajax/save_snapshot/$', views.save_snapshot, name='save_snapshot'),

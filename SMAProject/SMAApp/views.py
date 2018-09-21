@@ -16,7 +16,7 @@ from django.urls import reverse
 from .utils import login_required
 from .forms import SearchForm, SnapshotListForm, RegistrationForm, LoginForm
 from .chartdata import ChartData
-from SMAApp import extract, engagements, wordcloudscript, lda, hashtags, tasks, globals, queries, utils
+from SMAApp import extract, engagements, wordcloudscript, lda, hashtags, tasks, globals, queries, utils, chartcreator
 from SMAApp import smaapp_constants as constants
 from SMAApp.models import Snapshot, User, Names, WordCloudImageMask
 from background_task import background
@@ -76,9 +76,7 @@ def get_keyword(request):
 			quick_stats = {}
 			quick_stats_data = engagements.return_engagements(df)
 			request.session['quick_stats_db'] = quick_stats_data
-			formatted_quick_stats = format_quick_stats_comma(quick_stats_data)
-
-			quick_stats = formatted_quick_stats
+			quick_stats = format_quick_stats_comma(quick_stats_data)
 			request.session["quick_stats"] = quick_stats
 			diag_chartdata = {}
 			request.session['chartdata'] = prepare_chartdata(df)
@@ -116,29 +114,22 @@ def get_keyword(request):
 
 # Sets all data for charts
 def prepare_chartdata(df):
-    # chartdata = {}
 	chartdata = ChartData()
     # Data for timeline linechart (Diagnostics Page)
 	chartdata.timeline = engagements.return_timeline(df)
-    # chartdata["timeline"] = engagements.return_timeline(df)
 
     # Data for source donut chart (Diagnostics Page)
 	chartdata.source =  engagements.return_source(df)
-    # chartdata["source"] = engagements.return_source(df)
 
     # Data for composition donut chart (Diagnostics Page)
 	chartdata.composition = engagements.return_composition(df)
-    # chartdata["composition"] = engagements.return_composition(df)
 
     # Data for hashtags barchart (Topics Page)
 	chartdata.hashtags = hashtags.hash_(df)
-    # chartdata["hashtags"] = hashtags.hash_(df)
 
     # Data for polarity donut chart (Sentiments Page)
 	chartdata.sentiments = engagements.return_polarity_chartdata(df)
-    # chartdata["sentiments"] = engagements.return_polarity_chartdata(df)
 	chartdata.polarity_table = engagements.return_polarity(df)
-    # chartdata["polarity_table"] = engagements.return_polarity(df)
 
 	return chartdata
 
@@ -148,7 +139,7 @@ def login_user(request):
 		if loginform.is_valid():
 			email =  loginform.cleaned_data.get('email')
 			password = loginform.cleaned_data.get('password')
-			user1 = authenticate(email=email,password=password)
+			# user1 = authenticate(email=email,password=password)
 			try:
 				user = User.objects.get(email=email)
 			except DoesNotExist:
@@ -198,7 +189,7 @@ def ajax_login_user(request):
 					# snapshotlistform = SnapshotListForm()
 					authenticated = 'True'
 					messages.success(request, constants.LOGIN_SUCCESS)
-					# return HttpResponseRedirect('/diagnostics/')
+					# return HttpResponseRedirect(reverse('diagnostics'))
 					request.session['snapshot_list'] = queries.get_snapshot_list(user.id)
 					return JsonResponse(authenticated, status=200, safe=False)
 				else:
@@ -234,17 +225,12 @@ def logout_user(request):
 	logout(request)
 	return HttpResponseRedirect("/")
 
-# def revoke_started_task():
-# 	# isSnapshots values 'true' and 'false' is string
-# 	# so it will be boolean when passed to js on other functions
-# 	if request.session['isSnapshot'] == 'true' and request.session['lda_data']:
-
 def open_registration(request):
 	loginform = LoginForm()
 	registrationform = RegistrationForm()
 	searchform = SearchForm()
 	if request.session.get('isloggedin'):
-		return HttpResponseRedirect('/diagnostics/')
+		return HttpResponseRedirect(reverse('diagnostics'))
 	else:
 		if request.method == 'POST':
 			registrationform = RegistrationForm(request.POST)
@@ -267,7 +253,7 @@ def open_registration(request):
 
 				# Create a snapshot_list key so we won't get KeyError
 				request.session['snapshot_list'] = []
-				return HttpResponseRedirect('/diagnostics/')
+				return HttpResponseRedirect(reverse('diagnostics'))
 				# return render(request, 'diagnostics.html',
 				# 	{'isSnapshot':isSnapshot,'quick_stats':globals.quick_stats,
 				# 	'diag_chartdata':globals.diag_chartdata,'searchform':searchform,
@@ -393,11 +379,11 @@ def create_diag_chartdata(chartdata):
 	print("Creating Diagnostics chartdata")
 	# diag_chartdata = {}
 	diag_chartdata = ChartData()
-	diag_chartdata.timeline = timeline_linechart(chartdata.timeline)
-	diag_chartdata.source = sourcePiechartConverter(chartdata.source)
-	diag_chartdata.composition = compositionPiechartConverter(chartdata.composition)
-	# diag_chartdata["timeline"] = timeline_linechart(chartdata.timeline)
-	# diag_chartdata["source"] = sourcePiechartConverter(chartdata.source)
+	diag_chartdata.timeline = chartcreator.timeline_linechart(chartdata.timeline)
+	diag_chartdata.source = chartcreator.sourcePiechartConverter(chartdata.source)
+	diag_chartdata.composition = chartcreator.compositionPiechartConverter(chartdata.composition)
+	# diag_chartdata["timeline"] = chartcreator.timeline_linechart(chartdata.timeline)
+	# diag_chartdata["source"] = chartcreator.sourcePiechartConverter(chartdata.source)
 	# diag_chartdata["composition"] = compositionPiechartConverter(chartdata.composition)
 	return diag_chartdata
 
@@ -582,7 +568,7 @@ def save_snapshot(request):
 			messages.error(request,constants.SAVING_ERROR)
 			return HttpResponse(status=401)
 	
-	# return HttpResponseRedirect('/diagnostics/')
+	# return HttpResponseRedirect(reverse('diagnostics'))
 	# return render(request, 'diagnostics.html',
     #            {'quick_stats':quick_stats,
 	# 		   'diag_chartdata':diag_chartdata,
@@ -590,12 +576,6 @@ def save_snapshot(request):
 	# 		   'snapshotlistform':snapshotlistform,
 	# 		   'loginform':loginform,
 	# 		   'username':globals.loggedin_username})
-
-def start_background_tasks(request):
-	df = request.session["df"]
-	request.session["sentiments_data_id"] = tasks.generate_sentiments_data.delay(df.to_json())
-	request.session["lda_data_id"] = tasks.generate_lda_data.delay(df.to_json())
-	request.session.save()
 
 # Checks if email is already taken
 def validate_registration_email(request):
@@ -680,7 +660,7 @@ def open_sentiments(request):
 		chartdata = request.session['chartdata']
 		# data['polarityTable'] = request.session['chartdata']['polarity_table']
 		data['polarityTable'] = chartdata.polarity_table
-		data['polar'] = polarity_donutchart(chartdata.sentiments)
+		data['polar'] = chartcreator.polarity_donutchart(chartdata.sentiments)
 		searchform = SearchForm()
 		searchform.fields['keyword'].widget.attrs['placeholder'] = "Search #hashtag"
 		snapshotlistform = SnapshotListForm(request=request)
@@ -701,7 +681,7 @@ def open_topics(request):
 		# data["barchart"] = request.session["chartdata"]["hashtags"]
 		chartdata = request.session['chartdata']
 		data["barchart"] = chartdata.hashtags
-		# data["barchart"] = demo_horizontalBarChart(chartdata)
+		# data["barchart"] = chartcreator.hashtag_horizontalBarChart(chartdata)
          
 		sessionid = request.session["user_id"]
 		
@@ -737,6 +717,7 @@ def upload_wordcloud_mask(request):
 			request.session['pil_image_str'] = generate_wordcloud_image(request)
 			request.session['wc_image_str'] = utils.convert_to_base64(request.session['pil_image_str'])
 			path = settings.MEDIA_ROOT + "\\" + filename
+			# Remove uploaded photo from media folder after being converted into base64 image
 			os.remove(path)
 			return HttpResponse(request.session['wc_image_str'])
 
@@ -745,158 +726,3 @@ def format_quick_stats_comma(data):
                   'tweets': "{:,}".format(data['tweets']),
                   'engagements': "{:,}".format(data['engagements']),
                   'reach': "{:,}".format(data['reach'])}
-
-def sourceFormatData(data):
-    return {'webClient': "{:,}".format(data['Web Client']),
-            'android': "{:,}".format(data['Android']),
-            'iPhone': "{:,}".format(data['iPhone']),
-            'others': "{:,}".format(data['Others']),
-            } 
-
-def timeline_linechart(chartdata):
-    """
-    lineChart page
-    """
-    extra_serie = {"tooltip": {"y_start": "", "y_end": "Volume"}}        
-    chartdata = {'x': chartdata["xdata"], 'name1': 'Volume', 'y1': chartdata["ydata"], 'kwargs1': { 'color': '#ef6c00' }, 'extra1' : extra_serie}
-    charttype = "lineChart"
-    chartcontainer = 'linechart_container'  # container name
-    data = {
-        'charttype': charttype,
-        'chartdata': chartdata,
-        'chartcontainer': chartcontainer,
-        'extra': {
-            'x_is_date': True,
-            'x_axis_format': '%b-%d %H:%m',
-            'tag_script_js': True,
-            'jquery_on_ready': False
-		}
-    }
-
-    return data
-
-def polarity_donutchart(chartdata):
-    """
-    pieChart page
-    """
-    extra_serie = {"tooltip": {"y_start": "", "y_end": ""}}
-    chartdata = {'x': chartdata["xdata"], 'y1': chartdata["ydata"], 'name1':'Tweets', 'extra1': extra_serie
-    }
-    charttype = "pieChart"
-    chartcontainer = 'polarity_piechart_container'  # container name
-    data = {
-        'charttype': charttype,
-        'chartdata': chartdata,
-        'chartcontainer': chartcontainer,
-        'extra': {
-            'x_is_date': False,
-            'x_axis_format': '',
-            'tag_script_js': True,
-            'jquery_on_ready': False,
-    			'donut':True,
-            'donutRatio':0.5,
-            'chart_attr':{
-                'labelType':'\"percent\"',
-            }
-        }
-    }
-    return data
-
-def sourcePiechartConverter(chartdata):
-    """
-    pieChart page
-    """
-    # {'Web Client': 393, 'Android': 669, 'iPhone': 670, 'Others': 929}
-    # xdata = ["Web Client", "Android", "iPhone", "Others"]
-    # ydata = [data["webClient"], data["android"], data["iPhone"], data["others"]]
-    #ydata = [393, 669, 670, 929]
-    extra_serie = {"tooltip": {"y_start": "", "y_end": ""}}
-    chartdata = {'x': chartdata["xdata"], 'y1': chartdata["ydata"], 'extra1': extra_serie}
-    charttype = "pieChart"
-    chartcontainer = 'source_piechart_container'
-
-    data = {
-        'chartcontainer': chartcontainer,
-        'charttype': charttype,
-        'chartdata': chartdata,
-        'extra': {
-            'x_is_date': False,
-            'x_axis_format': '',
-            'tag_script_js': True,
-            'jquery_on_ready': False,
-            'donut':True,
-            'donutRatio':0.5,
-            'chart_attr':{
-                'labelType':'\"percent\"',
-            }
-        }
-    }
-    return data
-
-def demo_horizontalBarChart(chartdata):
-    #nb_element = 10
-    xdata = [i["hashtag"] for i in chartdata]
-    ydata = [i["count"] for i in chartdata] #[i + random.randint(-10, 10) for i in range(nb_element)]
-    #ydata2 = map(lambda x: x * 2, ydata)
-
-    extra_serie = {"tooltip": {"y_start": "", "y_end": " tweets"}}
-    
-    chartdata = {
-        'x': xdata,
-        'name1': 'Tweets', 'y1': ydata, 'extra1': extra_serie
-    }
-
-    charttype = "multiBarHorizontalChart"
-    chartcontainer = 'multibarhorizontalchart_container'  # container name
-    data = {
-        'charttype': charttype,
-        'chartdata': chartdata,
-        'chartcontainer': chartcontainer,
-        'extra': {
-            'x_is_date': False,
-            'x_axis_format': '',
-            'tag_script_js': True,
-            'jquery_on_ready': True,
-			'margin_left' : 120
-        }
-		
-    }
-    return data
-
-def compositionFormatData(data):
-    return {'retweet': "{:,}".format(data['retweet']),
-            'original': "{:,}".format(data['original']),
-            'reply': "{:,}".format(data['reply']),
-            } 
-    
-def compositionPiechartConverter(chartdata):
-    """
-    pieChart page
-    """
-    
-    #xdata = ["Retweet", "Original", "Reply"]
-    #ydata = [1307,950,316]
-    #ydata = [data["retweet"], data["original"], data["reply"]]
-
-    extra_serie = {"tooltip": {"y_start": "", "y_end": ""}}
-    chartdata = {'x': chartdata["xdata"], 'y1': chartdata["ydata"], 'extra1': extra_serie}
-    charttype = "pieChart"
-    chartcontainer = 'composition_piechart_container'
-
-    data = {
-        'chartcontainer': chartcontainer,
-        'charttype': charttype,
-        'chartdata': chartdata,
-        'extra': {
-            'x_is_date': False,
-            'x_axis_format': '',
-            'tag_script_js': True,
-            'jquery_on_ready': False,
-            'donut':True,
-            'donutRatio':0.5,
-            'chart_attr':{
-                'labelType':'\"percent\"',
-            }
-        }
-    }
-    return data
