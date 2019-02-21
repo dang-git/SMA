@@ -59,12 +59,12 @@ def get_keyword(request):
 				del request.session['lda_data']
 			request.session['user_id'] = request.session.session_key #str(uuid.uuid4())
 			request.session['engagements_data'] = ""
-			#df = extract.searchKeyWord(searchform.cleaned_data['keyword'])[0]
-			pickling = os.path.join(settings.BASE_DIR, "SMAApp\\pkls\\SM.pkl")
+			df = extract.searchKeyWord(searchform.cleaned_data['keyword'])[0]
+			#pickling = os.path.join(settings.BASE_DIR, "SMAApp\\pkls\\SM.pkl")
 			#df.to_pickle(pickling)
-			df = pd.read_pickle(pickling)
+			#df = pd.read_pickle(pickling)
 
-			# df = pd.DataFrame(data)
+			#df = pd.DataFrame(data)
 			request.session['df'] = df
 			request.session['search_keyword'] = searchform.cleaned_data['keyword']
 
