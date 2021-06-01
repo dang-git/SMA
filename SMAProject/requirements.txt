@@ -32,7 +32,7 @@ scipy==1.0.1
 six==1.11.0
 tweepy==3.6.0
 Unidecode==1.0.22
-urllib3==1.22
+urllib3==1.26.5
 vine==1.1.4
 virtualenv==15.2.0
 wrapt==1.10.11
